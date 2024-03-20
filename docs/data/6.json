@@ -1,0 +1,542 @@
+{
+    "600": {
+        "file_id": 44,
+        "content": "            \"content\": [\n                {\n                    \"type\": \"text\",\n                    \"text\": f\"{user_messages_part1_content}\"\n                }\n            ]\n        }\n        # assemble image introduction messages\n        image_introduction_messages = []\n        paragraph_input = params.get(constants.IMAGES_INPUT_TAG_NAME, None)\n        if paragraph_input is None or paragraph_input == \"\" or paragraph_input == []:\n            image_introduction_messages = []\n        else:\n            paragraph_content_pre = image_introduction_paragraph.replace(constants.IMAGES_INPUT_TAG, \"\")\n            message = {\n                \"role\": \"user\",\n                \"content\": [\n                    {\n                        \"type\": \"text\",\n                        \"text\": f\"{paragraph_content_pre}\"\n                    }\n                ]\n            }\n            image_introduction_messages.append(message)\n            for item in paragraph_input:\n                introduction = item.get(constants.IMAGE_INTRO_TAG_NAME, None)",
+        "type": "code",
+        "location": "/cradle/provider/openai.py:561-590"
+    },
+    "601": {
+        "file_id": 44,
+        "content": "The code assembles image introduction messages based on input paragraphs. If the paragraph_input is null, empty or an empty list, it creates an empty image_introduction_messages array. Otherwise, it removes the IMAGES_INPUT_TAG from the image_introduction_paragraph and adds a message to the image_introduction_messages array, with role as 'user' and content as the text from paragraph_content_pre. Then it iterates over each item in the paragraph_input and assigns the value of IMAGE_INTRO_TAG_NAME to the variable introduction, if not null.",
+        "type": "comment"
+    },
+    "602": {
+        "file_id": 44,
+        "content": "                path = item.get(constants.IMAGE_PATH_TAG_NAME, None)\n                assistant = item.get(constants.IMAGE_ASSISTANT_TAG_NAME, None)\n                resolution = item.get(constants.IMAGE_RESOLUTION_TAG_NAME, None)\n                if introduction is not None and introduction != \"\":\n                    message = {\n                        \"role\": \"user\",\n                        \"content\": [\n                            {\n                                \"type\": \"text\",\n                                \"text\": f\"{introduction}\"\n                            }\n                        ]\n                    }\n                    if path is not None and path != \"\":\n                        encoded_images = encode_data_to_base64_path(path)\n                        for encoded_image in encoded_images:\n                            msg_content = {\n                                    \"type\": \"image_url\",\n                                    \"image_url\":\n                                        {\n                                            \"url\": f\"{encoded_image}\"",
+        "type": "code",
+        "location": "/cradle/provider/openai.py:591-614"
+    },
+    "603": {
+        "file_id": 44,
+        "content": "This code is responsible for generating a message containing user input, an image, and additional information such as the image path, assistant, and resolution. It checks if the introduction is not empty and encodes the image path to base64 format before adding it to the message content.",
+        "type": "comment"
+    },
+    "604": {
+        "file_id": 44,
+        "content": "                                        }\n                                }\n                            if resolution is not None and resolution != \"\":\n                                msg_content[\"image_url\"][\"detail\"] = resolution\n                            message[\"content\"].append(msg_content)\n                    image_introduction_messages.append(message)\n                if assistant is not None and assistant != \"\":\n                    message = {\n                        \"role\": \"assistant\",\n                        \"content\": [\n                            {\n                                \"type\": \"text\",\n                                \"text\": f\"{assistant}\"\n                            }\n                        ]\n                    }\n                    image_introduction_messages.append(message)\n        # assemble user messages part 2\n        user_messages_part2_contents = []\n        for paragraph in user_messages_part2_paragraphs:\n            search_placeholder_pattern = re.compile(r\"<\\$[^\\$]+\\$>\")",
+        "type": "code",
+        "location": "/cradle/provider/openai.py:615-640"
+    },
+    "605": {
+        "file_id": 44,
+        "content": "The code is defining a function to assemble image introduction messages and user messages part 2. It creates a message object with the role \"user\" or \"assistant\" and appends it to the respective lists based on if there is any text in the variables \"user_messages_part1\", \"image\", and \"assistant\". The code also defines a pattern for search placeholders using regular expressions (regex) with the variable \"search_placeholder_pattern\".",
+        "type": "comment"
+    },
+    "606": {
+        "file_id": 44,
+        "content": "            placeholder = re.search(search_placeholder_pattern, paragraph)\n            if not placeholder:\n                user_messages_part2_contents.append(paragraph)\n            else:\n                placeholder = placeholder.group()\n                placeholder_name = placeholder.replace(\"<$\", \"\").replace(\"$>\", \"\")\n                paragraph_input = params.get(placeholder_name, None)\n                if paragraph_input is None or paragraph_input == \"\" or paragraph_input == []:\n                    continue\n                else:\n                    if isinstance(paragraph_input, str):\n                        paragraph_content = paragraph.replace(placeholder, paragraph_input)\n                        user_messages_part2_contents.append(paragraph_content)\n                    elif isinstance(paragraph_input, list):\n                        paragraph_content = paragraph.replace(placeholder, json.dumps(paragraph_input))\n                        user_messages_part2_contents.append(paragraph_content)\n                    else:",
+        "type": "code",
+        "location": "/cradle/provider/openai.py:642-659"
+    },
+    "607": {
+        "file_id": 44,
+        "content": "This code is searching for placeholders in the paragraph using a regular expression. If a placeholder is found, it extracts its name and checks if there's a corresponding input value from params. If the input exists, it replaces the placeholder with the input content (as a string or formatted as JSON if input is a list). Otherwise, it continues to the next paragraph without modifying this one.",
+        "type": "comment"
+    },
+    "608": {
+        "file_id": 44,
+        "content": "                        raise ValueError(f\"Unexpected input type: {type(paragraph_input)}\")\n        user_messages_part2_content = \"\\n\\n\".join(user_messages_part2_contents)\n        user_messages_part2 = {\n            \"role\": \"user\",\n            \"content\": [\n                {\n                    \"type\": \"text\",\n                    \"text\": f\"{user_messages_part2_content}\"\n                }\n            ]\n        }\n        return [system_message] + [user_messages_part1] + image_introduction_messages + [user_messages_part2]\n    def assemble_prompt_paragraph(self, template_str: str = None, params: Dict[str, Any] = None) -> List[Dict[str, Any]]:\n        raise NotImplementedError(\"This method is not implemented yet.\")\n    def assemble_prompt(self, template_str: str = None, params: Dict[str, Any] = None) -> List[Dict[str, Any]]:\n        if config.DEFAULT_MESSAGE_CONSTRUCTION_MODE == constants.MESSAGE_CONSTRUCTION_MODE_TRIPART:\n            return self.assemble_prompt_tripartite(template_str=template_str, params=params)",
+        "type": "code",
+        "location": "/cradle/provider/openai.py:660-682"
+    },
+    "609": {
+        "file_id": 44,
+        "content": "This code defines functions for assembling prompts. It checks the message construction mode and returns a list of dictionaries representing messages in a prompt. If the mode is tripartite, it calls another function to generate the prompt. However, the \"assemble_prompt_paragraph\" and \"assemble_prompt\" functions are not implemented yet and raise an error when called.",
+        "type": "comment"
+    },
+    "610": {
+        "file_id": 44,
+        "content": "        elif config.DEFAULT_MESSAGE_CONSTRUCTION_MODE == constants.MESSAGE_CONSTRUCTION_MODE_PARAGRAPH:\n            return self.assemble_prompt_paragraph(template_str=template_str, params=params)\ndef encode_image_path(image_path):\n    with open(image_path, \"rb\") as image_file:\n        encoded_image = encode_image_binary(image_file.read(), image_path)\n        return encoded_image\ndef encode_image_binary(image_binary, image_path=None):\n    encoded_image = encode_base64(image_binary)\n    if image_path is None:\n        image_path = '<$bin_placeholder$>'\n    logger.debug(f'|>. img_hash {hash_text_sha256(encoded_image)}, path {image_path} .<|')\n    return encoded_image\ndef decode_image(base64_encoded_image):\n    return decode_base64(base64_encoded_image)\ndef encode_data_to_base64_path(data: Any) -> List[str]:\n    encoded_images = []\n    if isinstance(data, (str, Image.Image, np.ndarray, bytes)):\n        data = [data]\n    for item in data:\n        if isinstance(item, str):\n            if os.path.exists(assemble_project_path(item)):",
+        "type": "code",
+        "location": "/cradle/provider/openai.py:683-714"
+    },
+    "611": {
+        "file_id": 44,
+        "content": "The code snippet demonstrates a function to encode images and their paths using base64 encoding. It first checks the default message construction mode, then encodes image binary data from a file, logs an image hash with its path, decodes base64-encoded images, and encodes data to base64 format for various types of input (strings, images, or numpy arrays).",
+        "type": "comment"
+    },
+    "612": {
+        "file_id": 44,
+        "content": "                path = assemble_project_path(item)\n                encoded_image = encode_image_path(path)\n                image_type = path.split(\".\")[-1].lower()\n                encoded_image = f\"data:image/{image_type};base64,{encoded_image}\"\n                encoded_images.append(encoded_image)\n            else:\n                encoded_images.append(item)\n            continue\n        elif isinstance(item, bytes):  # mss grab bytes\n            image = Image.frombytes('RGB', item.size, item.bgra, 'raw', 'BGRX')\n            buffered = io.BytesIO()\n            image.save(buffered, format=\"JPEG\")\n        elif isinstance(item, Image.Image):  # PIL image\n            buffered = io.BytesIO()\n            item.save(buffered, format=\"JPEG\")\n        elif isinstance(item, np.ndarray):  # cv2 image array\n            item = cv2.cvtColor(item, cv2.COLOR_BGR2RGB)  # convert to RGB\n            image = Image.fromarray(item)\n            buffered = io.BytesIO()\n            image.save(buffered, format=\"JPEG\")\n        encoded_image = encode_image_binary(buffered.getvalue())",
+        "type": "code",
+        "location": "/cradle/provider/openai.py:715-738"
+    },
+    "613": {
+        "file_id": 44,
+        "content": "This code handles various image formats and converts them into JPEG format. It checks the type of item, whether it is a file path, bytes, PIL Image, or numpy ndarray. Depending on the type, it performs necessary conversions to make the image compatible with the JPEG format. The image is then encoded as base64 and appended to the list of encoded images.",
+        "type": "comment"
+    },
+    "614": {
+        "file_id": 44,
+        "content": "        encoded_image = f\"data:image/jpeg;base64,{encoded_image}\"\n        encoded_images.append(encoded_image)\n    return encoded_images",
+        "type": "code",
+        "location": "/cradle/provider/openai.py:739-742"
+    },
+    "615": {
+        "file_id": 44,
+        "content": "This code snippet encodes an image and appends it to the encoded_images list before returning the final list.",
+        "type": "comment"
+    },
+    "616": {
+        "file_id": 45,
+        "content": "/cradle/utils/__init__.py",
+        "type": "filepath"
+    },
+    "617": {
+        "file_id": 45,
+        "content": "This code imports and exposes two classes, AbstractSingleton and Singleton, from the cradle.utils.singleton module as part of the __init__.py file in the Cradle/cradle/utils directory.",
+        "type": "summary"
+    },
+    "618": {
+        "file_id": 45,
+        "content": "from cradle.utils.singleton import AbstractSingleton, Singleton\n__all__ = [\n    \"AbstractSingleton\",\n    \"Singleton\",\n]",
+        "type": "code",
+        "location": "/cradle/utils/__init__.py:1-6"
+    },
+    "619": {
+        "file_id": 45,
+        "content": "This code imports and exposes two classes, AbstractSingleton and Singleton, from the cradle.utils.singleton module as part of the __init__.py file in the Cradle/cradle/utils directory.",
+        "type": "comment"
+    },
+    "620": {
+        "file_id": 46,
+        "content": "/cradle/utils/check.py",
+        "type": "filepath"
+    },
+    "621": {
+        "file_id": 46,
+        "content": "The code defines a function that checks planner parameters and verifies file paths for template items in the `templates` directory. If any key is missing or file does not exist, an error message is raised with relevant information.",
+        "type": "summary"
+    },
+    "622": {
+        "file_id": 46,
+        "content": "from typing import Dict\nfrom cradle.config import Config\nfrom cradle.log import Logger\nfrom cradle.utils.file_utils import assemble_project_path, exists_in_project_path\nconfig = Config()\nlogger = Logger()\ndef check_planner_params(planner: Dict = None):\n    flag = True\n    try:\n        # check keys\n        assert \"prompt_paths\" in planner, f\"prompt_paths is not in planner\"\n        assert \"__check_list__\" in planner, f\"__check_list__ is not in planner\"\n        prompt_paths = planner[\"prompt_paths\"]\n        assert \"inputs\" in prompt_paths, f\"input_example is not in prompt_paths\"\n        assert \"templates\" in prompt_paths, f\"templates is not in prompt_paths\"\n        input_example = prompt_paths[\"inputs\"]\n        templates = prompt_paths[\"templates\"]\n        \"\"\"check modules\"\"\"\n        check_list = planner[\"__check_list__\"]\n        for check_item in check_list:\n            assert (check_item in input_example and\n                    exists_in_project_path(input_example[check_item])), \\\n                f\"{check_item} is not in input_example or {assemble_project_path(input_example[check_item])} does not exist\"",
+        "type": "code",
+        "location": "/cradle/utils/check.py:1-32"
+    },
+    "623": {
+        "file_id": 46,
+        "content": "This code defines a function `check_planner_params` that takes a planner dictionary as input and checks if certain keys are present in the dictionary. If any key is missing, it raises an assertion error with an appropriate message. The keys being checked are \"prompt_paths\" and \"__check_list__\". It also verifies if the files specified in the \"input_example\" dictionary exist within the project path using the `exists_in_project_path` function from the `file_utils` module.",
+        "type": "comment"
+    },
+    "624": {
+        "file_id": 46,
+        "content": "            assert (check_item in templates and\n                    exists_in_project_path(templates[check_item])), \\\n                f\"{check_item} is not in template or {assemble_project_path(templates[check_item])} does not exist\"\n    except Exception as e:\n        logger.error(f\"Error in check_prompt_paths: {e}\")\n        flag = False\n    return flag",
+        "type": "code",
+        "location": "/cradle/utils/check.py:33-41"
+    },
+    "625": {
+        "file_id": 46,
+        "content": "The code checks if the specified `check_item` exists in `templates` and is a valid file path. If not, it throws an error with relevant information to the logger.",
+        "type": "comment"
+    },
+    "626": {
+        "file_id": 47,
+        "content": "/cradle/utils/encoding_utils.py",
+        "type": "filepath"
+    },
+    "627": {
+        "file_id": 47,
+        "content": "These functions encode and decode base64 data, respectively. If payload is None, it raises ValueError.",
+        "type": "summary"
+    },
+    "628": {
+        "file_id": 47,
+        "content": "import base64\ndef encode_base64(payload):\n    if payload is None:\n        raise ValueError(\"Payload cannot be None.\")\n    return base64.b64encode(payload).decode('utf-8')\ndef decode_base64(payload):\n    if payload is None:\n        raise ValueError(\"Payload cannot be None.\")\n    return base64.b64decode(payload)",
+        "type": "code",
+        "location": "/cradle/utils/encoding_utils.py:1-17"
+    },
+    "629": {
+        "file_id": 47,
+        "content": "These functions encode and decode base64 data, respectively. If payload is None, it raises ValueError.",
+        "type": "comment"
+    },
+    "630": {
+        "file_id": 48,
+        "content": "/cradle/utils/file_utils.py",
+        "type": "filepath"
+    },
+    "631": {
+        "file_id": 48,
+        "content": "This code defines functions for handling file paths within a project. `assemble_project_path` converts relative paths to absolute within the project root, `gen_relative_project_path` ensures path is within project root and generates relative path, `exists_in_project_path` checks if a path exists within the project, `get_project_root` finds the project's root directory, and `read_resource_file` reads contents of a resource file in the expected project structure.",
+        "type": "summary"
+    },
+    "632": {
+        "file_id": 48,
+        "content": "import os\ndef assemble_project_path(path):\n    \"\"\"Assemble a path relative to the project root directory\"\"\"\n    if not os.path.isabs(path):\n        path = os.path.join(get_project_root(), path)\n    return path\ndef gen_relative_project_path(path):\n    root = get_project_root()\n    if root not in path:\n        raise ValueError('Path to convert should be within the project root.')\n    path = path.replace(root, '.').replace('.\\\\', '')\n    return path\ndef exists_in_project_path(path):\n    return os.path.exists(assemble_project_path(path))\ndef get_project_root():\n    path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))\n    path = os.path.dirname(path) # get to parent, outside of project code path\"\n    return path\ndef read_resource_file(path):\n    assert \"./res/\" in path, 'Path should include ./res/'\n    with open(assemble_project_path(path), \"r\", encoding=\"utf-8\") as fd:\n        return fd.read()",
+        "type": "code",
+        "location": "/cradle/utils/file_utils.py:1-37"
+    },
+    "633": {
+        "file_id": 48,
+        "content": "This code defines functions for handling file paths within a project. `assemble_project_path` converts relative paths to absolute within the project root, `gen_relative_project_path` ensures path is within project root and generates relative path, `exists_in_project_path` checks if a path exists within the project, `get_project_root` finds the project's root directory, and `read_resource_file` reads contents of a resource file in the expected project structure.",
+        "type": "comment"
+    },
+    "634": {
+        "file_id": 49,
+        "content": "/cradle/utils/image_utils.py",
+        "type": "filepath"
+    },
+    "635": {
+        "file_id": 49,
+        "content": "This code compares two minimap images for movement by reading in the images, creating ORB features, matching descriptors, and determining if a threshold is exceeded based on average distance.",
+        "type": "summary"
+    },
+    "636": {
+        "file_id": 49,
+        "content": "import numpy as np\nimport cv2\nfrom cradle.config import Config\nconfig = Config()\ndef show_image(img):\n    if isinstance(img, str):\n        img = cv2.imread(img)\n    cv2.namedWindow(\"display\", cv2.WINDOW_NORMAL)\n    cv2.imshow(\"display\", img)\n    cv2.waitKey(0)\n    cv2.destroyAllWindows()\ndef minimap_movement_detection(image_path1, image_path2, threshold = 30):\n    '''\n    Detect whether two minimaps are the same to determine whether the character moves successfully.\n    Args:\n        image_path1, image_path2: 2 minimap images to be detected.\n        threshold: pixel-level threshold for minimap movement detection, default 30.\n    Returns:\n        change_detected: True if the movements is above the threshold,\n        img_matches: Draws the found matches of keypoints from two images. Can be visualized by plt.imshow(img_matches)\n    '''\n    img1 = cv2.imread(image_path1, cv2.IMREAD_GRAYSCALE)\n    img2 = cv2.imread(image_path2, cv2.IMREAD_GRAYSCALE)\n    orb = cv2.ORB_create()\n    keypoints1, descriptors1 = orb.detectAndCompute(img1, None)",
+        "type": "code",
+        "location": "/cradle/utils/image_utils.py:1-33"
+    },
+    "637": {
+        "file_id": 49,
+        "content": "The code is for image processing and comparison, specifically detecting movement between two minimap images. It reads in the images, creates ORB features, and compares the keypoints to determine if a movement threshold has been exceeded.",
+        "type": "comment"
+    },
+    "638": {
+        "file_id": 49,
+        "content": "    keypoints2, descriptors2 = orb.detectAndCompute(img2, None)\n    if type(descriptors1) != type(None) and type(descriptors2) != type(None):\n        bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)\n        matches = bf.match(descriptors1, descriptors2)\n    else:\n        return True, None, None\n    matches = sorted(matches, key = lambda x:x.distance)\n    img_matches = cv2.drawMatches(img1, keypoints1, img2, keypoints2, matches[:20], None, flags=2)\n    best_matches = matches[:20]\n    average_distance = np.mean([m.distance for m in best_matches])\n    change_detected = average_distance > (threshold * config.resolution_ratio) or np.allclose(average_distance, 0, atol=1e-3)\n    return change_detected, img_matches, average_distance",
+        "type": "code",
+        "location": "/cradle/utils/image_utils.py:34-50"
+    },
+    "639": {
+        "file_id": 49,
+        "content": "This code detects and computes keypoints and descriptors for two images using ORB algorithm, matches the descriptors using BFMatcher, draws top 20 matches on the images, calculates average distance, and determines if a change is detected based on the average distance and threshold.",
+        "type": "comment"
+    },
+    "640": {
+        "file_id": 50,
+        "content": "/cradle/utils/json_utils.py",
+        "type": "filepath"
+    },
+    "641": {
+        "file_id": 50,
+        "content": "This Python code provides JSON handling functions, including loading/saving, validity checks, and pattern matching with regular expressions. It also includes parsing functions for semi-formatted JSON and text data, processing dictionaries, and replacing placeholders.",
+        "type": "summary"
+    },
+    "642": {
+        "file_id": 50,
+        "content": "import json\nimport re\nfrom cradle import constants\nfrom cradle.log import Logger\nlogger = Logger()\ndef load_json(file_path):\n    with open(file_path, mode='r', encoding='utf8') as fp:\n        json_dict = json.load(fp)\n        return json_dict\ndef save_json(file_path, json_dict, indent=-1):\n    with open(file_path, mode='w', encoding='utf8') as fp:\n        if indent == -1:\n            json.dump(json_dict, fp, ensure_ascii=False)\n        else:\n            json.dump(json_dict, fp, ensure_ascii=False, indent=indent)\ndef check_json(json_string):\n    try:\n        json.loads(json_string)\n    except:\n        return False\n    return True\ndef refine_json(json_string):\n    patterns = [\n        r\"^`+json(.*?)`+\", # ```json content```, ```json content``, ...\n        r\"^json(.*?)\", # json content\n        r\"^json(.*?)\\.\" # json content.\n    ]\n    for pattern in patterns:\n        match = re.search(pattern, json_string, re.DOTALL)\n        if match:\n            json_string = match.group(1)\n            if check_json(json_string):\n                return json_string",
+        "type": "code",
+        "location": "/cradle/utils/json_utils.py:1-44"
+    },
+    "643": {
+        "file_id": 50,
+        "content": "This Python code defines several functions for handling JSON data. It includes functions to load, save, check validity, and refine JSON strings. The code uses the built-in json library and regular expressions (re module) for pattern matching.",
+        "type": "comment"
+    },
+    "644": {
+        "file_id": 50,
+        "content": "    return json_string\ndef parse_semi_formatted_json(json_string):\n    obj = None\n    try:\n        response = refine_json(json_string)\n        obj = json.loads(response)\n    except Exception as e:\n        logger.error(f\"Error in processing json: {e}. Object was: {json_string}.\")\n        logger.error_ex(e)\n    return obj\ndef parse_semi_formatted_text(text):\n    lines = text.split('\\n')\n    lines = [line.rstrip() for line in lines if line.rstrip()]\n    result_dict = {}\n    current_key = None\n    current_value = []\n    parsed_data = []\n    in_code_flag = False\n    for line in lines:\n        # Check if the line indicates a new key\n        if line.endswith(\":\") and in_code_flag == False:\n            # If there's a previous key, process its values\n            if current_key and current_key == constants.ACTION_GUIDANCE:\n                result_dict[current_key] = parsed_data\n            elif current_key:\n                result_dict[current_key] = '\\n'.join(current_value).strip()\n            try:\n                current_key = line.rstrip(':').lower()",
+        "type": "code",
+        "location": "/cradle/utils/json_utils.py:45-84"
+    },
+    "645": {
+        "file_id": 50,
+        "content": "This code defines two functions, \"parse_semi_formatted_json\" and \"parse_semi_formatted_text\", which parse semi-formatted JSON and text data respectively. The JSON function first refines the input string, then loads it into an object using json.loads(). If there is an exception during this process, it logs the error message and original JSON string. The text parsing function splits the input string by newlines, trims whitespace, and processes key-value pairs within the text. It stores them in a dictionary after processing each key's associated values.",
+        "type": "comment"
+    },
+    "646": {
+        "file_id": 50,
+        "content": "            except Exception as e:\n                logger.error(f\"Response is not in the correct format: {e}\\nReceived text was: {text}\")\n                raise\n            current_value = []\n            parsed_data = []\n        else:\n            if current_key == constants.ACTION_GUIDANCE:\n                in_code_flag = True\n                if line.strip() == '```':\n                    if current_value:  # Process previous code block and description\n                        entry = {\"code\": '\\n'.join(current_value[1:])}\n                        parsed_data.append(entry)\n                        current_value = []\n                    in_code_flag = False\n                else:\n                    current_value.append(line)\n                    if line.strip().lower() == 'null':\n                        in_code_flag = False\n            else:\n                in_code_flag = False\n                line = line.strip()\n                current_value.append(line)\n    # Process the last key\n    if current_key == constants.ACTION_GUIDANCE:",
+        "type": "code",
+        "location": "/cradle/utils/json_utils.py:85-110"
+    },
+    "647": {
+        "file_id": 50,
+        "content": "This code handles the parsing of JSON data. It checks for the 'Action Guidance' key and identifies code blocks using triple backticks (```). If a code block is found, it stores the code lines in the current_value list. Once a new line with triple backticks is encountered or if the value is null, it processes the previous code block and adds it to parsed_data. Any other keys are not processed and are stored in the current_key variable for further use.",
+        "type": "comment"
+    },
+    "648": {
+        "file_id": 50,
+        "content": "        if current_value:  # Process the last code block and description\n            entry = {\"code\": '\\n'.join(current_value[:-1]).strip()}\n            parsed_data.append(entry)\n        result_dict[current_key] = parsed_data\n    else:\n        result_dict[current_key] = '\\n'.join(current_value).strip()\n    if \"actions\" in result_dict:\n        actions = result_dict[\"actions\"]\n        actions = actions.replace('```python', '').replace('```', '')\n        actions = actions.split('\\n')\n        actions = [action for action in actions if action]\n        actions = [action.split('#')[0] if \"#\" in action else action for action in actions]\n        result_dict[\"actions\"] = actions\n    if \"success\" in result_dict:\n        result_dict[\"success\"] = result_dict[\"success\"].lower() == \"true\"\n    return result_dict",
+        "type": "code",
+        "location": "/cradle/utils/json_utils.py:111-132"
+    },
+    "649": {
+        "file_id": 50,
+        "content": "This code processes a dictionary containing code blocks and descriptions. If the current value has a description, it creates an entry with the code block stripped of leading/trailing whitespace. The resulting parsed data is appended to a list for the current key in the result dictionary. If the \"actions\" key exists, the code replaces placeholders, removes empty lines, converts all action strings to lowercase, and sets the \"success\" key to True if it equals \"true\", or False otherwise. The processed dictionary is then returned.",
+        "type": "comment"
+    },
+    "650": {
+        "file_id": 51,
+        "content": "/cradle/utils/singleton.py",
+        "type": "filepath"
+    },
+    "651": {
+        "file_id": 51,
+        "content": "This code defines a Singleton metaclass, ensuring only one instance of a class is created. It utilizes the ABCMeta and type classes, creates an instances dictionary for storage, and includes a call method to manage instantiation and return the singleton instance. The AbstractSingleton class serves as a base class for creating single-instance subclasses.",
+        "type": "summary"
+    },
+    "652": {
+        "file_id": 51,
+        "content": "\"\"\"A singleton metaclass for ensuring only one instance of a class.\"\"\"\nimport abc\nclass Singleton(abc.ABCMeta, type):\n    \"\"\"\n    Singleton metaclass for ensuring only one instance of a class.\n    \"\"\"\n    _instances = {}\n    def __call__(cls, *args, **kwargs):\n        \"\"\"Call method for the singleton metaclass.\"\"\"\n        if cls not in cls._instances:\n            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)\n        return cls._instances[cls]\nclass AbstractSingleton(abc.ABC, metaclass=Singleton):\n    \"\"\"\n    Abstract singleton class for ensuring only one instance of a class.\n    \"\"\"\n    pass",
+        "type": "code",
+        "location": "/cradle/utils/singleton.py:1-24"
+    },
+    "653": {
+        "file_id": 51,
+        "content": "This code defines a Singleton metaclass, ensuring only one instance of a class is created. It utilizes the ABCMeta and type classes, creates an instances dictionary for storage, and includes a call method to manage instantiation and return the singleton instance. The AbstractSingleton class serves as a base class for creating single-instance subclasses.",
+        "type": "comment"
+    },
+    "654": {
+        "file_id": 52,
+        "content": "/cradle/utils/string_utils.py",
+        "type": "filepath"
+    },
+    "655": {
+        "file_id": 52,
+        "content": "This code imports the hashlib module and defines a function that takes a string as input, encodes it using utf-8, calculates its SHA256 hash, and returns the resulting hexadecimal digest.",
+        "type": "summary"
+    },
+    "656": {
+        "file_id": 52,
+        "content": "import hashlib\ndef hash_text_sha256(text: str) -> str:\n    hash_object = hashlib.sha256(text.encode())\n    return hash_object.hexdigest()",
+        "type": "code",
+        "location": "/cradle/utils/string_utils.py:1-5"
+    },
+    "657": {
+        "file_id": 52,
+        "content": "This code imports the hashlib module and defines a function that takes a string as input, encodes it using utf-8, calculates its SHA256 hash, and returns the resulting hexadecimal digest.",
+        "type": "comment"
+    },
+    "658": {
+        "file_id": 53,
+        "content": "/cradle/utils/template_matching.py",
+        "type": "filepath"
+    },
+    "659": {
+        "file_id": 53,
+        "content": "This code uses a timing decorator with OpenCV template matching for image combining, scales and rotates images, measures detection time, and outputs results in various formats. It converts detection data into a list of dictionaries containing type, name, coordinates, confidence, and optional reasoning.",
+        "type": "summary"
+    },
+    "660": {
+        "file_id": 53,
+        "content": "import os\nimport time\nfrom typing import List, Union\nimport cv2\nfrom MTM import matchTemplates, drawBoxesOnRGB\nimport numpy as np\nfrom cradle.config import Config\nfrom cradle.log import Logger\nfrom cradle.utils.file_utils import assemble_project_path\nfrom cradle.utils.json_utils import save_json\nconfig = Config()\nlogger = Logger()\ndef render(overlay, template_image, output_file_name='', view=False):\n    canvas_width = overlay.shape[1] + template_image.shape[1]\n    canvas_height = max(overlay.shape[0], template_image.shape[0])\n    canvas = np.zeros((canvas_height, canvas_width, 3), dtype=np.uint8)\n    canvas[:overlay.shape[0], :overlay.shape[1]] = overlay\n    canvas[:template_image.shape[0], overlay.shape[1]:overlay.shape[1] + template_image.shape[1]] = template_image\n    if output_file_name:\n        cv2.imwrite(output_file_name, canvas)\n    if view:\n        cv2.namedWindow('match result', 0)\n        cv2.imshow('match result', canvas)\n        cv2.waitKey(0)\n        cv2.destroyAllWindows()\ndef timing(func):\n    def wrapper(*args, **kwargs):",
+        "type": "code",
+        "location": "/cradle/utils/template_matching.py:1-37"
+    },
+    "661": {
+        "file_id": 53,
+        "content": "This code defines a function \"render\" that combines two images, overlay and template_image, into a single canvas. It also defines a decorator \"timing\" which measures the execution time of a decorated function. The render function can optionally save the result to a file and/or display it in a window.",
+        "type": "comment"
+    },
+    "662": {
+        "file_id": 53,
+        "content": "        start_time = time.time()\n        result = func(*args, **kwargs)\n        end_time = time.time()\n        elapsed_time = end_time - start_time\n        logger.debug(f\"{func.__name__} consumes {elapsed_time:.4f}s\")\n        return result\n    return wrapper\n# @timing\ndef get_mtm_match(image: np.ndarray, template: np.ndarray, scales: list):\n    detection = matchTemplates([('', cv2.resize(template, (0, 0), fx=s, fy=s)) for s in scales], image, N_object=1, method=cv2.TM_CCOEFF_NORMED, maxOverlap=0.1)\n    detection['TemplateName'] = [str(round(i, 3)) for i in detection['Score']]  # confidence as name for display\n    return detection\ndef match_template_image(src_file: str, template_file: str, debug = False, output_bb = False, save_matches = False, scale = \"normal\", rotate_angle : float = 0) -> List[dict]:\n    '''\n    Multi-scale template matching\n    :param src_file: source image file\n    :param template_file: template image file\n    :param debug: output debug log messages\n    :param output_bb: output bounding boxes in json",
+        "type": "code",
+        "location": "/cradle/utils/template_matching.py:38-61"
+    },
+    "663": {
+        "file_id": 53,
+        "content": "This code contains a function for multi-scale template matching, taking an image and a template as input. It resizes the template to different scales, performs template matching using OpenCV's matchTemplates function, renames detection results based on confidence scores, and provides optional output in various formats depending on user parameters. The code also includes a timing decorator to measure execution time for each function call.",
+        "type": "comment"
+    },
+    "664": {
+        "file_id": 53,
+        "content": "    :param save_matches: save the matched image\n    :param scale: scale for template, default is 'normal', chosen from 'small', 'mid', 'normal', 'full', or you can also specify a list of float numbers\n    :param rotate_angle: angle for source image rotation, at the center of image, clockwise\n    :return:\n    objects_list, a list of dicts, including template name, bounding box and confidence.\n    '''\n    output_dir = config.work_dir\n    tid = time.time()\n    scales = scale\n    if scales == 'small':\n        scales = [0.1, 0.2, 0.3, 0.4, 0.5]\n    elif scales == 'mid':\n        scales = [0.3, 0.4, 0.5, 0.6, 0.7]\n    elif scales == 'normal':\n        scales = [0.8, 0.9, 1.0, 1.1, 1.2]\n    elif scales == 'full':\n        scales = [0.5,0.75,1.0,1.5,2]\n    elif not isinstance(scales, list):\n        raise ValueError('scales must be a list of float numbers or one of \"small\", \"mid\", \"normal\", \"full\"')\n    image = cv2.imread(assemble_project_path(src_file))\n    template = cv2.imread(assemble_project_path(template_file))\n    # Resize template according to resolution ratio",
+        "type": "code",
+        "location": "/cradle/utils/template_matching.py:62-88"
+    },
+    "665": {
+        "file_id": 53,
+        "content": "This function takes parameters for scaling and rotation of a source image, reads the image, and resizes the template based on the given resolution ratio. It also provides default options for scaling and raises a ValueError if an invalid argument is provided.",
+        "type": "comment"
+    },
+    "666": {
+        "file_id": 53,
+        "content": "    template = cv2.resize(template, (0, 0), fx=config.resolution_ratio, fy=config.resolution_ratio)\n    if rotate_angle != 0:\n        h, w, c = image.shape\n        M = cv2.getRotationMatrix2D((w // 2, h // 2), rotate_angle, 1)\n        image = cv2.warpAffine(image, M, (w, h))  # np.rot90\n    begin_detect_time = time.time()\n    detection = get_mtm_match(image, template, scales)\n    end_detect_time = time.time()\n    template_name = os.path.splitext(os.path.basename(template_file))[0]\n    source__name = os.path.splitext(os.path.basename(src_file))[0]\n    output_prefix = f'match_{str(tid)}_{template_name}_in_{source__name}'\n    if save_matches:\n        overlay = drawBoxesOnRGB(image, detection,\n                                 showLabel=True,\n                                 boxThickness=4,\n                                 boxColor=(0, 255, 0),\n                                 labelColor=(0, 255, 0),\n                                 labelScale=1)\n        overlay_file_path = os.path.join(output_dir, f'{output_prefix}_overlay.jpg')",
+        "type": "code",
+        "location": "/cradle/utils/template_matching.py:89-114"
+    },
+    "667": {
+        "file_id": 53,
+        "content": "Resizes template image based on resolution ratio and rotates the input image if necessary. Measures detection time, extracts template name and source name, creates output prefix. If matches are saved, draws bounding boxes and labels on overlay image and saves it with output prefix appended.",
+        "type": "comment"
+    },
+    "668": {
+        "file_id": 53,
+        "content": "        render(overlay, template, overlay_file_path)\n    # DataFrame to list of dicts\n    objects_list = []\n    for bounding_box, confidence in zip(detection['BBox'], detection['Score']):\n        object_dict = {\n            \"type\":template_name,\n            \"name\": template_name,\n            \"bounding_box\": bounding_box,\n            \"reasoning\": \"\",\n            \"value\": 0,\n            \"confidence\": confidence,\n        }\n        objects_list.append(object_dict)\n        if debug:\n           logger.debug(f'{src_file}\\t{template_file}\\t{bounding_box}\\t{confidence}\\t{end_detect_time - begin_detect_time}',)\n    if output_bb:\n        bb_output_file = os.path.join(output_dir, f'{output_prefix}_bb.json')\n        save_json(bb_output_file, objects_list, 4)\n    return objects_list",
+        "type": "code",
+        "location": "/cradle/utils/template_matching.py:115-137"
+    },
+    "669": {
+        "file_id": 53,
+        "content": "This code converts detection results into a list of dictionaries, with each dictionary containing the type, name, bounding box coordinates, reasoning (empty for now), value (set to 0), and confidence. It also logs debug information if necessary. If output_bb is True, it saves the objects_list as JSON in a specified file. It then returns the objects_list.",
+        "type": "comment"
+    },
+    "670": {
+        "file_id": 54,
+        "content": "/prototype_runner.py",
+        "type": "filepath"
+    },
+    "671": {
+        "file_id": 54,
+        "content": "This code imports modules, manages game actions and AI providers, records data, configures inputs and outputs, annotates frames, logs info, classifies, checks errors, updates descriptions, assigns tasks to skills, handles image data, and summarizes from memory.",
+        "type": "summary"
+    },
+    "672": {
+        "file_id": 54,
+        "content": "import os\nimport time\nimport copy\nimport argparse\nfrom groundingdino.util.inference import load_image\nfrom cradle.config import Config\nfrom cradle.gameio.game_manager import GameManager\nfrom cradle.log import Logger\nfrom cradle.agent import Agent\nfrom cradle.planner.planner import Planner\nfrom cradle.memory import LocalMemory\nfrom cradle.provider.openai import OpenAIProvider\nfrom cradle.provider import GdProvider\nfrom cradle.gameio.io_env import IOEnvironment\nfrom cradle.gameio.lifecycle.ui_control import switch_to_game, IconReplacer\nfrom cradle.gameio.video.VideoRecorder import VideoRecorder\nfrom cradle.gameio.video.VideoFrameExtractor import VideoFrameExtractor\nfrom cradle.gameio.atomic_skills.trade_utils import __all__ as trade_skills\nfrom cradle.gameio.atomic_skills.buy import __all__ as buy_skills\nfrom cradle.gameio.atomic_skills.map import __all__ as map_skills\nfrom cradle.gameio.atomic_skills.move import __all__ as move_skills\nfrom cradle.gameio.atomic_skills.combat import __all__ as combat_skills\nfrom cradle.gameio.composite_skills.auto_shoot import __all__ as auto_shoot_skills",
+        "type": "code",
+        "location": "/prototype_runner.py:1-25"
+    },
+    "673": {
+        "file_id": 54,
+        "content": "The code imports various modules and classes from different packages related to game management, agent control, logging, and memory. It also includes functions and skills for atomic and composite actions such as trading, buying, mapping, moving, and combat.",
+        "type": "comment"
+    },
+    "674": {
+        "file_id": 54,
+        "content": "from cradle.gameio.composite_skills.follow import __all__ as follow_skills\nfrom cradle import constants\nconfig = Config()\nlogger = Logger()\nio_env = IOEnvironment()\ndef trigger_pipeline_loop(llm_provider_config_path, planner_params, task_description, skill_library, use_success_detection = False, use_self_reflection = False, use_information_summary = False):\n    llm_provider = OpenAIProvider()\n    llm_provider.init_provider(llm_provider_config_path)\n    gd_detector = GdProvider()\n    frame_extractor = VideoFrameExtractor()\n    icon_replacer = IconReplacer()\n    planner = Planner(llm_provider=llm_provider,\n                      planner_params=planner_params,\n                      frame_extractor=frame_extractor,\n                      icon_replacer=icon_replacer,\n                      object_detector=gd_detector,\n                      use_self_reflection=use_self_reflection,\n                      use_information_summary=use_information_summary)\n    memory = LocalMemory(memory_path=config.work_dir,\n                         max_recent_steps=config.max_recent_steps)",
+        "type": "code",
+        "location": "/prototype_runner.py:26-53"
+    },
+    "675": {
+        "file_id": 54,
+        "content": "This code initializes a pipeline loop for a Cradle prototype. It sets up an LLM provider, Gd detector, video frame extractor, and icon replacer. It also creates a planner and a local memory, configuring various parameters and options.",
+        "type": "comment"
+    },
+    "676": {
+        "file_id": 54,
+        "content": "    memory.load(config.memory_load_path)\n    gm = GameManager(env_name = config.env_name,\n                     embedding_provider = llm_provider)\n    img_prompt_decision_making = planner.decision_making_.input_map[\"image_introduction\"]\n    if config.skill_retrieval:\n        gm.register_available_skills(skill_library)\n        skill_library = gm.retrieve_skills(query_task = task_description, skill_num = config.skill_num, screen_type = constants.GENERAL_GAME_INTERFACE)\n    skill_library = gm.get_skill_information(skill_library)\n    switch_to_game()\n    videocapture=VideoRecorder(os.path.join(config.work_dir, 'video.mp4'))\n    videocapture.start_capture()\n    start_frame_id = videocapture.get_current_frame_id()\n    cur_screen_shot_path, _ = gm.capture_screen()\n    memory.add_recent_history(\"image\", cur_screen_shot_path)\n    success = False\n    pre_action = \"\"\n    pre_screen_classification = \"\"\n    pre_decision_making_reasoning = \"\"\n    pre_self_reflection_reasoning = \"\"\n    time.sleep(2)\n    end_frame_id = videocapture.get_current_frame_id()",
+        "type": "code",
+        "location": "/prototype_runner.py:54-82"
+    },
+    "677": {
+        "file_id": 54,
+        "content": "The code loads game environment, registers available skills, retrieves relevant skills based on task description and number of skills needed, starts video recording, captures initial screen shot, adds it to recent history, waits for 2 seconds, and then records the end frame id.",
+        "type": "comment"
+    },
+    "678": {
+        "file_id": 54,
+        "content": "    gm.pause_game()\n    while not success:\n        try:\n            # Gather information preparation\n            logger.write(f'Gather Information Start Frame ID: {start_frame_id}, End Frame ID: {end_frame_id}')\n            input = planner.gather_information_.input_map\n            text_input = planner.gather_information_.text_input_map\n            video_clip_path = videocapture.get_video(start_frame_id,end_frame_id)\n            task_description = memory.get_task_guidance(use_last=False)\n            get_text_image_introduction = [\n                {\n                    \"introduction\": input[\"image_introduction\"][-1][\"introduction\"],\n                    \"path\": memory.get_recent_history(\"image\", k=1)[0],\n                    \"assistant\": input[\"image_introduction\"][-1][\"assistant\"]\n                }\n            ]\n            # Configure the gather_information module\n            gather_information_configurations = {\n                \"frame_extractor\": True, # extract text from the video clip\n                \"icon_replacer\": True,",
+        "type": "code",
+        "location": "/prototype_runner.py:83-106"
+    },
+    "679": {
+        "file_id": 54,
+        "content": "Code snippet from Cradle/prototype_runner.py:82-105 is related to the Gather Information task in an AI application. It pauses the game, gathers information preparation details like frame IDs and video clip path, retrieves task guidance and configurations, and prepares the gather_information module with frame extraction and icon replacement enabled. This section seems to be involved in data collection and task configuration for the Gather Information function.",
+        "type": "comment"
+    },
+    "680": {
+        "file_id": 54,
+        "content": "                \"llm_description\": True, # get the description of the current screenshot\n                \"object_detector\": True\n            }\n            input[\"gather_information_configurations\"] = gather_information_configurations\n            # Modify the general input for gather_information here\n            image_introduction=[get_text_image_introduction[-1]]\n            input[\"task_description\"] = task_description\n            input[\"video_clip_path\"] = video_clip_path\n            input[\"image_introduction\"] = image_introduction\n            # Modify the input for get_text module in gather_information here\n            text_input[\"image_introduction\"] = get_text_image_introduction\n            input[\"text_input\"] = text_input\n            # >> Calling INFORMATION GATHERING\n            logger.write(f'>> Calling INFORMATION GATHERING')\n            data = planner.gather_information(input=input)\n            # Any information from the gathered_information_JSON\n            gathered_information_JSON=data['res_dict']['gathered_information_JSON']",
+        "type": "code",
+        "location": "/prototype_runner.py:107-127"
+    },
+    "681": {
+        "file_id": 54,
+        "content": "This code is configuring and passing input parameters to the information gathering function. It sets up configurations for object detection, screenshot description, and image introduction. Then it modifies the general input and text input for the get_text module. Finally, it calls the gather_information function with the prepared inputs and stores the gathered information in the gathered_information_JSON variable.",
+        "type": "comment"
+    },
+    "682": {
+        "file_id": 54,
+        "content": "            if gathered_information_JSON is not None:\n                gathered_information=gathered_information_JSON.data_structure\n            else:\n                logger.warn(\"NO data_structure in gathered_information_JSON\")\n                gathered_information = dict()\n            # Sort the gathered_information by timestamp\n            gathered_information = dict(sorted(gathered_information.items(), key=lambda item: item[0]))\n            all_dialogue = gathered_information_JSON.search_type_across_all_indices(constants.DIALOGUE)\n            all_task_guidance = gathered_information_JSON.search_type_across_all_indices(constants.TASK_GUIDANCE)\n            all_generated_actions = gathered_information_JSON.search_type_across_all_indices(constants.ACTION_GUIDANCE)\n            classification_reasons = gathered_information_JSON.search_type_across_all_indices(constants.GATHER_TEXT_REASONING)\n            response_keys = data['res_dict'].keys()\n            if constants.LAST_TASK_GUIDANCE in response_keys:",
+        "type": "code",
+        "location": "/prototype_runner.py:129-144"
+    },
+    "683": {
+        "file_id": 54,
+        "content": "This code checks if the gathered_information_JSON exists, if not it logs a warning. If it does exist, it sorts the data by timestamp and extracts specific types of data (dialogue, task guidance, generated actions, classification reasons) from it. It then checks if 'LAST_TASK_GUIDANCE' is present in the response keys.",
+        "type": "comment"
+    },
+    "684": {
+        "file_id": 54,
+        "content": "                last_task_guidance = data['res_dict'][constants.LAST_TASK_GUIDANCE]\n                if constants.LAST_TASK_HORIZON in response_keys:\n                    long_horizon = bool(int(data['res_dict'][constants.LAST_TASK_HORIZON][0])) # Only first character is relevant\n                else:\n                    long_horizon = False\n            else:\n                logger.warn(f\"No {constants.LAST_TASK_GUIDANCE} in response.\")\n                last_task_guidance = \"\"\n                long_horizon = False\n            if constants.IMAGE_DESCRIPTION in response_keys:\n                image_description=data['res_dict'][constants.IMAGE_DESCRIPTION]\n                if constants.SCREEN_CLASSIFICATION in response_keys:\n                    screen_classification=data['res_dict'][constants.SCREEN_CLASSIFICATION]\n                else:\n                    screen_classification=\"None\"\n            else:\n                logger.warn(f\"No {constants.IMAGE_DESCRIPTION} in response.\")\n                image_description=\"No description\"",
+        "type": "code",
+        "location": "/prototype_runner.py:145-163"
+    },
+    "685": {
+        "file_id": 54,
+        "content": "The code extracts task guidance, image description, and screen classification from a response dictionary. If any of these values are missing, it logs a warning and sets the value to a default string. The first character of last_task_horizon is used as the boolean value.",
+        "type": "comment"
+    },
+    "686": {
+        "file_id": 54,
+        "content": "                screen_classification=\"None\"\n            # Return to pause if screen type changed\n            if screen_classification.lower() == constants.GENERAL_GAME_INTERFACE:\n                gm.pause_game(screen_classification.lower())\n            if constants.TARGET_OBJECT_NAME in response_keys:\n                target_object_name=data['res_dict'][constants.TARGET_OBJECT_NAME]\n                object_name_reasoning=data['res_dict'][constants.GATHER_INFO_REASONING]\n            else:\n                logger.write(\"> No target object\")\n                target_object_name = \"\"\n                object_name_reasoning=\"\"\n            if \"boxes\" in response_keys:\n                image_source, image = load_image(cur_screen_shot_path)\n                boxes = data['res_dict'][\"boxes\"]\n                logits = data['res_dict'][\"logits\"]\n                phrases = data['res_dict'][\"phrases\"]\n                directory, filename = os.path.split(cur_screen_shot_path)\n                bb_image_path = os.path.join(directory, \"bb_\"+filename)",
+        "type": "code",
+        "location": "/prototype_runner.py:164-184"
+    },
+    "687": {
+        "file_id": 54,
+        "content": "This code checks the screen classification, retrieves target object information and reasoning, loads an image from the current screenshot, and extracts bounding boxes, logits, and phrases from the response dictionary. It also creates a path for storing the bounding box image.",
+        "type": "comment"
+    },
+    "688": {
+        "file_id": 54,
+        "content": "                gd_detector.save_annotate_frame(image_source, boxes, logits, phrases, target_object_name.title(), bb_image_path)\n                if boxes is not None and boxes.numel() != 0:\n                    # Add the screenshot with bounding boxes into working memory\n                    memory.add_recent_history(key=constants.AUGMENTED_IMAGES_MEM_BUCKET, info=bb_image_path)\n                else:\n                    memory.add_recent_history(key=constants.AUGMENTED_IMAGES_MEM_BUCKET, info=constants.NO_IMAGE)\n            else:\n                memory.add_recent_history(key=constants.AUGMENTED_IMAGES_MEM_BUCKET, info=constants.NO_IMAGE)\n            logger.write(f'Image Description: {image_description}')\n            logger.write(f'Object Name: {target_object_name}')\n            logger.write(f'Reasoning: {object_name_reasoning}')\n            logger.write(f'Screen Classification: {screen_classification}')\n            logger.write(f'Dialogue: {all_dialogue}')\n            logger.write(f'Gathered Information: {gathered_information}')",
+        "type": "code",
+        "location": "/prototype_runner.py:185-201"
+    },
+    "689": {
+        "file_id": 54,
+        "content": "The code saves annotated frames, adds screenshots with bounding boxes to working memory if any, and logs image description, object name, reasoning, screen classification, dialogue, and gathered information.",
+        "type": "comment"
+    },
+    "690": {
+        "file_id": 54,
+        "content": "            logger.write(f'Classification Reasons: {classification_reasons}')\n            logger.write(f'All Task Guidance: {all_task_guidance}')\n            logger.write(f'Last Task Guidance: {last_task_guidance}')\n            logger.write(f'Long Horizon: {long_horizon}')\n            logger.write(f'Generated Actions: {all_generated_actions}')\n            if use_self_reflection and start_frame_id > -1:\n                input = planner.self_reflection_.input_map\n                action_frames = []\n                video_frames = videocapture.get_frames(start_frame_id,end_frame_id)\n                if len(video_frames) <= config.max_images_in_self_reflection * config.duplicate_frames + 1:\n                    action_frames = [frame[1] for frame in video_frames[1::config.duplicate_frames]]\n                else:\n                    for i in range(config.max_images_in_self_reflection):\n                        step = len(video_frames) // config.max_images_in_self_reflection * i + 1\n                        action_frames.append(video_frames[step][1])",
+        "type": "code",
+        "location": "/prototype_runner.py:202-218"
+    },
+    "691": {
+        "file_id": 54,
+        "content": "This code writes classification reasons, task guidance, and long horizon to the logger. It then checks if self-reflection is enabled and gets action frames from a video capture object based on certain conditions.",
+        "type": "comment"
+    },
+    "692": {
+        "file_id": 54,
+        "content": "                image_introduction = [\n                    {\n                        \"introduction\": \"Here are the sequential frames of the character executing the last action.\",\n                        \"path\": action_frames,\n                        \"assistant\": \"\",\n                        \"resolution\": \"low\"\n                }]\n                input[\"image_introduction\"] = image_introduction\n                input[\"task_description\"] = task_description\n                input['skill_library'] = skill_library\n                input[\"previous_reasoning\"] = pre_decision_making_reasoning\n                if pre_action:\n                    pre_action_name, pre_action_params = gm.skill_registry.convert_expression_to_skill(pre_action)\n                    # only input the pre_action name\n                    input[\"previous_action\"] = pre_action_name\n                    action_code, action_code_info = gm.get_skill_library_in_code(pre_action_name)\n                    input['action_code'] = action_code if action_code is not None else action_code_info",
+        "type": "code",
+        "location": "/prototype_runner.py:220-239"
+    },
+    "693": {
+        "file_id": 54,
+        "content": "This code section is setting up the input for an AI model. It includes an image_introduction, task_description, skill_library, and previous_reasoning. The pre_action (if exists) is also converted into a skill and inputted as previous_action. The action_code for this skill is obtained from the skill_library if it exists, otherwise, the action code info is inputted.",
+        "type": "comment"
+    },
+    "694": {
+        "file_id": 54,
+        "content": "                else:\n                    input[\"previous_action\"] = \"\"\n                    input['action_code'] = \"\"\n                if exec_info[\"errors\"]:\n                    input['executing_action_error']  = exec_info[\"errors_info\"]\n                else:\n                    input['executing_action_error']  = \"\"\n                # >> Calling SELF REFLECTION\n                logger.write(f'>> Calling SELF REFLECTION')\n                reflection_data = planner.self_reflection(input = input)\n                if 'reasoning' in reflection_data['res_dict'].keys():\n                    self_reflection_reasoning = reflection_data['res_dict']['reasoning']\n                else:\n                    self_reflection_reasoning = \"\"\n                pre_self_reflection_reasoning = self_reflection_reasoning\n                memory.add_recent_history(\"self_reflection_reasoning\", self_reflection_reasoning)\n                logger.write(f'Self-reflection reason: {self_reflection_reasoning}')\n            if last_task_guidance:",
+        "type": "code",
+        "location": "/prototype_runner.py:240-262"
+    },
+    "695": {
+        "file_id": 54,
+        "content": "Code snippet sets the previous action and action code to empty strings if they don't exist, handles executing action errors, calls self-reflection using a planner function, retrieves reasoning from the returned data, adds recent history to memory about self-reflection reasoning, and logs the reasoning.",
+        "type": "comment"
+    },
+    "696": {
+        "file_id": 54,
+        "content": "                task_description = last_task_guidance\n                memory.add_task_guidance(last_task_guidance, long_horizon)\n            logger.write(f'Current Task Guidance: {task_description}')\n            if config.skill_retrieval:\n                for extracted_skills in all_generated_actions:\n                    extracted_skills=extracted_skills['values']\n                    for extracted_skill in extracted_skills:\n                        gm.add_new_skill(skill_code=extracted_skill['code'])\n                skill_library = gm.retrieve_skills(query_task = task_description, skill_num = config.skill_num, screen_type = screen_classification.lower())\n                logger.write(f'skill_library: {skill_library}')\n                skill_library = gm.get_skill_information(skill_library)\n            videocapture.clear_frame_buffer()\n            # Decision making preparation\n            input = copy.deepcopy(planner.decision_making_.input_map)\n            number_of_execute_skills = input[\"number_of_execute_skills\"]",
+        "type": "code",
+        "location": "/prototype_runner.py:263-283"
+    },
+    "697": {
+        "file_id": 54,
+        "content": "This code block updates the task description from previous guidance, adds it to memory, and writes the current task description to a logger. It then retrieves skills based on the task description using skill_retrieval configuration. The skill library is populated with skill information and the video capture's frame buffer is cleared for decision making preparation.",
+        "type": "comment"
+    },
+    "698": {
+        "file_id": 54,
+        "content": "            if pre_action:\n                input[\"previous_action\"] = memory.get_recent_history(\"action\", k=1)[-1]\n                input[\"previous_reasoning\"] = memory.get_recent_history(\"decision_making_reasoning\", k=1)[-1]\n            if pre_self_reflection_reasoning:\n                input[\"previous_self_reflection_reasoning\"] = memory.get_recent_history(\"self_reflection_reasoning\", k=1)[-1]\n            input['skill_library'] = skill_library\n            input['info_summary'] = memory.get_summarization()\n            if not \"boxes\" in response_keys:\n                input['few_shots'] = []\n            else:\n                if boxes is None or boxes.numel() == 0:\n                    input['few_shots'] = []\n            # @TODO Temporary solution with fake augmented entries if no bounding box exists. Ideally it should read images, then check for possible augmentation.\n            image_memory = memory.get_recent_history(\"image\", k=config.decision_making_image_num)\n            augmented_image_memory = memory.get_recent_history(constants.AUGMENTED_IMAGES_MEM_BUCKET, k=config.decision_making_image_num)",
+        "type": "code",
+        "location": "/prototype_runner.py:285-303"
+    },
+    "699": {
+        "file_id": 54,
+        "content": "The code is checking if any actions or reasoning occurred before the current action and storing them in the input dictionary. It also retrieves a summarization from memory, checks for existing 'boxes' in the response_keys, and populates 'few_shots' if none exist. Finally, it gets recent image data from memory and handles possible augmented images as well.",
+        "type": "comment"
+    }
+}

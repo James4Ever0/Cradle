@@ -1,0 +1,546 @@
+{
+    "500": {
+        "file_id": 38,
+        "content": "        return data\n    def _check_success(self, *args, data, **kwargs):\n        success = False\n        prop_name = \"description\"\n        if prop_name in data.keys():\n            desc = data[prop_name]\n            success = desc is not None and len(desc) > 0\n        return success\n    def _replace_icon(self, extracted_frame_paths):\n        extracted_frames = [frame[0] for frame in extracted_frame_paths]\n        extracted_timesteps = [frame[1] for frame in extracted_frame_paths]\n        extracted_frames = self.icon_replacer(image_paths=extracted_frames)\n        extracted_frame_paths = list(zip(extracted_frames, extracted_timesteps))\n        return extracted_frame_paths\nclass DecisionMaking():\n    def __init__(self,\n                 input_map: Dict = None,\n                 template: Dict = None,\n                 llm_provider: LLMProvider = None,\n                 ):\n        self.input_map = input_map\n        self.template = template\n        self.llm_provider = llm_provider\n    def _pre(self, *args, input: Dict[str, Any] = None, **kwargs) -> Dict[str, Any]:",
+        "type": "code",
+        "location": "/cradle/planner/planner.py:405-440"
+    },
+    "501": {
+        "file_id": 38,
+        "content": "The code defines a class `DecisionMaking` with an initialization function that takes input map, template, and LLMProvider as parameters. The class contains a method `_pre` which returns a dictionary after processing the inputs. There is also a helper function `_check_success` to check if the description is present in the given data and `_replace_icon` to replace the icons from extracted frame paths.",
+        "type": "comment"
+    },
+    "502": {
+        "file_id": 38,
+        "content": "        return input\n    def __call__(self, *args, input: Dict[str, Any] = None, **kwargs) -> Dict[str, Any]:\n        input = self.input_map if input is None else input\n        input = self._pre(input=input)\n        flag = True\n        processed_response = {}\n        try:\n            message_prompts = self.llm_provider.assemble_prompt(template_str=self.template, params=input)\n            logger.debug(f'{logger.UPSTREAM_MASK}{json.dumps(message_prompts, ensure_ascii=False)}\\n')\n            # Call the LLM provider for decision making\n            response, info = self.llm_provider.create_completion(message_prompts)\n            logger.debug(f'{logger.DOWNSTREAM_MASK}{response}\\n')\n            if response is None or len(response) == 0:\n                logger.warn('No response in decision making call')\n                logger.debug(input)\n            # Convert the response to dict\n            processed_response = parse_semi_formatted_text(response)\n        except Exception as e:\n            logger.error(f\"Error in decision_making: {e}\")",
+        "type": "code",
+        "location": "/cradle/planner/planner.py:441-470"
+    },
+    "503": {
+        "file_id": 38,
+        "content": "The code defines a method for a class that takes an input, preprocesses it, and then uses an LLM (Language Model) provider to make a decision based on the input. The result is converted into a dictionary format and returned. If no response is received or the response is empty, a warning message is logged. Exceptions are caught and handled through logging.",
+        "type": "comment"
+    },
+    "504": {
+        "file_id": 38,
+        "content": "            logger.error_ex(e)\n            flag = False\n        data = dict(\n            flag=flag,\n            input=input,\n            res_dict=processed_response,\n        )\n        data = self._post(data=data)\n        return data\n    def _post(self, *args, data: Dict[str, Any] = None, **kwargs) -> Dict[str, Any]:\n        return data\nclass SuccessDetection():\n    def __init__(self,\n                 input_map: Dict = None,\n                 template: Dict = None,\n                 llm_provider: LLMProvider = None,\n                 ):\n        self.input_map = input_map\n        self.template = template\n        self.llm_provider = llm_provider\n    def _pre(self, *args, input: Dict[str, Any] = None, **kwargs) -> Dict[str, Any]:\n        return input\n    def __call__(self, *args, input: Dict[str, Any] = None, **kwargs) -> Dict[str, Any]:\n        input = self.input_map if input is None else input\n        input = self._pre(input=input)\n        flag = True\n        processed_response = {}\n        try:\n            # Call the LLM provider for success detection",
+        "type": "code",
+        "location": "/cradle/planner/planner.py:471-513"
+    },
+    "505": {
+        "file_id": 38,
+        "content": "This code snippet defines a class called `SuccessDetection` which takes an input map, template, and LLMProvider as parameters. The `_pre` method preprocesses the input before it is passed to the `__call__` method. Inside `__call__`, the input is further processed using the input map or the provided input, and then passed to the LLM provider for success detection. If an exception occurs during this process, it is logged as an error. The function returns a dictionary with flag, input, and processed response (res_dict) fields. Additionally, there is a `_post` method that takes data as input and returns it.",
+        "type": "comment"
+    },
+    "506": {
+        "file_id": 38,
+        "content": "            message_prompts = self.llm_provider.assemble_prompt(template_str=self.template, params=input)\n            logger.debug(f'{logger.UPSTREAM_MASK}{json.dumps(message_prompts, ensure_ascii=False)}\\n')\n            response, info = self.llm_provider.create_completion(message_prompts)\n            logger.debug(f'{logger.DOWNSTREAM_MASK}{response}\\n')\n            # Convert the response to dict\n            processed_response = parse_semi_formatted_text(response)\n        except Exception as e:\n            logger.error(f\"Error in success_detection: {e}\")\n            flag = False\n        data = dict(\n            flag=flag,\n            input=input,\n            res_dict=processed_response,\n        )\n        data = self._post(data=data)\n        return data\n    def _post(self, *args, data: Dict[str, Any] = None, **kwargs) -> Dict[str, Any]:\n        return data\nclass SelfReflection():\n    def __init__(self,\n                 input_map: Dict = None,\n                 template: Dict = None,\n                 llm_provider: LLMProvider = None,",
+        "type": "code",
+        "location": "/cradle/planner/planner.py:514-548"
+    },
+    "507": {
+        "file_id": 38,
+        "content": "The code appears to be a part of an AI planner that utilizes a LLM (Large Language Model) provider. It assembles prompts, creates completions based on those prompts, converts the response to a dictionary format and sends the data to a post method for further processing. An exception handling block is also present to handle any errors that may occur during execution.",
+        "type": "comment"
+    },
+    "508": {
+        "file_id": 38,
+        "content": "                 ):\n        self.input_map = input_map\n        self.template = template\n        self.llm_provider = llm_provider\n    def _pre(self, *args, input: Dict[str, Any] = None, **kwargs) -> Dict[str, Any]:\n        return input\n    def __call__(self, *args, input: Dict[str, Any] = None, **kwargs) -> Dict[str, Any]:\n        input = self.input_map if input is None else input\n        input = self._pre(input=input)\n        flag = True\n        processed_response = {}\n        try:\n            # Call the LLM provider for self reflection\n            message_prompts = self.llm_provider.assemble_prompt(template_str=self.template, params=input)\n            logger.debug(f'{logger.UPSTREAM_MASK}{json.dumps(message_prompts, ensure_ascii=False)}\\n')\n            response, info = self.llm_provider.create_completion(message_prompts)\n            logger.debug(f'{logger.DOWNSTREAM_MASK}{response}\\n')\n            # Convert the response to dict\n            processed_response = parse_semi_formatted_text(response)\n        except Exception as e:",
+        "type": "code",
+        "location": "/cradle/planner/planner.py:549-581"
+    },
+    "509": {
+        "file_id": 38,
+        "content": "This code defines a class with an input map, template, and LLM provider as parameters. It has two methods: _pre() and __call__(). The _pre() method prepares the input for processing. The __call__() method uses the input_map to get the input, then applies _pre(), calls llm_provider to generate a prompt, logs the prompts, then creates a completion using llm_provider. Finally, it parses the response into a dictionary.",
+        "type": "comment"
+    },
+    "510": {
+        "file_id": 38,
+        "content": "            logger.error(f\"Error in self reflection: {e}\")\n            flag = False\n        data = dict(\n            flag=flag,\n            input=input,\n            res_dict=processed_response,\n        )\n        data = self._post(data=data)\n        return data\n    def _post(self, *args, data: Dict[str, Any] = None, **kwargs) -> Dict[str, Any]:\n        return data\nclass InformationSummary():\n    def __init__(self,\n                 input_map: Dict = None,\n                 template: Dict = None,\n                 llm_provider: LLMProvider = None,\n                 ):\n        self.input_map = input_map\n        self.template = template\n        self.llm_provider = llm_provider\n    def _pre(self, *args, input: Dict[str, Any] = None, **kwargs) -> Dict[str, Any]:\n        return input\n    def __call__(self, *args, input: Dict[str, Any] = None, **kwargs) -> Dict[str, Any]:\n        input = self.input_map if input is None else input\n        input = self._pre(input=input)\n        flag = True\n        processed_response = {}\n        res_json = None",
+        "type": "code",
+        "location": "/cradle/planner/planner.py:582-623"
+    },
+    "511": {
+        "file_id": 38,
+        "content": "The code defines a function that handles errors and calls another method to post data. It also initializes an InformationSummary class with input_map, template, and llm_provider as parameters, and includes methods for preprocessing input and processing the summary.",
+        "type": "comment"
+    },
+    "512": {
+        "file_id": 38,
+        "content": "        try:\n            # Call the LLM provider for information summary\n            message_prompts = self.llm_provider.assemble_prompt(template_str=self.template, params=input)\n            logger.debug(f'{logger.UPSTREAM_MASK}{json.dumps(message_prompts, ensure_ascii=False)}\\n')\n            response, info = self.llm_provider.create_completion(message_prompts)\n            logger.debug(f'{logger.DOWNSTREAM_MASK}{response}\\n')\n            # Convert the response to dict\n            processed_response = parse_semi_formatted_text(response)\n        except Exception as e:\n            logger.error(f\"Error in information_summary: {e}\")\n            flag = False\n        data = dict(\n            flag=flag,\n            input=input,\n            res_dict=processed_response,\n            # res_json=res_json,\n        )\n        data = self._post(data=data)\n        return data\n    def _post(self, *args, data: Dict[str, Any] = None, **kwargs) -> Dict[str, Any]:\n        return data\nclass Planner(BasePlanner):\n    def __init__(self,",
+        "type": "code",
+        "location": "/cradle/planner/planner.py:625-660"
+    },
+    "513": {
+        "file_id": 38,
+        "content": "The code attempts to assemble a prompt using the LLM (Large Language Model) provider and then create a completion. If any exception occurs, it logs an error message. The response is parsed into a dictionary format, and a data object is created with flag, input, and processed response information. Finally, the _post method is called to process the data.",
+        "type": "comment"
+    },
+    "514": {
+        "file_id": 38,
+        "content": "                 llm_provider: Any = None,\n                 planner_params: Dict = None,\n                 use_screen_classification: bool = False,\n                 use_information_summary: bool = False,\n                 use_self_reflection: bool = False,\n                 gather_information_max_steps: int = 1,  # 5,\n                 icon_replacer: Any = None,\n                 object_detector: Any = None,\n                 frame_extractor: Any = None,\n                 ):\n        \"\"\"\n        inputs: input key-value pairs\n        templates: template for composing the prompt\n        planner_params = {\n            \"__check_list__\":[\n              \"screen_classification\",\n              \"gather_information\",\n              \"decision_making\",\n              \"information_summary\",\n              \"self_reflection\"\n            ],\n            \"prompt_paths\": {\n              \"inputs\": {\n                \"screen_classification\": \"./res/prompts/inputs/screen_classification.json\",\n                \"gather_information\": \"./res/prompts/inputs/gather_information.json\",",
+        "type": "code",
+        "location": "/cradle/planner/planner.py:661-686"
+    },
+    "515": {
+        "file_id": 38,
+        "content": "This code defines a function that takes input key-value pairs and templates. It utilizes several parameters, such as llm_provider, planner_params, use_screen_classification, use_information_summary, use_self_reflection, gather_information_max_steps, icon_replacer, object_detector, and frame_extractor. The function uses these parameters to compose a prompt for a task, with planner_params specifying the task steps and prompt paths for inputs based on the given parameters.",
+        "type": "comment"
+    },
+    "516": {
+        "file_id": 38,
+        "content": "                \"decision_making\": \"./res/prompts/inputs/decision_making.json\",\n                \"success_detection\": \"./res/prompts/inputs/success_detection.json\",\n                \"information_summary\": \"./res/prompts/inputs/information_summary.json\",\n                \"self_reflection\": \"./res/prompts/inputs/self_reflection.json\",\n              },\n              \"templates\": {\n                \"screen_classification\": \"./res/prompts/templates/screen_classification.prompt\",\n                \"gather_information\": \"./res/prompts/templates/gather_information.prompt\",\n                \"decision_making\": \"./res/prompts/templates/decision_making.prompt\",\n                \"success_detection\": \"./res/prompts/templates/success_detection.prompt\",\n                \"information_summary\": \"./res/prompts/templates/information_summary.prompt\",\n                \"self_reflection\": \"./res/prompts/templates/self_reflection.prompt\",\n              }\n            }\n          }\n        \"\"\"\n        super(BasePlanner, self).__init__()\n        self.llm_provider = llm_provider",
+        "type": "code",
+        "location": "/cradle/planner/planner.py:687-706"
+    },
+    "517": {
+        "file_id": 38,
+        "content": "This code sets up a planner with input prompts and template files for decision making, success detection, information summary, and self-reflection tasks. The llm_provider is initialized in the superclass constructor.",
+        "type": "comment"
+    },
+    "518": {
+        "file_id": 38,
+        "content": "        self.use_screen_classification = use_screen_classification\n        self.use_information_summary = use_information_summary\n        self.use_self_reflection = use_self_reflection\n        self.gather_information_max_steps = gather_information_max_steps\n        self.icon_replacer = icon_replacer\n        self.object_detector = object_detector\n        self.frame_extractor = frame_extractor\n        self.set_internal_params(planner_params=planner_params,\n                                 use_screen_classification=use_screen_classification,\n                                 use_information_summary=use_information_summary)\n    # Allow re-configuring planner\n    def set_internal_params(self,\n                            planner_params: Dict = None,\n                            use_screen_classification: bool = False,\n                            use_information_summary: bool = False):\n        self.planner_params = planner_params\n        if not check_planner_params(self.planner_params):\n            raise ValueError(f\"Error in planner_params: {self.planner_params}\")",
+        "type": "code",
+        "location": "/cradle/planner/planner.py:708-729"
+    },
+    "519": {
+        "file_id": 38,
+        "content": "The code defines a class with several instance variables for different features such as screen classification, information summary, and self-reflection. It also sets the maximum steps for gathering information. The `set_internal_params` method allows reconfiguration of the planner with optional parameters. Additionally, it checks the validity of planner_params using the `check_planner_params` function to avoid any potential errors.",
+        "type": "comment"
+    },
+    "520": {
+        "file_id": 38,
+        "content": "        self.inputs = self._init_inputs()\n        self.templates = self._init_templates()\n        if use_screen_classification:\n            self.screen_classification_ = ScreenClassification(input_example=self.inputs[\"screen_classification\"],\n                                                               template=self.templates[\"screen_classification\"],\n                                                               llm_provider=self.llm_provider)\n        else:\n            self.screen_classification_ = None\n        self.gather_information_ = GatherInformation(input_map=self.inputs[\"gather_information\"],\n                                                     template=self.templates[\"gather_information\"],\n                                                     text_input_map=self.inputs[\"gather_text_information\"],\n                                                     get_text_template=self.templates[\"gather_text_information\"],\n                                                     frame_extractor=self.frame_extractor,",
+        "type": "code",
+        "location": "/cradle/planner/planner.py:731-745"
+    },
+    "521": {
+        "file_id": 38,
+        "content": "This code initializes instance attributes for a planner object. It sets the inputs and templates, checks a boolean flag to initialize screen_classification_, and initializes gather_information_. The input examples and templates are used in these process steps. If the use_screen_classification flag is true, an instance of ScreenClassification is initialized; otherwise, it's set to None. Similarly, an instance of GatherInformation is created based on the given inputs and templates. FrameExtractor appears to be used by both steps.",
+        "type": "comment"
+    },
+    "522": {
+        "file_id": 38,
+        "content": "                                                     icon_replacer=self.icon_replacer,\n                                                     object_detector=self.object_detector,\n                                                     llm_provider=self.llm_provider)\n        self.decision_making_ = DecisionMaking(input_map=self.inputs[\"decision_making\"],\n                                               template=self.templates[\"decision_making\"],\n                                               llm_provider=self.llm_provider)\n        self.success_detection_ = SuccessDetection(input_map=self.inputs[\"success_detection\"],\n                                                   template=self.templates[\"success_detection\"],\n                                                   llm_provider=self.llm_provider)\n        if self.use_self_reflection:\n            self.self_reflection_ = SelfReflection(input_map=self.inputs[\"self_reflection\"],\n                                                   template=self.templates[\"self_reflection\"],",
+        "type": "code",
+        "location": "/cradle/planner/planner.py:746-760"
+    },
+    "523": {
+        "file_id": 38,
+        "content": "The code is creating and initializing several modules (icon_replacer, object_detector, decision_making, success_detection, self_reflection) with different input maps and templates. The llm_provider seems to be a shared parameter across these modules.",
+        "type": "comment"
+    },
+    "524": {
+        "file_id": 38,
+        "content": "                                                   llm_provider=self.llm_provider)\n        else:\n            self.self_reflection_ = None\n        if use_information_summary:\n            self.information_summary_ = InformationSummary(input_map=self.inputs[\"information_summary\"],\n                                                           template=self.templates[\"information_summary\"],\n                                                           llm_provider=self.llm_provider)\n        else:\n            self.information_summary_ = None\n    def _init_inputs(self):\n        input_examples = dict()\n        prompt_paths = self.planner_params[\"prompt_paths\"]\n        input_example_paths = prompt_paths[\"inputs\"]\n        for key, value in input_example_paths.items():\n            path = assemble_project_path(value)\n            if path.endswith(PROMPT_EXT):\n                input_examples[key] = read_resource_file(path)\n            else:\n                input_examples[key] = load_json(path)\n        return input_examples\n    def _init_templates(self):",
+        "type": "code",
+        "location": "/cradle/planner/planner.py:761-789"
+    },
+    "525": {
+        "file_id": 38,
+        "content": "This code initializes the self-reflection and information summary attributes based on input parameters. It also initializes input examples by assembling paths from a JSON file and reading resource files, and then initializes templates using these example inputs.",
+        "type": "comment"
+    },
+    "526": {
+        "file_id": 38,
+        "content": "        templates = dict()\n        prompt_paths = self.planner_params[\"prompt_paths\"]\n        template_paths = prompt_paths[\"templates\"]\n        for key, value in template_paths.items():\n            path = assemble_project_path(value)\n            if path.endswith(PROMPT_EXT):\n                templates[key] = read_resource_file(path)\n            else:\n                templates[key] = load_json(path)\n        return templates\n    def gather_information(self, *args, input: Dict[str, Any] = None, **kwargs) -> Dict[str, Any]:\n        if input is None:\n            input = self.inputs[\"gather_information\"]\n        image_file = input[\"image_introduction\"][0][\"path\"]\n        if self.use_screen_classification:\n            class_ = self.screen_classification_(screenshot_file=image_file)[\"class_\"]\n        else:\n            class_ = None\n        for i in range(self.gather_information_max_steps):\n            data = self.gather_information_(input=input, class_=class_)\n            success = data[\"success\"]\n            if success:",
+        "type": "code",
+        "location": "/cradle/planner/planner.py:791-822"
+    },
+    "527": {
+        "file_id": 38,
+        "content": "The code defines a function `gather_information` that takes an input dictionary and returns another dictionary after processing it. It first checks if the input is provided, then retrieves the image file path from it. Depending on the value of `use_screen_classification`, it assigns the class to either the result of `screen_classification_` function or None. The code then loops for a maximum number of steps (`gather_information_max_steps`) and calls the `gather_information_` function with the input and class as arguments. It retrieves the success status from the returned data and continues if successful.",
+        "type": "comment"
+    },
+    "528": {
+        "file_id": 38,
+        "content": "                break\n        return data\n    def decision_making(self, *args, input: Dict[str, Any] = None, **kwargs) -> Dict[str, Any]:\n        if input is None:\n            input = self.inputs[\"decision_making\"]\n        data = self.decision_making_(input=input)\n        return data\n    def success_detection(self, *args, input: Dict[str, Any] = None, **kwargs) -> Dict[str, Any]:\n        if input is None:\n            input = self.inputs[\"success_detection\"]\n        data = self.success_detection_(input=input)\n        return data\n    def self_reflection(self, *args, input: Dict[str, Any] = None, **kwargs) -> Dict[str, Any]:\n        if input is None:\n            input = self.inputs[\"self_reflection\"]\n        data = self.self_reflection_(input=input)\n        return data\n    def information_summary(self, *args, input: Dict[str, Any] = None, **kwargs) -> Dict[str, Any]:\n        if input is None:\n            input = self.inputs[\"information_summary\"]\n        data = self.information_summary_(input=input)\n        return data",
+        "type": "code",
+        "location": "/cradle/planner/planner.py:823-865"
+    },
+    "529": {
+        "file_id": 38,
+        "content": "This code snippet contains several methods: decision_making, success_detection, self_reflection, and information_summary. These methods take an optional input dictionary and return a Dict[str, Any] data type. The first if statement checks if the input parameter is None and assigns it to the corresponding input value from the instance's inputs dictionary. This allows for default inputs when no specific input is provided. Each method then proceeds to call its respective method with the input argument.",
+        "type": "comment"
+    },
+    "530": {
+        "file_id": 39,
+        "content": "/cradle/planner/util.py",
+        "type": "filepath"
+    },
+    "531": {
+        "file_id": 39,
+        "content": "Function `get_attr` takes an attribute (attr), a key, and a default value. If the attr is a dictionary, it uses dict's get method to return the value associated with the given key; otherwise, it uses Python's built-in getattr function to retrieve the value of the attribute from the object. The default value is returned if no such key or attribute exists.",
+        "type": "summary"
+    },
+    "532": {
+        "file_id": 39,
+        "content": "def get_attr(attr, key, default=None):\n    if isinstance(attr, dict):\n        return attr.get(key, default)\n    else:\n        return getattr(attr, key, default)",
+        "type": "code",
+        "location": "/cradle/planner/util.py:1-6"
+    },
+    "533": {
+        "file_id": 39,
+        "content": "Function `get_attr` takes an attribute (attr), a key, and a default value. If the attr is a dictionary, it uses dict's get method to return the value associated with the given key; otherwise, it uses Python's built-in getattr function to retrieve the value of the attribute from the object. The default value is returned if no such key or attribute exists.",
+        "type": "comment"
+    },
+    "534": {
+        "file_id": 40,
+        "content": "/cradle/provider/__init__.py",
+        "type": "filepath"
+    },
+    "535": {
+        "file_id": 40,
+        "content": "This code imports necessary classes and sets up a list of providers for LLMs (Language Models) and embeddings. These providers are used in the \"Cradle\" framework, which likely involves natural language processing tasks.",
+        "type": "summary"
+    },
+    "536": {
+        "file_id": 40,
+        "content": "from cradle.provider.base_embedding import EmbeddingProvider\nfrom cradle.provider.base_llm import LLMProvider\nfrom cradle.provider.openai import OpenAIProvider\nfrom cradle.provider.gd_provider import GdProvider\n__all__ = [\n    \"LLMProvider\",\n    \"EmbeddingProvider\",\n    \"OpenAIProvider\",\n    \"GdProvider\"\n]",
+        "type": "code",
+        "location": "/cradle/provider/__init__.py:1-11"
+    },
+    "537": {
+        "file_id": 40,
+        "content": "This code imports necessary classes and sets up a list of providers for LLMs (Language Models) and embeddings. These providers are used in the \"Cradle\" framework, which likely involves natural language processing tasks.",
+        "type": "comment"
+    },
+    "538": {
+        "file_id": 41,
+        "content": "/cradle/provider/base_embedding.py",
+        "type": "filepath"
+    },
+    "539": {
+        "file_id": 41,
+        "content": "Base class for embedding model providers with abstract methods to embed queries, get embedding dimensions, and initialize provider via a JSON config.",
+        "type": "summary"
+    },
+    "540": {
+        "file_id": 41,
+        "content": "\"\"\"Base class for embedding model providers.\"\"\"\nimport abc\nfrom typing import (\n    List,\n)\nclass EmbeddingProvider(abc.ABC):\n    \"\"\"Interface for embedding models.\"\"\"\n    @abc.abstractmethod\n    def embed_query(self, text: str) -> List[float]:\n        \"\"\"Embed query text.\"\"\"\n    @abc.abstractmethod\n    def get_embedding_dim(self) -> int:\n        \"\"\"Get the embedding dimensions.\"\"\"\n        pass\n    @abc.abstractmethod\n    def init_provider(self, provider_cfg) -> None:\n        \"\"\"Initialize a provider via a json config.\"\"\"\n        pass",
+        "type": "code",
+        "location": "/cradle/provider/base_embedding.py:1-23"
+    },
+    "541": {
+        "file_id": 41,
+        "content": "Base class for embedding model providers with abstract methods to embed queries, get embedding dimensions, and initialize provider via a JSON config.",
+        "type": "comment"
+    },
+    "542": {
+        "file_id": 42,
+        "content": "/cradle/provider/base_llm.py",
+        "type": "filepath"
+    },
+    "543": {
+        "file_id": 42,
+        "content": "This is a base class for LLM providers, with an abstract method assemble_prompt for combining parameters and creating completion from messages in text. Subclasses must implement the assemble_prompt method.",
+        "type": "summary"
+    },
+    "544": {
+        "file_id": 42,
+        "content": "\"\"\"Base class for LLM model providers.\"\"\"\nimport abc\nfrom typing import (\n    List,\n    Dict,\n    Tuple,\n    Optional,\n    Any\n)\nclass LLMProvider(abc.ABC):\n    \"\"\"Interface for LLM models.\"\"\"\n    @abc.abstractmethod\n    def create_completion(\n        self,\n        messages: List[Dict[str, str]],\n        model: str,\n        temperature: float,\n        stop_tokens: Optional[List[str]] = None,\n    ) -> Tuple[str, Dict[str, int]]:\n        \"\"\"Create a completion from messages in text (and potentially also encoded images).\"\"\"\n        pass\n    @abc.abstractmethod\n    async def create_completion_async(\n        self,\n        messages: List[Dict[str, str]],\n        model: str,\n        temperature: float,\n        stop_tokens: Optional[List[str]] = None,\n    ) -> Tuple[str, Dict[str, int]]:\n        \"\"\"Create a completion from messages in text (and potentially also encoded images).\"\"\"\n        pass\n    @abc.abstractmethod\n    def init_provider(self, provider_cfg) -> None:\n        \"\"\"Initialize a provider via a json config.\"\"\"\n        pass",
+        "type": "code",
+        "location": "/cradle/provider/base_llm.py:1-40"
+    },
+    "545": {
+        "file_id": 42,
+        "content": "Base class for LLM (Language Model) providers, defining abstract methods for creating completion from messages in text and initializing the provider via a JSON config.",
+        "type": "comment"
+    },
+    "546": {
+        "file_id": 42,
+        "content": "    @abc.abstractmethod\n    def assemble_prompt(self, template_str: str = None, params: Dict[str, Any] = None) -> List[Dict[str, Any]]:\n        \"\"\"Combine parametes in the appropriate way for the provider to use.\"\"\"\n        pass",
+        "type": "code",
+        "location": "/cradle/provider/base_llm.py:42-45"
+    },
+    "547": {
+        "file_id": 42,
+        "content": "The method assemble_prompt is an abstract method that combines parameters in the appropriate way for the provider to use. It takes a template string and params dictionary as input and returns a list of dictionaries as output. This is declared as abstract, meaning subclasses must implement it.",
+        "type": "comment"
+    },
+    "548": {
+        "file_id": 43,
+        "content": "/cradle/provider/gd_provider.py",
+        "type": "filepath"
+    },
+    "549": {
+        "file_id": 43,
+        "content": "The code provides functions for image captioning and object detection, utilizing Singleton pattern to handle annotations and categorize detections. It also writes annotated frames and processes minimap images.",
+        "type": "summary"
+    },
+    "550": {
+        "file_id": 43,
+        "content": "import math\nimport cv2\nimport torch\nimport numpy as np\nfrom torchvision.ops import box_convert\nfrom groundingdino.util.inference import load_model, load_image\nfrom cradle.gameio.lifecycle.ui_control import annotate_with_coordinates, segment_minimap\nfrom cradle.utils import Singleton\nfrom cradle.log import Logger\nfrom cradle import constants\nlogger = Logger()\ndef unique_predict(\n        model,\n        image: torch.Tensor,\n        caption: str,\n        box_threshold: float,\n        device: str = \"cuda\",\n):\n    caption = caption.lower().strip()\n    if not caption.endswith(\".\"):\n        caption = caption + \" .\"\n    model = model.to(device)\n    image = image.to(device)\n    with torch.no_grad():\n        outputs = model(image[None], captions=[caption])\n    prediction_logits = outputs[\"pred_logits\"].cpu().sigmoid()[0]  # prediction_logits.shape = (nq, 256)\n    prediction_boxes = outputs[\"pred_boxes\"].cpu()[0]  # prediction_boxes.shape = (nq, 4)\n    mask = prediction_logits.max(dim=1)[0] > box_threshold\n    logits = prediction_logits[mask]  # logits.shape = (n, 256)",
+        "type": "code",
+        "location": "/cradle/provider/gd_provider.py:1-39"
+    },
+    "551": {
+        "file_id": 43,
+        "content": "This code is defining a function called \"unique_predict\" that takes an image, caption, box threshold, and model as inputs. It ensures the input caption ends with a period, moves the model and image to specified device (CPU or GPU), performs inference using the model, extracts prediction logits and boxes, applies a mask based on the box threshold, and returns only the relevant logits.",
+        "type": "comment"
+    },
+    "552": {
+        "file_id": 43,
+        "content": "    boxes = prediction_boxes[mask]  # boxes.shape = (n, 4)\n    # Modified version: recognize seperation and choose the best one with highest probability\n    phrases = []\n    input_text = caption.split()\n    for logit in logits:\n        prob = logit[logit > 0][1:-1]\n        max_prob, cum_prob, pre_i, label = 0, 0, 0, ''\n        for i, (c, p) in enumerate(zip(input_text, prob)):\n            if c == '.':\n                if cum_prob > max_prob:\n                    max_prob = cum_prob\n                    label = ' '.join(input_text[pre_i:i])\n                cum_prob = 0\n                pre_i = i + 1\n            else:\n                cum_prob += p\n        phrases.append(label)\n    return boxes, logits.max(dim=1)[0], phrases\nclass GdProvider(metaclass=Singleton):\n    def __init__(self):\n        self.detect_model = None\n        try:\n            self.detect_model = load_model(\"./cache/GroundingDINO_SwinB_cfg.py\", \"./cache/groundingdino_swinb_cogcoor.pth\")\n        except Exception as e:\n            logger.error(f\"Faile",
+        "type": "code",
+        "location": "/cradle/provider/gd_provider.py:40-71"
+    },
+    "553": {
+        "file_id": 43,
+        "content": "The code is for image captioning. It takes an input text and the logits from a detection model, and then separates the text into individual words. For each word, it calculates the cumulative probability of that word appearing in the input text. If the cumulative probability exceeds the current maximum, it updates the maximum and stores the corresponding phrase. Finally, it returns the prediction boxes, the logits with the highest value for each input, and a list of separated phrases. The code is part of the GdProvider class, which uses a Singleton design pattern to ensure only one instance exists at any time.",
+        "type": "comment"
+    },
+    "554": {
+        "file_id": 43,
+        "content": "d to load the grounding model. Make sure you follow the instructions on README to download the necessary files.\\n{e}\")\n    def detect(self, image_path,\n                  text_prompt=\"wolf .\",\n                  box_threshold=0.4,\n                  device='cuda',\n                  ):\n        image_source, image = load_image(image_path)\n        boxes, logits, phrases = unique_predict(\n            model=self.detect_model,\n            image=image,\n            caption=text_prompt,\n            box_threshold=box_threshold,\n            device=device\n        )\n        return image_source, boxes, logits, phrases\n    def save_annotate_frame(self, image_source, boxes, logits, phrases, text_prompt, cur_screen_shot_path):\n        # Remove the main character itself from boxes\n        if \"person\" in text_prompt.lower():\n            if len(boxes) > 1:\n                index = 0\n                dis = 1.5\n                for i in range(len(boxes)):\n                    down_mid = (boxes[i, 0], boxes[i, 1] + boxes[i, 3] / 2)\n                    distance = torch.sum(torch.abs(torch.tensor(down_mid) - torch.tensor((0.5, 1.0))))",
+        "type": "code",
+        "location": "/cradle/provider/gd_provider.py:71-103"
+    },
+    "555": {
+        "file_id": 43,
+        "content": "The code defines a function `detect` to detect objects in an image and return the coordinates, logits (confidence scores), and recognized phrases. Another function `save_annotate_frame` saves annotated frames by removing the main character from detected boxes if it's mentioned in the text prompt.",
+        "type": "comment"
+    },
+    "556": {
+        "file_id": 43,
+        "content": "                    if distance < dis:\n                        dis = distance\n                        index = i\n                boxes_ = torch.cat([boxes[:index], boxes[index + 1:]])\n                logits_ = torch.cat([logits[:index], logits[index + 1:]])\n                phrases.pop(index)\n                annotated_frame = annotate_with_coordinates(image_source=image_source, boxes=boxes_[:,:], logits=logits_[:], phrases=phrases)\n                cv2.imwrite(cur_screen_shot_path, annotated_frame)\n            elif len(boxes)==1:\n                phrases.pop(0)\n                boxes_ = torch.tensor(boxes[1:])\n                logits_ = torch.tensor(logits[1:])\n                annotated_frame = annotate_with_coordinates(image_source=image_source, boxes=boxes_[:,:], logits=logits_[:], phrases=phrases)\n                cv2.imwrite(cur_screen_shot_path, annotated_frame)\n            else:\n                annotated_frame = annotate_with_coordinates(image_source=image_source, boxes=boxes[:,:], logits=logits[:], phrases=phrases)",
+        "type": "code",
+        "location": "/cradle/provider/gd_provider.py:105-126"
+    },
+    "557": {
+        "file_id": 43,
+        "content": "This code block is responsible for handling different scenarios involving boxes and logits. If there are multiple boxes, it rearranges them and the corresponding logits by comparing their distances to a given distance value. Then, it generates an annotated frame using the adjusted boxes and logits. If there's only one box, it performs similar operations but on sliced arrays. Otherwise, it simply creates an annotated frame without any rearrangement. The final step is writing the annotated frame to a file.",
+        "type": "comment"
+    },
+    "558": {
+        "file_id": 43,
+        "content": "                cv2.imwrite(cur_screen_shot_path, annotated_frame)\n        else:\n            annotated_frame = annotate_with_coordinates(image_source=image_source, boxes=boxes[:,:], logits=logits[:], phrases=phrases)\n            cv2.imwrite(cur_screen_shot_path, annotated_frame)\n    # Process current minimap for detect red points, yellow points and yellow region. return the angle to turn.\n    def process_minimap_targets(self, image_path):\n        minimap_image, boxes, logits, phrases = self.detect(image_path=segment_minimap(image_path),\n                                                                text_prompt=constants.GD_PROMPT,\n                                                                box_threshold=0.29, device='cuda')\n        get_theta = lambda x0, y0, x, y:math.degrees(math.atan2(x - x0, y0 - y))\n        h, w, _ = minimap_image.shape\n        xyxy = box_convert(boxes=boxes.detach().cpu() * torch.Tensor([w, h, w, h]), in_fmt=\"cxcywh\", out_fmt=\"xyxy\").numpy().astype(int)\n        minimap_d",
+        "type": "code",
+        "location": "/cradle/provider/gd_provider.py:127-145"
+    },
+    "559": {
+        "file_id": 43,
+        "content": "This code segment is part of a function in the \"gd_provider.py\" file. It first checks if a current screen shot path exists, and if so, writes an annotated frame to it. If not, it annotates an image based on input parameters like image source, bounding boxes, logits, and phrases, then writes the annotated frame to the specified path. The code segment also includes a function to process a minimap image by detecting red, yellow points, and regions using the detected box coordinates, logits, and phrases, and calculates the angle needed to turn based on these points.",
+        "type": "comment"
+    },
+    "560": {
+        "file_id": 43,
+        "content": "etection_objects = {constants.RED_POINTS: [], constants.YELLOW_POINTS: [], constants.YELLOW_REGION: []}\n        for detect_xyxy, detect_object, detect_confidence in zip(xyxy, phrases, logits):\n            # Exclude too large detections\n            if detect_xyxy[2] - detect_xyxy[0] > 0.8 * w and detect_xyxy[3] - detect_xyxy[1] > 0.8 * h:\n                continue\n            if detect_object == constants.YELLOW_POINTS and (detect_xyxy[2] - detect_xyxy[0] > 0.1 * w or detect_xyxy[3] - detect_xyxy[1] > 0.1 * h):\n                detect_object = constants.YELLOW_REGION\n            tgt_x = int((detect_xyxy[0] + detect_xyxy[2]) / 2)  # center of the box\n            tgt_y = int((detect_xyxy[1] + detect_xyxy[3]) / 2)\n            theta = get_theta(h // 2, w // 2, tgt_x, tgt_y)\n            minimap_detection_objects[detect_object].append(dict(\n                theta=theta,\n            ))\n        return minimap_detection_objects",
+        "type": "code",
+        "location": "/cradle/provider/gd_provider.py:145-165"
+    },
+    "561": {
+        "file_id": 43,
+        "content": "This code is filtering and categorizing detected objects based on size and color. It excludes large detections, merges yellow points into a region if they exceed certain size thresholds, calculates the center position of each detection box, and stores the object's orientation (theta) in a dictionary for further processing. The function returns a dictionary with categorized detections.",
+        "type": "comment"
+    },
+    "562": {
+        "file_id": 44,
+        "content": "/cradle/provider/openai.py",
+        "type": "filepath"
+    },
+    "563": {
+        "file_id": 44,
+        "content": "The code initializes OpenAI provider, generates safe embeddings, provides text embedding and chat completion functions using GPT-4 vision model, manages API requests, handles exceptions, logs completion info, calculates token requirements, and takes user input with error handling for unexpected inputs and different input types.",
+        "type": "summary"
+    },
+    "564": {
+        "file_id": 44,
+        "content": "import os\nfrom typing import (\n    Any,\n    Dict,\n    List,\n    Literal,\n    Optional,\n    Sequence,\n    Set,\n    Tuple,\n    Union,\n)\nimport json\nimport re\nimport io\nimport asyncio\nimport backoff\nimport tiktoken\nimport numpy as np\nimport cv2\nfrom PIL import Image\nfrom openai import OpenAI, AzureOpenAI, APIError, RateLimitError, APITimeoutError\nfrom cradle import constants\nfrom cradle.provider import LLMProvider, EmbeddingProvider\nfrom cradle.config import Config\nfrom cradle.log import Logger\nfrom cradle.utils.json_utils import load_json\nfrom cradle.utils.encoding_utils import encode_base64, decode_base64\nfrom cradle.utils.file_utils import assemble_project_path\nfrom cradle.utils.string_utils import hash_text_sha256\nconfig = Config()\nlogger = Logger()\nMAX_TOKENS = {\n    \"gpt-3.5-turbo-0301\": 4097,\n    \"gpt-3.5-turbo-0613\": 4097,\n    \"gpt-3.5-turbo-16k-0613\": 16385,\n}\nPROVIDER_SETTING_KEY_VAR = \"key_var\"\nPROVIDER_SETTING_EMB_MODEL = \"emb_model\"\nPROVIDER_SETTING_COMP_MODEL = \"comp_model\"\nPROVIDER_SETTING_IS_AZURE = \"is_azure\"\nPROVIDER_SETTING_BASE_VAR = \"base_var\"       # Azure-speficic setting",
+        "type": "code",
+        "location": "/cradle/provider/openai.py:1-47"
+    },
+    "565": {
+        "file_id": 44,
+        "content": "This code imports various libraries and defines constants, dictionaries, and variables for configuring an OpenAI provider in Cradle. It sets up the MAX_TOKENS dictionary, PROVIDER_SETTING_KEY_VAR, PROVIDER_SETTING_EMB_MODEL, PROVIDER_SETTING_COMP_MODEL, PROVIDER_SETTING_IS_AZURE, and PROVIDER_SETTING_BASE_VAR variables for configuring the OpenAI provider.",
+        "type": "comment"
+    },
+    "566": {
+        "file_id": 44,
+        "content": "PROVIDER_SETTING_API_VERSION = \"api_version\" # Azure-speficic setting\nPROVIDER_SETTING_DEPLOYMENT_MAP = \"models\"   # Azure-speficic setting\nclass OpenAIProvider(LLMProvider, EmbeddingProvider):\n    \"\"\"A class that wraps a given model\"\"\"\n    client: Any = None\n    llm_model: str = \"\"\n    embedding_model: str = \"\"\n    allowed_special: Union[Literal[\"all\"], Set[str]] = set()\n    disallowed_special: Union[Literal[\"all\"], Set[str], Sequence[str]] = \"all\"\n    chunk_size: int = 1000\n    embedding_ctx_length: int = 8191\n    request_timeout: Optional[Union[float, Tuple[float, float]]] = None\n    tiktoken_model_name: Optional[str] = None\n    \"\"\"Whether to skip empty strings when embedding or raise an error.\"\"\"\n    skip_empty: bool = False\n    def __init__(self) -> None:\n        \"\"\"Initialize a class instance\n        Args:\n            cfg: Config object\n        Returns:\n            None\n        \"\"\"\n        self.retries = 5\n    def init_provider(self, provider_cfg ) -> None:\n        self.provider_cfg = self._parse_config(provider_cfg)",
+        "type": "code",
+        "location": "/cradle/provider/openai.py:48-83"
+    },
+    "567": {
+        "file_id": 44,
+        "content": "This Python class, OpenAIProvider, is a wrapper for a given model that uses Azure-specific settings such as API version and models. The class has attributes for LLM and Embedding providers, along with other configuration parameters like chunk size, embedding context length, timeout, Tiktoken model name, and options to skip empty strings. It initializes the class instance and allows retries when initializing the provider using a provider configuration.",
+        "type": "comment"
+    },
+    "568": {
+        "file_id": 44,
+        "content": "    def _parse_config(self, provider_cfg) -> dict:\n        \"\"\"Parse the config object\"\"\"\n        conf_dict = dict()\n        if isinstance(provider_cfg, dict):\n            conf_dict = provider_cfg\n        else:\n            path = assemble_project_path(provider_cfg)\n            conf_dict = load_json(path)\n        key_var_name = conf_dict[PROVIDER_SETTING_KEY_VAR]\n        if conf_dict[PROVIDER_SETTING_IS_AZURE]:\n            key = os.getenv(key_var_name)\n            endpoint_var_name = conf_dict[PROVIDER_SETTING_BASE_VAR]\n            endpoint = os.getenv(endpoint_var_name)\n            self.client = AzureOpenAI(\n                api_key = key,\n                api_version = conf_dict[PROVIDER_SETTING_API_VERSION],\n                azure_endpoint = endpoint\n            )\n        else:\n            key = os.getenv(key_var_name)\n            self.client = OpenAI(api_key=key)\n        self.embedding_model = conf_dict[PROVIDER_SETTING_EMB_MODEL]\n        self.llm_model = conf_dict[PROVIDER_SETTING_COMP_MODEL]\n        return conf_dict",
+        "type": "code",
+        "location": "/cradle/provider/openai.py:86-117"
+    },
+    "569": {
+        "file_id": 44,
+        "content": "This function parses a provider configuration file and initializes the appropriate OpenAI client, based on whether the config is for Azure or not. It loads the embedding model and language model specified in the config and assigns them to instance variables.",
+        "type": "comment"
+    },
+    "570": {
+        "file_id": 44,
+        "content": "    @property\n    def _emb_invocation_params(self) -> Dict:\n        openai_args = {\n            \"model\": self.embedding_model,\n        }\n        if self.provider_cfg[PROVIDER_SETTING_IS_AZURE]:\n            engine = self._get_azure_deployment_id_for_model(self.embedding_model)\n            openai_args = {\n                \"model\": self.embedding_model,\n            }\n        return openai_args\n    def embed_with_retry(self, **kwargs: Any) -> Any:\n        \"\"\"Use backoff to retry the embedding call.\"\"\"\n        @backoff.on_exception(\n            backoff.expo,\n            (\n                APIError,\n                RateLimitError,\n                APITimeoutError,\n            ),\n            max_tries=self.retries,\n            max_value=10,\n            jitter=None,\n        )\n        def _embed_with_retry(**kwargs: Any) -> Any:\n            response = self.client.embeddings.create(**kwargs)\n            if any(len(d.embedding) == 1 for d in response.data):\n                raise RuntimeError(\"OpenAI API returned an empty embedding\")",
+        "type": "code",
+        "location": "/cradle/provider/openai.py:119-151"
+    },
+    "571": {
+        "file_id": 44,
+        "content": "The code defines a property _emb_invocation_params, which gets the model name from self.embedding_model and sets it as openai_args['model']. If the provider is Azure, it also retrieves the deployment ID for the specified model using _get_azure_deployment_id_for_model() method and sets it in openai_args. The embed_with_retry() function uses backoff with exponential backoff to retry the embedding call with maximum retries and max value, while handling exceptions such as APIError, RateLimitError, and APITimeoutError.",
+        "type": "comment"
+    },
+    "572": {
+        "file_id": 44,
+        "content": "            return response\n        return _embed_with_retry(**kwargs)\n    def _get_len_safe_embeddings(\n        self,\n        texts: List[str],\n    ) -> List[List[float]]:\n        embeddings: List[List[float]] = [[] for _ in range(len(texts))]\n        try:\n            import tiktoken\n        except ImportError:\n            raise ImportError(\n                \"Could not import tiktoken python package. \"\n                \"This is needed in order to for OpenAIEmbeddings. \"\n                \"Please install it with `pip install tiktoken`.\"\n            )\n        tokens = []\n        indices = []\n        model_name = self.tiktoken_model_name or self.embedding_model\n        try:\n            encoding = tiktoken.encoding_for_model(model_name)\n        except KeyError:\n            logger.warn(\"Warning: model not found. Using cl100k_base encoding.\")\n            model = \"cl100k_base\"\n            encoding = tiktoken.get_encoding(model)\n        for i, text in enumerate(texts):\n            token = encoding.encode(\n                text,",
+        "type": "code",
+        "location": "/cradle/provider/openai.py:152-182"
+    },
+    "573": {
+        "file_id": 44,
+        "content": "This function generates safe embeddings for a list of texts using the OpenAI Embeddings class. It checks if the tiktoken package is installed, and if not, raises an ImportError. The function encodes each text using the encoding corresponding to the provided model name (or falls back to cl100k_base). It then returns a list of lists, where each inner list represents the embeddings for each text in the input.",
+        "type": "comment"
+    },
+    "574": {
+        "file_id": 44,
+        "content": "                allowed_special=self.allowed_special,\n                disallowed_special=self.disallowed_special,\n            )\n            for j in range(0, len(token), self.embedding_ctx_length):\n                tokens.append(token[j : j + self.embedding_ctx_length])\n                indices.append(i)\n        batched_embeddings: List[List[float]] = []\n        _chunk_size = self.chunk_size\n        _iter = range(0, len(tokens), _chunk_size)\n        for i in _iter:\n            response = self.embed_with_retry(\n                input=tokens[i : i + self.chunk_size],\n                **self._emb_invocation_params,\n            )\n            batched_embeddings.extend(r.embedding for r in response.data)\n        results: List[List[List[float]]] = [[] for _ in range(len(texts))]\n        num_tokens_in_batch: List[List[int]] = [[] for _ in range(len(texts))]\n        for i in range(len(indices)):\n            if self.skip_empty and len(batched_embeddings[i]) == 1:\n                continue\n            results[indices[i]].append(batched_embeddings[i])",
+        "type": "code",
+        "location": "/cradle/provider/openai.py:183-206"
+    },
+    "575": {
+        "file_id": 44,
+        "content": "This code is responsible for tokenizing and embedding text into embeddings. It splits the input text into chunks, then retrieves the embeddings using an external API, and finally appends the embeddings to a list of results, handling empty batches if necessary. The chunk size and embedding context length are specified as parameters.",
+        "type": "comment"
+    },
+    "576": {
+        "file_id": 44,
+        "content": "            num_tokens_in_batch[indices[i]].append(len(tokens[i]))\n        for i in range(len(texts)):\n            _result = results[i]\n            if len(_result) == 0:\n                average = self.embed_with_retry(\n                    input=\"\",\n                    **self._emb_invocation_params,\n                ).data[0].embedding\n            else:\n                average = np.average(_result, axis=0, weights=num_tokens_in_batch[i])\n            embeddings[i] = (average / np.linalg.norm(average)).tolist()\n        return embeddings\n    def embed_documents(\n        self,\n        texts: List[str],\n    ) -> List[List[float]]:\n        \"\"\"Call out to OpenAI's embedding endpoint for embedding search docs.\n        Args:\n            texts: The list of texts to embed.\n        Returns:\n            List of embeddings, one for each text.\n        \"\"\"\n        # NOTE: to keep things simple, we assume the list may contain texts longer\n        #       than the maximum context and use length-safe embedding function.\n        return self._get_len_safe_embeddings(texts)",
+        "type": "code",
+        "location": "/cradle/provider/openai.py:207-236"
+    },
+    "577": {
+        "file_id": 44,
+        "content": "This code snippet defines a class method that calculates embeddings for a list of texts. It uses the OpenAI embedding API and implements length-safe embedding to handle longer texts. In case there are no results from the API, it falls back to a default embedding calculation. The calculated embeddings are returned as a list.",
+        "type": "comment"
+    },
+    "578": {
+        "file_id": 44,
+        "content": "    def embed_query(self, text: str) -> List[float]:\n        \"\"\"Call out to OpenAI's embedding endpoint for embedding query text.\n        Args:\n            text: The text to embed.\n        Returns:\n            Embedding for the text.\n        \"\"\"\n        return self.embed_documents([text])[0]\n    def get_embedding_dim(self) -> int:\n        \"\"\"Get the embedding dimension.\"\"\"\n        if self.embedding_model == \"text-embedding-ada-002\":\n            embedding_dim = 1536\n        else:\n            raise ValueError(f\"Unknown embedding model: {self.embedding_model}\")\n        return embedding_dim\n    def create_completion(\n        self,\n        messages: List[Dict[str, str]],\n        model: str | None = None,\n        temperature: float = config.temperature,\n        seed: int = config.seed,\n        max_tokens: int = config.max_tokens,\n    ) -> Tuple[str, Dict[str, int]]:\n        \"\"\"Create a chat completion using the OpenAI API\n        Supports both GPT-4 and GPT-4V).\n        Example Usage:\n        image_path = \"path_to_your_image.jpg\"",
+        "type": "code",
+        "location": "/cradle/provider/openai.py:239-273"
+    },
+    "579": {
+        "file_id": 44,
+        "content": "This code defines functions for embedding text using OpenAI's embedding endpoint, retrieving the embedding dimension based on the model, and creating a chat completion using the OpenAI API. The `embed_query` function takes a text input and returns its corresponding embedding, while `get_embedding_dim` retrieves the dimension of the chosen embedding model. The `create_completion` function generates a chat completion using messages, optional model selection, temperature, seed, and maximum token count.",
+        "type": "comment"
+    },
+    "580": {
+        "file_id": 44,
+        "content": "        base64_image = encode_image(image_path)\n        response, info = self.create_completion(\n            model=\"gpt-4-vision-preview\",\n            messages=[\n              {\n                \"role\": \"user\",\n                \"content\": [\n                  {\n                    \"type\": \"text\",\n                    \"text\": \"What’s in this image?\"\n                  },\n                  {\n                    \"type\": \"image_url\",\n                    \"image_url\": {\n                      \"url\": f\"data:image/jpeg;base64,{base64_image}\"\n                    }\n                  }\n                ]\n              }\n            ],\n        )\n        \"\"\"\n        if model is None:\n            model = self.llm_model\n        if config.debug_mode:\n            logger.debug(f\"Creating chat completion with model {model}, temperature {temperature}, max_tokens {max_tokens}\")\n        else:\n            logger.write(f\"Requesting {model} completion...\")\n        @backoff.on_exception(\n            backoff.constant,\n            (\n                APIError,",
+        "type": "code",
+        "location": "/cradle/provider/openai.py:274-308"
+    },
+    "581": {
+        "file_id": 44,
+        "content": "This code is creating a chat completion using the GPT-4 vision model. It encodes an image into base64 format, then creates a message with both text and image URL for the model to analyze. The model's response will be stored in 'response'. If debug mode is enabled, it logs information about the request being made to the model.",
+        "type": "comment"
+    },
+    "582": {
+        "file_id": 44,
+        "content": "                RateLimitError,\n                APITimeoutError),\n            max_tries=self.retries,\n            interval=10,\n        )\n        def _generate_response_with_retry(\n            messages: List[Dict[str, str]],\n            model: str,\n            temperature: float,\n            seed: int = None,\n            max_tokens: int = 512,\n        ) -> Tuple[str, Dict[str, int]]:\n            \"\"\"Send a request to the OpenAI API.\"\"\"\n            if self.provider_cfg[PROVIDER_SETTING_IS_AZURE]:\n                response = self.client.chat.completions.create(model=model,\n                messages=messages,\n                temperature=temperature,\n                seed=seed,\n                max_tokens=max_tokens,)\n            else:\n                response = self.client.chat.completions.create(model=model,\n                messages=messages,\n                temperature=temperature,\n                seed=seed,\n                max_tokens=max_tokens,)\n            if response is None:\n                logger.error(\"Failed to get a response from OpenAI. Try again.\")",
+        "type": "code",
+        "location": "/cradle/provider/openai.py:309-337"
+    },
+    "583": {
+        "file_id": 44,
+        "content": "This code defines a function that sends a request to the OpenAI API to generate responses. It uses retry logic with rate limiting and timeout handling, and handles Azure and non-Azure providers differently.",
+        "type": "comment"
+    },
+    "584": {
+        "file_id": 44,
+        "content": "                logger.double_check()\n            message = response.choices[0].message.content\n            info = {\n                \"prompt_tokens\" : response.usage.prompt_tokens,\n                \"completion_tokens\" : response.usage.completion_tokens,\n                \"total_tokens\" : response.usage.total_tokens,\n                \"system_fingerprint\" : response.system_fingerprint,\n            }\n            logger.write(f'Response received from {model}.')\n            return message, info\n        return _generate_response_with_retry(\n            messages,\n            model,\n            temperature,\n            seed,\n            max_tokens,\n        )\n    async def create_completion_async(\n            self,\n            messages: List[Dict[str, str]],\n            model: str | None = None,\n            temperature: float = config.temperature,\n            seed: int = config.seed,\n            max_tokens: int = config.max_tokens,\n    ) -> Tuple[str, Dict[str, int]]:\n        if model is None:\n            model = self.llm_model",
+        "type": "code",
+        "location": "/cradle/provider/openai.py:338-371"
+    },
+    "585": {
+        "file_id": 44,
+        "content": "This code retrieves a response from an OpenAI model, handles potential errors with retry logic, logs information about the response, and returns the generated message and usage details. It also provides an asynchronous version of the function for improved efficiency.",
+        "type": "comment"
+    },
+    "586": {
+        "file_id": 44,
+        "content": "        if config.debug_mode:\n            logger.debug(\n                f\"Creating chat completion with model {model}, temperature {temperature}, max_tokens {max_tokens}\")\n        else:\n            logger.write(f\"Requesting {model} completion...\")\n        @backoff.on_exception(\n            backoff.constant,\n            (\n                    APIError,\n                    RateLimitError,\n                    APITimeoutError),\n            max_tries=self.retries,\n            interval=10,\n        )\n        async def _generate_response_with_retry_async(\n                messages: List[Dict[str, str]],\n                model: str,\n                temperature: float,\n                seed: int = None,\n                max_tokens: int = 512,\n        ) -> Tuple[str, Dict[str, int]]:\n            \"\"\"Send a request to the OpenAI API.\"\"\"\n            if self.provider_cfg[PROVIDER_SETTING_IS_AZURE]:\n                response = await asyncio.to_thread(\n                    self.client.chat.completions.create,\n                    model=model,",
+        "type": "code",
+        "location": "/cradle/provider/openai.py:373-400"
+    },
+    "587": {
+        "file_id": 44,
+        "content": "This code snippet is responsible for creating a function that generates a response asynchronously, with support for retrying if an API error, rate limit error, or timeout occurs. The function sends a request to the OpenAI API using Azure client for chat completion and takes parameters such as messages, model, temperature, seed, and max_tokens. If debug mode is enabled, it logs information about the completion being created; otherwise, it simply logs that the completion request is being made.",
+        "type": "comment"
+    },
+    "588": {
+        "file_id": 44,
+        "content": "                    messages=messages,\n                    temperature=temperature,\n                    seed=seed,\n                    max_tokens=max_tokens,\n                )\n            else:\n                response = await asyncio.to_thread(\n                    self.client.chat.completions.create,\n                    model=model,\n                    messages=messages,\n                    temperature=temperature,\n                    seed=seed,\n                    max_tokens=max_tokens,\n                )\n            if response is None:\n                logger.error(\"Failed to get a response from OpenAI. Try again.\")\n                logger.double_check()\n            message = response.choices[0].message.content\n            info = {\n                \"prompt_tokens\": response.usage.prompt_tokens,\n                \"completion_tokens\": response.usage.completion_tokens,\n                \"total_tokens\": response.usage.total_tokens,\n                \"system_fingerprint\": response.system_fingerprint,\n            }\n            logger.write(f'Response received from {model}.')",
+        "type": "code",
+        "location": "/cradle/provider/openai.py:401-429"
+    },
+    "589": {
+        "file_id": 44,
+        "content": "This code retrieves a response from OpenAI's chat completions API, based on the specified model, messages, temperature, seed, and maximum tokens. If the response is None, it tries again and logs an error message. The function then extracts the content of the first message in the response, along with usage information such as prompt, completion, and total tokens, and finally writes a log message indicating the completion of the operation.",
+        "type": "comment"
+    },
+    "590": {
+        "file_id": 44,
+        "content": "            return message, info\n        return await _generate_response_with_retry_async(\n            messages,\n            model,\n            temperature,\n            seed,\n            max_tokens,\n        )\n    def num_tokens_from_messages(self, messages, model):\n        \"\"\"Return the number of tokens used by a list of messages.\n        Borrowed from https://github.com/openai/openai-cookbook/blob/main/examples/How_to_count_tokens_with_tiktoken.ipynb\n        \"\"\"\n        try:\n            encoding = tiktoken.encoding_for_model(model)\n        except KeyError:\n            logger.debug(\"Warning: model not found. Using cl100k_base encoding.\")\n            encoding = tiktoken.get_encoding(\"cl100k_base\")\n        if model in {\n            \"gpt-4-1106-vision-preview\",\n        }:\n            raise ValueError(\"We don't support counting tokens of GPT-4V yet.\")\n        if model in {\n            \"gpt-3.5-turbo-0613\",\n            \"gpt-3.5-turbo-16k-0613\",\n            \"gpt-4-0314\",\n            \"gpt-4-32k-0314\",\n            \"gpt-4-0613\",",
+        "type": "code",
+        "location": "/cradle/provider/openai.py:431-461"
+    },
+    "591": {
+        "file_id": 44,
+        "content": "This code snippet is part of a provider class for OpenAI's services. It defines a method to generate a response using the OpenAI API and counts the number of tokens used by a list of messages based on the model provided. The code uses the Tiktoken encoding for tokenization, and handles exceptions for unsupported models like GPT-4V.",
+        "type": "comment"
+    },
+    "592": {
+        "file_id": 44,
+        "content": "            \"gpt-4-32k-0613\",\n            \"gpt-4-1106-preview\",\n        }:\n            tokens_per_message = 3\n            tokens_per_name = 1\n        elif model == \"gpt-3.5-turbo-0301\":\n            tokens_per_message = (\n                4  # every message follows <|start|>{role/name}\\n{content}<|end|>\\n\n            )\n            tokens_per_name = -1  # if there's a name, the role is omitted\n        else:\n            raise NotImplementedError(\n                f\"\"\"num_tokens_from_messages() is not implemented for model {model}. See https://github.com/openai/openai-python/blob/main/chatml.md for information on how messages are converted to tokens.\"\"\"\n            )\n        num_tokens = 0\n        for message in messages:\n            num_tokens += tokens_per_message\n            for key, value in message.items():\n                num_tokens += len(encoding.encode(value))\n                if key == \"name\":\n                    num_tokens += tokens_per_name\n        num_tokens += 3  # every reply is primed with <|start|>assistant<|message|>",
+        "type": "code",
+        "location": "/cradle/provider/openai.py:462-485"
+    },
+    "593": {
+        "file_id": 44,
+        "content": "The code calculates the number of tokens required for a given message in an OpenAI ChatGPT model based on the model type. It handles models like \"gpt-4-32k-0613\" and \"gpt-3.5-turbo-0301\". The tokens calculation includes the number of messages, their content, name (if present), and prime for each reply. If the model is not supported, it raises a NotImplementedError with a link to information on how messages are converted to tokens.",
+        "type": "comment"
+    },
+    "594": {
+        "file_id": 44,
+        "content": "        return num_tokens\n    def _get_azure_deployment_id_for_model(self, model_label) -> list:\n        return self.provider_cfg[PROVIDER_SETTING_DEPLOYMENT_MAP][model_label]\n    def assemble_prompt_tripartite(self, template_str: str = None, params: Dict[str, Any] = None) -> List[Dict[str, Any]]:\n        \"\"\"\n        A tripartite prompt is a message with the following structure:\n        <system message>\n        <user message part 1 before image introduction>\n        <image introduction>\n        <user message part 2 after image introduction>\n        \"\"\"\n        pattern = re.compile(r\"(.+?)(?=\\n\\n|$)\", re.DOTALL)\n        paragraphs = re.findall(pattern, template_str)\n        filtered_paragraphs = [p for p in paragraphs if p.strip() != '']\n        system_content = filtered_paragraphs[0]  # the system content defaults to the first paragraph of the template\n        system_message = {\n            \"role\": \"system\",\n            \"content\": [\n                {\n                    \"type\": \"text\",\n                    \"text\": f\"{system_content}\"",
+        "type": "code",
+        "location": "/cradle/provider/openai.py:487-516"
+    },
+    "595": {
+        "file_id": 44,
+        "content": "The code defines a function `assemble_prompt_tripartite` which assembles a tripartite prompt consisting of system, user messages, and an image introduction. It uses regular expression to parse the template string into paragraphs, filters empty or whitespace-only paragraphs, and sets the system content as the first non-empty paragraph. The function returns the assembled prompt in list format.",
+        "type": "comment"
+    },
+    "596": {
+        "file_id": 44,
+        "content": "                }\n            ]\n        }\n        # segmenting \"paragraphs\"\n        image_introduction_paragraph_index = None\n        image_introduction_paragraph = None\n        for i, paragraph in enumerate(filtered_paragraphs):\n            if constants.IMAGES_INPUT_TAG in paragraph:\n                image_introduction_paragraph_index = i\n                image_introduction_paragraph = paragraph\n                break\n        user_messages_part1_paragraphs = filtered_paragraphs[1:image_introduction_paragraph_index]\n        user_messages_part2_paragraphs = filtered_paragraphs[image_introduction_paragraph_index + 1:]\n        # assemble user messages part 1\n        user_messages_part1_contents = []\n        for paragraph in user_messages_part1_paragraphs:\n            search_placeholder_pattern = re.compile(r\"<\\$[^\\$]+\\$>\")\n            placeholder = re.search(search_placeholder_pattern, paragraph)\n            if not placeholder:\n                user_messages_part1_contents.append(paragraph)\n            else:\n                placeholder = placeholder.group()",
+        "type": "code",
+        "location": "/cradle/provider/openai.py:517-542"
+    },
+    "597": {
+        "file_id": 44,
+        "content": "This code segments \"paragraphs\" in a document, identifying those containing the constant \"IMAGES_INPUT_TAG\". It then divides the filtered paragraphs into two sections: before and after the image introduction paragraph. The code assembles user messages part 1 by excluding any paragraphs with placeholders like \"<$...$>\".",
+        "type": "comment"
+    },
+    "598": {
+        "file_id": 44,
+        "content": "                placeholder_name = placeholder.replace(\"<$\", \"\").replace(\"$>\", \"\")\n                paragraph_input = params.get(placeholder_name, None)\n                if paragraph_input is None or paragraph_input == \"\" or paragraph_input == []:\n                    continue\n                else:\n                    if isinstance(paragraph_input, str):\n                        paragraph_content = paragraph.replace(placeholder, paragraph_input)\n                        user_messages_part1_contents.append(paragraph_content)\n                    elif isinstance(paragraph_input, list):\n                        paragraph_content = paragraph.replace(placeholder, json.dumps(paragraph_input))\n                        user_messages_part1_contents.append(paragraph_content)\n                    else:\n                        raise ValueError(f\"Unexpected input type: {type(paragraph_input)}\")\n        user_messages_part1_content = \"\\n\\n\".join(user_messages_part1_contents)\n        user_messages_part1 = {\n            \"role\": \"user\",",
+        "type": "code",
+        "location": "/cradle/provider/openai.py:543-560"
+    },
+    "599": {
+        "file_id": 44,
+        "content": "Checks if the input paragraph matches the placeholder and appends modified content to user_messages_part1_contents based on input type. If unexpected input type is encountered, raises ValueError. Finally, joins contents with newlines and assigns to user_messages_part1.",
+        "type": "comment"
+    }
+}

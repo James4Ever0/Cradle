@@ -1,0 +1,542 @@
+{
+    "100": {
+        "file_id": 10,
+        "content": "from .buy import *\nfrom .sell import *\nfrom .map import *\nfrom .move import *\nfrom .trade_utils import *",
+        "type": "code",
+        "location": "/cradle/gameio/atomic_skills/__init__.py:1-5"
+    },
+    "101": {
+        "file_id": 10,
+        "content": "This code imports various functionalities from different modules within the atomic_skills package, which are used for buying, selling, map-related tasks, and trade utilities.",
+        "type": "comment"
+    },
+    "102": {
+        "file_id": 11,
+        "content": "/cradle/gameio/atomic_skills/buy.py",
+        "type": "filepath"
+    },
+    "103": {
+        "file_id": 11,
+        "content": "This code enables seamless navigation through game catalogs and menus using mouse and keyboard actions, facilitating interaction with the environment via specific key presses. It features functions for browsing the catalogue, viewing products, and buying items.",
+        "type": "summary"
+    },
+    "104": {
+        "file_id": 11,
+        "content": "from cradle.config import Config\nfrom cradle.gameio import IOEnvironment\nfrom cradle.gameio.skill_registry import register_skill, post_skill_wait\nconfig = Config()\nio_env = IOEnvironment()\n@register_skill(\"zoom\")\ndef zoom():\n    \"\"\"\n    Enables zoom after opening the catalog.\n    \"\"\"\n    io_env.mouse_hold_button(io_env.RIGHT_MOUSE_BUTTON)\n@register_skill(\"cancel_zoom\")\ndef cancel_zoom():\n    \"\"\"\n    Releases the right mouse button to exit zoom.\n    \"\"\"\n    io_env.mouse_release_button(io_env.RIGHT_MOUSE_BUTTON)\n@register_skill(\"browse_catalogue\")\ndef browse_catalogue(duration=1):\n    \"\"\"\n    Opens the catalog by pressing the \"e\" key for a specified duration.\n    Note: it must run the shopkeeper_interaction function before running this function.\n    Parameters:\n     - duration: The duration for which the \"e\" key is held down (default is 1 second).\n    \"\"\"\n    io_env.key_hold('e', duration)\n    post_skill_wait(config.DEFAULT_POST_ACTION_WAIT_TIME)\n@register_skill(\"view_next_page\")\ndef view_next_page():\n    \"\"\"\n    Pressing \"e\" opens the next page in the catalog.",
+        "type": "code",
+        "location": "/cradle/gameio/atomic_skills/buy.py:1-42"
+    },
+    "105": {
+        "file_id": 11,
+        "content": "The code defines several skills for interacting with the game catalog using mouse and keyboard actions. It includes \"zoom\" to enable zoom after opening the catalog, \"cancel_zoom\" to exit zoom, \"browse_catalogue\" to open the catalog for a specified duration, and \"view_next_page\" to move to the next page in the catalog. The skills are registered using `register_skill` function from `cradle.gameio.skill_registry`, and the actions are performed via `IOEnvironment` object.",
+        "type": "comment"
+    },
+    "106": {
+        "file_id": 11,
+        "content": "    \"\"\"\n    io_env.key_press('e')\n    post_skill_wait(config.DEFAULT_POST_ACTION_WAIT_TIME)\n@register_skill(\"view_previous_page\")\ndef view_previous_page():\n    \"\"\"\n    Pressing \"q\" returns to the previous page in the catalog.\n    \"\"\"\n    io_env.key_press('q')\n    post_skill_wait(config.DEFAULT_POST_ACTION_WAIT_TIME)\n@register_skill(\"confirm_selection\")\ndef confirm_selection():\n    \"\"\"\n    Confirm the selected item in the menu.\n    \"\"\"\n    io_env.key_press('enter')\n@register_skill(\"select_next_product_type_in_menu\")\ndef select_next_product_type_in_menu():\n    \"\"\"\n    Move to the next product type in the menu by pressing the \"down\" arrow key.\n    \"\"\"\n    io_env.key_press('down')\n@register_skill(\"select_previous_product_type_in_menu\")\ndef select_previous_product_type_in_menu():\n    \"\"\"\n    Move to the previous product type in the menu by pressing the \"up\" arrow key.\n    \"\"\"\n    io_env.key_press('up')\n@register_skill(\"buy_product\")\ndef buy_product():\n    \"\"\"\n    Pressing \"enter\" purchases the selected product.\n    \"\"\"\n    io_env.key_press('enter')",
+        "type": "code",
+        "location": "/cradle/gameio/atomic_skills/buy.py:43-88"
+    },
+    "107": {
+        "file_id": 11,
+        "content": "This code defines various skills for interaction with a menu, including moving to the previous/next page, confirming selection, and buying a product. The skills use key presses ('e', 'q', 'enter', 'up', 'down') to perform corresponding actions in the menu environment.",
+        "type": "comment"
+    },
+    "108": {
+        "file_id": 11,
+        "content": "@register_skill(\"view_info\")\ndef view_info():\n    \"\"\"\n    Views product price and basic information by pressing \"f\".\n    \"\"\"\n    io_env.key_press('f')\n@register_skill(\"hide_info\")\ndef hide_info():\n    \"\"\"\n    Hides product price and basic information by pressing \"f\".\n    \"\"\"\n    io_env.key_press('f')\n@register_skill(\"product_details\")\ndef product_details():\n    \"\"\"\n    Views detailed information about the product by pressing \"space\".\n    \"\"\"\n    io_env.key_press('space')\n@register_skill(\"scroll_up_keyboard_for_info\")\ndef scroll_up_keyboard_for_info():\n    \"\"\"\n    Scrolls up in the catalog using the \"up\" arrow key.\n    \"\"\"\n    io_env.key_press('up')\n@register_skill(\"scroll_down_keyboard_for_info\")\ndef scroll_down_keyboard_for_info():\n    \"\"\"\n    Scrolls down in the catalog using the \"down\" arrow key.\n    \"\"\"\n    io_env.key_press('down')\n@register_skill(\"scroll_up_mouse_for_info\")\ndef scroll_up_mouse_for_info():\n    \"\"\"\n    Scrolls up in the catalog using the mouse wheel up.\n    \"\"\"\n    io_env.mouse_click_button(io_env.WHEEL_UP_MOUSE_BUTTON)",
+        "type": "code",
+        "location": "/cradle/gameio/atomic_skills/buy.py:91-136"
+    },
+    "109": {
+        "file_id": 11,
+        "content": "The code defines several skills for interacting with a catalog using keyboard and mouse inputs. The \"view_info\" and \"hide_info\" skills toggle the display of product price and basic information by pressing \"f\". The \"product_details\" skill shows detailed product info with a space press. The \"scroll_up_keyboard_for_info\", \"scroll_down_keyboard_for_info\" skills use arrow keys to navigate catalog, while \"scroll_up_mouse_for_info\" uses the mouse wheel up for scrolling. All these functionalities are registered as skills using @register_skill decorator.",
+        "type": "comment"
+    },
+    "110": {
+        "file_id": 11,
+        "content": "@register_skill(\"scroll_down_mouse_for_info\")\ndef scroll_down_mouse_for_info():\n    \"\"\"\n    Scrolls down in the catalog using the mouse wheel down.\n    \"\"\"\n    io_env.mouse_click_button(io_env.WHEEL_DOWN_MOUSE_BUTTON)\n# Buy products on the shelves\n@register_skill(\"examine_product\")\ndef examine_product(duration=1):\n    \"\"\"\n    Examines a product on the shelf for a specified duration.\n    Parameters:\n     - duration: The duration for which the \"e\" key is held down (default is 1 second).\n    \"\"\"\n    io_env.key_hold('e', duration)\n@register_skill(\"toggle_view\")\ndef toggle_view():\n    \"\"\"\n    Toggles the view mode.\n    \"\"\"\n    io_env.key_press('v')\n@register_skill(\"purchase_from_shelf\")\ndef purchase_from_shelf(duration=1):\n    \"\"\"\n    Buys a product from the shelf by holding down the \"r\" key for a specified duration.\n    Parameters:\n     - duration: The duration for which the \"r\" key is held down (default is 1 second).\n    \"\"\"\n    io_env.key_hold('r', duration)\n@register_skill(\"browse_shelf\")\ndef browse_shelf(duration=1):",
+        "type": "code",
+        "location": "/cradle/gameio/atomic_skills/buy.py:139-179"
+    },
+    "111": {
+        "file_id": 11,
+        "content": "This code includes several functions for interacting with in-game items, such as scrolling down a catalog using the mouse wheel and purchasing products from shelves. The functions can be registered and called to interact with game objects by holding certain keys or clicking the mouse button for specified durations.",
+        "type": "comment"
+    },
+    "112": {
+        "file_id": 11,
+        "content": "    \"\"\"\n    Opens the context menu on a shelf by holding down the right mouse button for a specified duration.\n    Parameters:\n     - duration: The duration for which the right mouse button is held down (default is 1 second).\n    \"\"\"\n    io_env.mouse_hold_button(io_env.RIGHT_MOUSE_BUTTON, duration)\n@register_skill(\"select_product_type\")\ndef select_product_type():\n    \"\"\"\n    Moving the mouse over the specified product type and pressing enter\n    allows viewing the contained products.\n    \"\"\"\n    io_env.key_press('enter')\n__all__ = [\n    \"browse_catalogue\",\n    \"view_next_page\",\n    \"view_previous_page\",\n    \"buy_product\",\n]",
+        "type": "code",
+        "location": "/cradle/gameio/atomic_skills/buy.py:180-203"
+    },
+    "113": {
+        "file_id": 11,
+        "content": "This code opens the context menu on a shelf by holding down the right mouse button for a specified duration, and allows viewing contained products by moving the mouse over the specified product type and pressing enter. It includes functions for browsing the catalogue, viewing next or previous page, and buying a product.",
+        "type": "comment"
+    },
+    "114": {
+        "file_id": 12,
+        "content": "/cradle/gameio/atomic_skills/combat.py",
+        "type": "filepath"
+    },
+    "115": {
+        "file_id": 12,
+        "content": "The code includes four skills: aiming, selecting weapons, shooting, and fighting, utilizing mouse and keyboard input.",
+        "type": "summary"
+    },
+    "116": {
+        "file_id": 12,
+        "content": "from cradle.config import Config\nfrom cradle.gameio import IOEnvironment\nfrom cradle.gameio.skill_registry import register_skill\nconfig = Config()\nio_env = IOEnvironment()\n@register_skill(\"aim\")\ndef aim():\n    \"\"\"\n    Aim the weapon in the game.\n    \"\"\"\n    io_env.mouse_hold_button(button=io_env.RIGHT_MOUSE_BUTTON)\n@register_skill(\"select_weapon\")\ndef select_weapon(x, y):\n    \"\"\"\n    Move the mouse to a specific location to select the weapon in the game.\n    Parameters:\n    - x: The normalized abscissa of the pixel.\n    - y: The normalized ordinate of the pixel.\n    \"\"\"\n    io_env.mouse_move_normalized(x, y)\n@register_skill(\"select_sidearm\")\ndef select_sidearm(x, y):\n    \"\"\"\n    Move the mouse to a specific location to select the sidearm in the game.\n    Parameters:\n    - x: The normalized abscissa of the pixel.\n    - y: The normalized ordinate of the pixel.\n    \"\"\"\n    select_weapon(x, y)\n@register_skill(\"shoot\")\ndef shoot(x, y):\n    \"\"\"\n    Shoot the weapon at a specific location in view.\n    Parameters:\n    - x: The normalized abscissa of the pixel.",
+        "type": "code",
+        "location": "/cradle/gameio/atomic_skills/combat.py:1-44"
+    },
+    "117": {
+        "file_id": 12,
+        "content": "This code registers four skills: \"aim\", \"select_weapon\", \"select_sidearm\", and \"shoot\". The \"aim\" skill holds the right mouse button, while \"select_weapon\" and \"select_sidearm\" move the mouse to a specified location. Lastly, the \"shoot\" skill shoots at the given pixel location in view.",
+        "type": "comment"
+    },
+    "118": {
+        "file_id": 12,
+        "content": "    - y: The normalized ordinate of the pixel.\n    \"\"\"\n    io_env.mouse_move_normalized(x=x, y=y, relative=True, from_center = True)\n    io_env.mouse_click_button(button=io_env.LEFT_MOUSE_BUTTON, clicks=2, duration=0.1)\n@register_skill(\"view_weapons\")\ndef view_weapons():\n    \"\"\"\n    View the weapon wheel.\n    \"\"\"\n    io_env.key_hold('tab')\n@register_skill(\"fight\")\ndef fight():\n    \"\"\"\n    Fight agains another person.\n    \"\"\"\n    io_env.key_press('f,f,f,f,f,f')\n__all__ = [\n    \"aim\",\n    \"shoot\",\n    \"select_weapon\",\n    \"select_sidearm\",\n    \"fight\",\n]",
+        "type": "code",
+        "location": "/cradle/gameio/atomic_skills/combat.py:45-73"
+    },
+    "119": {
+        "file_id": 12,
+        "content": "This code appears to contain a set of skills for a game, including aiming, shooting, selecting weapons, fighting, and viewing the weapon wheel. The \"mouse_move_normalized\" function moves the mouse cursor, while \"key_hold\" and \"key_press\" functions handle keyboard input. The \"fight\" skill seems to involve pressing 'f' repeatedly.",
+        "type": "comment"
+    },
+    "120": {
+        "file_id": 13,
+        "content": "/cradle/gameio/atomic_skills/map.py",
+        "type": "filepath"
+    },
+    "121": {
+        "file_id": 13,
+        "content": "This code defines map interaction functions for game navigation, using key presses and IOEnvironment class. It allows scrolling through index with the \"down\" arrow key in Atomic Skills map module.",
+        "type": "summary"
+    },
+    "122": {
+        "file_id": 13,
+        "content": "from cradle.config import Config\nfrom cradle.log import Logger\nfrom cradle.gameio import IOEnvironment\nfrom cradle.gameio.skill_registry import register_skill, post_skill_wait\nconfig = Config()\nlogger = Logger()\nio_env = IOEnvironment()\n@register_skill(\"open_map\")\ndef open_map():\n    \"\"\"\n    Opens the in-game map.\n    \"\"\"\n    logger.write(\"Running open_map()\")\n    io_env.key_press('m')\n    post_skill_wait(config.DEFAULT_POST_ACTION_WAIT_TIME)\n@register_skill(\"add_mark\")\ndef add_mark():\n    \"\"\"\n    Marks the current mouse position on the map by pressing \"z\".\n    A red message indicating the mark will appear on the map.\n    Clicks the Cancel message if it appears.\n    \"\"\"\n    io_env.key_press('z')\n@register_skill(\"add_waypoint\")\ndef add_waypoint():\n    \"\"\"\n    Creates a waypoint at the item selected in the opened map index, by pressing \"enter\".\n    Waypoint creation displays the path to the target location.\n    \"\"\"\n    logger.write(\"Running add_waypoint()\")\n    io_env.key_press('enter')\n@register_skill(\"close_map\")\ndef close_map():",
+        "type": "code",
+        "location": "/cradle/gameio/atomic_skills/map.py:1-46"
+    },
+    "123": {
+        "file_id": 13,
+        "content": "This code defines several functions for interacting with the in-game map, such as opening it, adding a mark, creating a waypoint, and closing it. It uses the IOEnvironment class from cradle.gameio to perform key presses and utilizes Config and Logger classes from cradle.config and cradle.log respectively.",
+        "type": "comment"
+    },
+    "124": {
+        "file_id": 13,
+        "content": "    \"\"\"\n    Closes the in-game map by pressing \"esc\".\n    \"\"\"\n    io_env.key_press('esc')\n    post_skill_wait(config.DEFAULT_POST_ACTION_WAIT_TIME)\n@register_skill(\"open_index\")\ndef open_index():\n    \"\"\"\n    Opens the map index by pressing the \"space\" key, after the map is open.\n    \"\"\"\n    logger.write(\"Running open_index()\")\n    io_env.key_press('space')\n    post_skill_wait(config.DEFAULT_POST_ACTION_WAIT_TIME)\n@register_skill(\"close_index\")\ndef close_index():\n    \"\"\"\n    Closes the game index by pressing the \"space\" key.\n    \"\"\"\n    io_env.key_press('space')\n    post_skill_wait(config.DEFAULT_POST_ACTION_WAIT_TIME)\n@register_skill(\"select_previous_index_object\")\ndef select_previous_index_object():\n    \"\"\"\n    When the index is opened, moves to the previous index selection by pressing the \"up\" arrow key.\n    Items of interest may be out of view, so this skill is useful for scrolling through the index.\n    \"\"\"\n    io_env.key_press('up')\n@register_skill(\"select_next_index_object\")\ndef select_next_index_object():\n    \"\"\"",
+        "type": "code",
+        "location": "/cradle/gameio/atomic_skills/map.py:47-89"
+    },
+    "125": {
+        "file_id": 13,
+        "content": "This code defines several skills for manipulating the in-game map. \"open_index\" opens the map index by pressing the \"space\" key, \"close_index\" closes the game index by pressing the \"space\" key, \"select_previous_index_object\" moves to the previous index selection using the \"up\" arrow key, and \"select_next_index_object\" moves to the next index selection using the \"up\" arrow key. These skills use \"io_env.key_press()\" function for input actions and have a wait time after each action with \"post_skill_wait()\".",
+        "type": "comment"
+    },
+    "126": {
+        "file_id": 13,
+        "content": "    When the index is opened, moves to the next index selection by pressing the \"down\" arrow key.\n    Items of interest may be out of view, so this skill is useful for scrolling through the index.\n    \"\"\"\n    io_env.key_press('down')\n__all__ = [\n    \"open_map\",\n    \"add_waypoint\",\n    \"close_map\",\n    \"open_index\",\n    \"close_index\",\n    \"select_previous_index_object\",\n    \"select_next_index_object\",\n]",
+        "type": "code",
+        "location": "/cradle/gameio/atomic_skills/map.py:90-104"
+    },
+    "127": {
+        "file_id": 13,
+        "content": "This code opens the index in a game and allows the user to scroll through it using the \"down\" arrow key. It is part of the Atomic Skills map module, likely for navigation purposes.",
+        "type": "comment"
+    },
+    "128": {
+        "file_id": 14,
+        "content": "/cradle/gameio/atomic_skills/move.py",
+        "type": "filepath"
+    },
+    "129": {
+        "file_id": 14,
+        "content": "The code features two atomic skills, \"turn_and_move_forward\" and \"turn,\" for controlling character movement. It also includes additional skills for interacting with a horse such as mounting, dismounting, and stopping the horse via the \"Ctrl\" key.",
+        "type": "summary"
+    },
+    "130": {
+        "file_id": 14,
+        "content": "from cradle.config import Config\nfrom cradle.log import Logger\nfrom cradle.gameio import IOEnvironment\nfrom cradle.gameio.skill_registry import register_skill, post_skill_wait\nfrom cradle.gameio.lifecycle.ui_control import pause_game, unpause_game\nconfig = Config()\nlogger = Logger()\nio_env = IOEnvironment()\n@register_skill(\"turn_and_move_forward\")\ndef turn_and_move_forward(theta, duration):\n    \"\"\"\n    First turns the in-game character left or right based on the specified theta angle and then moves the in-game character forward for the specified duration.\n    Parameters:\n    - theta: The angle for the turn. Use a negative value to turn left and a positive value to turn right.\n    For example, if theta = 30, the character will turn right 30 degrees. If theta = -30, the character will turn left 30 degrees.\n    - duration: The duration in seconds for which the character should move forward.\n    \"\"\"\n    turn(theta)\n    move_forward(duration)\n@register_skill(\"turn\")\ndef turn(theta):\n    \"\"\"\n    Turns the in-game character left or right based on the specified theta angle.",
+        "type": "code",
+        "location": "/cradle/gameio/atomic_skills/move.py:1-29"
+    },
+    "131": {
+        "file_id": 14,
+        "content": "The code defines two atomic skills - \"turn_and_move_forward\" and \"turn\". These skills control the in-game character's movement by turning left or right based on a specified angle, followed by moving forward for a specified duration. The skills are registered with the skill registry for use within the game environment.",
+        "type": "comment"
+    },
+    "132": {
+        "file_id": 14,
+        "content": "    Parameters:\n    - theta: The angle for the turn. Use a negative value to turn left and a positive value to turn right.\n    For example, if theta = 30, the character will turn right 30 degrees. If theta = -30, the character will turn left 30 degrees.\n    \"\"\"\n    io_env.mouse_move_horizontal_angle(theta)\n@register_skill(\"move_forward\")\ndef move_forward(duration):\n    \"\"\"\n    Moves the in-game character forward for the specified duration.\n    Parameters:\n    - duration: The duration in seconds for which the character should move forward.\n    \"\"\"\n    io_env.key_hold('w', duration)\n@register_skill(\"mount_horse\")\ndef mount_horse():\n    \"\"\"\n    Needs to be close to the horse. Mounts the horse by pressing the \"e\" key.\n    \"\"\"\n    io_env.key_press('e')\n    post_skill_wait(config.DEFAULT_POST_ACTION_WAIT_TIME)\n@register_skill(\"dismount_horse\")\ndef dismount_horse():\n    \"\"\"\n    Dismounts the horse by pressing the \"e\" key.\n    \"\"\"\n    io_env.key_press('e')\n    post_skill_wait(config.DEFAULT_POST_ACTION_WAIT_TIME)\n@register_skill(\"stop_horse\")",
+        "type": "code",
+        "location": "/cradle/gameio/atomic_skills/move.py:31-69"
+    },
+    "133": {
+        "file_id": 14,
+        "content": "This code includes skills for character movement and interaction with a horse. The \"move_forward\" skill moves the character forward for a specified duration, \"mount_horse\" mounts the horse when close by pressing \"e\", \"dismount_horse\" dismounts the horse also by pressing \"e\", and \"stop_horse\" is likely for stopping the horse but code is missing. Angle-based turning is available with the \"move\" skill.",
+        "type": "comment"
+    },
+    "134": {
+        "file_id": 14,
+        "content": "def stop_horse():\n    \"\"\"\n    Stops the horse by pressing the \"Ctrl\" key.\n    \"\"\"\n    io_env.key_press('ctrl', 0.5)\n__all__ = [\n    \"turn\",\n    \"move_forward\",\n    \"turn_and_move_forward\",\n    \"mount_horse\",\n    \"dismount_horse\",\n    \"stop_horse\",\n]",
+        "type": "code",
+        "location": "/cradle/gameio/atomic_skills/move.py:70-84"
+    },
+    "135": {
+        "file_id": 14,
+        "content": "This function stops the horse by pressing the \"Ctrl\" key, and it is included in the `__all__` list.",
+        "type": "comment"
+    },
+    "136": {
+        "file_id": 15,
+        "content": "/cradle/gameio/atomic_skills/sell.py",
+        "type": "filepath"
+    },
+    "137": {
+        "file_id": 15,
+        "content": "The code provides skills for selling products in a game, including \"sell_product\", \"sell_single_product_all_quantity\" and \"sell_one_product\". It also contains functions for switching between product types using keys 'e' and 'q', simulating key presses with the 'io_env.key_press' function.",
+        "type": "summary"
+    },
+    "138": {
+        "file_id": 15,
+        "content": "from cradle.gameio import IOEnvironment\nfrom cradle.gameio.skill_registry import register_skill\nio_env = IOEnvironment()\n@register_skill(\"sell_product\")\ndef sell_product(duration=1):\n    \"\"\"\n    Opens the trade bar for selling products.\n    Note: it must run the shopkeeper_interaction function before running this function\n    Parameters:\n     - duration: The duration for which the \"r\" key is held down (default is 1 second).\n    \"\"\"\n    io_env.key_hold('r', duration)\n@register_skill(\"sell_single_product_all_quantity\")\ndef sell_single_product_all_quantity(duration=1.0):\n    \"\"\"\n    Presses and holds the \"f\" key to sell the quantity of one unit of the current product.\n    Note: The product quantity must be greater than one.\n    Parameters:\n     - duration: The duration for which the \"f\" key is held down in seconds (default is 1.0 second).\n    \"\"\"\n    io_env.key_hold('f', duration)\n@register_skill(\"sell_one_product\")\ndef sell_one_product():\n    \"\"\"\n    Presses \"enter\" to sell one unit of the current product.\n    \"\"\"",
+        "type": "code",
+        "location": "/cradle/gameio/atomic_skills/sell.py:1-34"
+    },
+    "139": {
+        "file_id": 15,
+        "content": "The code defines three skills for selling products in a game. The \"sell_product\" skill opens the trade bar for selling products, \"sell_single_product_all_quantity\" sells one unit of the current product by holding the \"f\" key, and \"sell_one_product\" sells one unit of the current product by pressing \"enter\". Each skill can be executed with different durations depending on user input.",
+        "type": "comment"
+    },
+    "140": {
+        "file_id": 15,
+        "content": "    io_env.key_press('enter')\n@register_skill(\"switch_to_next_product_type\")\ndef switch_to_next_product_type():\n    \"\"\"\n    Presses \"e\" to switch to the next product type.\n    \"\"\"\n    io_env.key_press('e')\n@register_skill(\"switch_to_previous_product_type\")\ndef switch_to_previous_product_type():\n    \"\"\"\n    Presses \"q\" to switch to the previous product type.\n    \"\"\"\n    io_env.key_press('q')\n__all__ = [\n]",
+        "type": "code",
+        "location": "/cradle/gameio/atomic_skills/sell.py:35-55"
+    },
+    "141": {
+        "file_id": 15,
+        "content": "This code contains three functions: \"switch_to_next_product_type\", \"switch_to_previous_product_type\". It presses \"e\" and \"q\" respectively to switch between product types. The 'io_env.key_press' function simulates key presses.",
+        "type": "comment"
+    },
+    "142": {
+        "file_id": 16,
+        "content": "/cradle/gameio/atomic_skills/trade_utils.py",
+        "type": "filepath"
+    },
+    "143": {
+        "file_id": 16,
+        "content": "The code provides game shopkeeper interaction skills using mouse actions and pydirectinput for keyboard inputs, including functions for product selection.",
+        "type": "summary"
+    },
+    "144": {
+        "file_id": 16,
+        "content": "from cradle.config import Config\nfrom cradle.gameio import IOEnvironment\nfrom cradle.gameio.skill_registry import register_skill, post_skill_wait\nconfig = Config()\nio_env = IOEnvironment()\n@register_skill(\"shopkeeper_interaction\")\ndef shopkeeper_interaction():\n    \"\"\"\n    Initiates interaction with the shopkeeper by long-pressing the right mouse button.\n    This action opens the transaction menu.\n    Note: The transaction type must be determined and the interaction closed afterward.\n    \"\"\"\n    io_env.mouse_hold_button(button=io_env.RIGHT_MOUSE_BUTTON)\n    post_skill_wait(config.DEFAULT_POST_ACTION_WAIT_TIME)\n@register_skill(\"cancel_shopkeeper_interaction\")\ndef cancel_shopkeeper_interaction():\n    \"\"\"\n    Cancels the interaction with the shopkeeper by releasing the right mouse button.\n    \"\"\"\n    io_env.mouse_release_button(button=io_env.RIGHT_MOUSE_BUTTON)\n    post_skill_wait(config.DEFAULT_POST_ACTION_WAIT_TIME)\n@register_skill(\"mouse_select_item\")\ndef mouse_select_item(x, y):\n    \"\"\"\n    Move the mouse to a specific location to select the item in the game.",
+        "type": "code",
+        "location": "/cradle/gameio/atomic_skills/trade_utils.py:1-34"
+    },
+    "145": {
+        "file_id": 16,
+        "content": "This code defines skills for interacting with a shopkeeper and selecting items in a game using mouse actions. The \"shopkeeper_interaction\" skill initiates interaction by long-pressing the right mouse button, while \"cancel_shopkeeper_interaction\" cancels the interaction by releasing the button. The \"mouse_select_item\" skill moves the mouse to a specific location to select an item in the game. All skills include post-action wait time using config.DEFAULT_POST_ACTION_WAIT_TIME.",
+        "type": "comment"
+    },
+    "146": {
+        "file_id": 16,
+        "content": "    Parameters:\n    - x: The normalized abscissa of the pixel.\n    - y: The normalized ordinate of the pixel.\n    \"\"\"\n    io_env.mouse_move_normalized(x, y)\n@register_skill(\"mouse_confirm_item\")\ndef mouse_confirm_item():\n    \"\"\"\n    Confirms the selection item by clicking the left mouse button once.\n    \"\"\"\n    io_env.mouse_click_button(button=io_env.LEFT_MOUSE_BUTTON)\n@register_skill(\"go_back\")\ndef go_back():\n    \"\"\"\n    Returns to the upper level by pressing the \"esc\" key.\n    \"\"\"\n    io_env.key_press('esc')\n    post_skill_wait(config.DEFAULT_POST_ACTION_WAIT_TIME)\n@register_skill(\"select_upside_product\")\ndef select_upside_product():\n    \"\"\"\n    This function simulates the action of selecting the product on the next upside of the current selected product.\n    It uses the pydirectinput library to press the \"up\" key.\n    \"\"\"\n    io_env.key_press('up')\n@register_skill(\"select_downside_product\")\ndef select_downside_product():\n    \"\"\"\n    This function simulates the action of selecting the product on the next downside of the current selected product.",
+        "type": "code",
+        "location": "/cradle/gameio/atomic_skills/trade_utils.py:35-72"
+    },
+    "147": {
+        "file_id": 16,
+        "content": "The code includes functions for interacting with the game interface using input commands. The \"mouse_confirm_item\" function clicks the left mouse button to confirm a selection, while \"go_back\" function presses the \"esc\" key to return to the previous level. The \"select_upside_product\" and \"select_downside_product\" functions use the \"up\" and \"down\" keys to navigate product listings.",
+        "type": "comment"
+    },
+    "148": {
+        "file_id": 16,
+        "content": "    It uses the pydirectinput library to press the \"down\" key.\n    \"\"\"\n    io_env.key_press('down')\n@register_skill(\"select_leftside_product\")\ndef select_leftside_product():\n    \"\"\"\n    This function simulates the action of selecting the product on the next leftside of the current selected product.\n    It uses the pydirectinput library to press the \"left\" key.\n    \"\"\"\n    io_env.key_press('left')\n@register_skill(\"select_rightside_product\")\ndef select_rightside_product():\n    \"\"\"\n    This function simulates the action of selecting the product on the next rightside of the current selected product.\n    It uses the pydirectinput library to press the \"right\" key.\n    \"\"\"\n    io_env.key_press('right')\n@register_skill(\"select_next_product\")\ndef select_next_product():\n    \"\"\"\n    This function simulates the action of selecting the next product of the current selected product.\n    It uses the pydirectinput library to press the \"right\" key.\n    \"\"\"\n    io_env.key_press('right')\n__all__ = [\n    \"shopkeeper_interaction\",\n    \"cancel_shopkeeper_interaction\",",
+        "type": "code",
+        "location": "/cradle/gameio/atomic_skills/trade_utils.py:73-107"
+    },
+    "149": {
+        "file_id": 16,
+        "content": "This code utilizes the pydirectinput library to simulate user keyboard inputs for selecting products in a game. The functions \"select_leftside_product\", \"select_rightside_product\", and \"select_next_product\" enable navigation through product options using the 'left', 'right', and 'down' keys, respectively.",
+        "type": "comment"
+    },
+    "150": {
+        "file_id": 16,
+        "content": "    \"select_upside_product\",\n    \"select_downside_product\",\n    \"select_leftside_product\",\n    \"select_rightside_product\",\n]",
+        "type": "code",
+        "location": "/cradle/gameio/atomic_skills/trade_utils.py:108-112"
+    },
+    "151": {
+        "file_id": 16,
+        "content": "These lines define four different product selection functions: \"select_upside_product\", \"select_downside_product\", \"select_leftside_product\", and \"select_rightside_product\". Each function likely selects a specific product based on certain conditions or parameters, such as direction or side.",
+        "type": "comment"
+    },
+    "152": {
+        "file_id": 17,
+        "content": "/cradle/gameio/composite_skills/auto_shoot.py",
+        "type": "filepath"
+    },
+    "153": {
+        "file_id": 17,
+        "content": "This code is for a game AI system that automatically targets and shoots enemies in shooting games. It uses screenshots, target detection, angle adjustment, area sorting, and filters unnecessary boxes. It detects targets, shoots if detected, follows a red circle, saves annotated images, logs coordinates with post-wait time, and uses action identifiers for various targets.",
+        "type": "summary"
+    },
+    "154": {
+        "file_id": 17,
+        "content": "import os\nimport time\nimport numpy as np\nimport cv2\nimport torch\nfrom torchvision.ops import box_convert\nfrom groundingdino.util.inference import load_model, load_image, predict, annotate\nfrom cradle.gameio.lifecycle.ui_control import take_screenshot, CircleDetector, unpause_game,pause_game\nfrom cradle.gameio.atomic_skills.combat import aim, shoot\nfrom cradle.gameio.lifecycle.ui_control import switch_to_game, take_screenshot\nfrom cradle.gameio.atomic_skills.move import turn, move_forward\nfrom cradle.gameio.skill_registry import register_skill\nfrom cradle.provider import GdProvider\nfrom cradle.config import Config\nfrom cradle.log import Logger\nfrom cradle.gameio import IOEnvironment\nconfig = Config()\nlogger = Logger()\nio_env = IOEnvironment()\ngd_detector = GdProvider()\nDEFAULT_MAX_SHOOTING_ITERATIONS = 100\nSHOOT_PEOPLE_TARGET_NAME = \"person\"\nSHOOT_WOLVES_TARGET_NAME = \"wolf\"\nCONTINUE_NO_ENEMY_FREQ = 5\n@register_skill(\"shoot_people\")\ndef shoot_people():\n    \"\"\"\n    Shoot at person-shaped targets, if necessary.\n    \"\"\"",
+        "type": "code",
+        "location": "/cradle/gameio/composite_skills/auto_shoot.py:1-34"
+    },
+    "155": {
+        "file_id": 17,
+        "content": "The code is part of a game AI system, likely designed for shooting targets like people or wolves. It imports necessary libraries and registers the \"shoot_people\" skill in the skill registry. The function shoot_people() is responsible for shooting at person-shaped targets if necessary. The code uses various functions from different modules to achieve this task, such as loading models, taking screenshots, aiming, and shooting. It also has a maximum number of shooting iterations and continues shooting even without enemies after a certain frequency.",
+        "type": "comment"
+    },
+    "156": {
+        "file_id": 17,
+        "content": "    keep_shooting_target(DEFAULT_MAX_SHOOTING_ITERATIONS, detect_target=SHOOT_PEOPLE_TARGET_NAME, debug=False)\n@register_skill(\"shoot_wolves\")\ndef shoot_wolves():\n    \"\"\"\n    Shoot at wolf targets, if necessary.\n    \"\"\"\n    keep_shooting_target(DEFAULT_MAX_SHOOTING_ITERATIONS, detect_target=SHOOT_WOLVES_TARGET_NAME, debug=False)\ndef keep_shooting_target(\n        iterations,\n        detect_target=\"wolf\",\n        debug=True\n):\n    '''\n    Keep shooting the 'detect_target' detected by object detector automatically.\n    '''\n    POST_WAIT_TIME = 0.1\n    save_dir = config.work_dir\n    circle_detector = CircleDetector(config.resolution_ratio)\n    aim()  # aim before detection\n    terminal_flags = []\n    for step in range(1, 1 + iterations):\n        if debug:\n            logger.debug(f'Go into combat #{step}')\n        if config.ocr_different_previous_text:\n            logger.write(\"The text is different from the previous one.\")\n            config.ocr_enabled = False # disable ocr\n            config.ocr_different_previous_text = False # reset",
+        "type": "code",
+        "location": "/cradle/gameio/composite_skills/auto_shoot.py:35-70"
+    },
+    "157": {
+        "file_id": 17,
+        "content": "The code defines a function \"keep_shooting_target\" that automatically shoots at detected targets for a specified number of iterations. It also includes a function \"shoot_wolves\" which utilizes the keep_shooting_target function to target and shoot wolves specifically. The code initializes variables, logs progress and debug information, and disables OCR if the text is different from the previous one.",
+        "type": "comment"
+    },
+    "158": {
+        "file_id": 17,
+        "content": "            break\n        timestep = time.time()\n        screen_image_filename, minimap_image_filename = take_screenshot(timestep, config.game_region, config.minimap_region, draw_axis=False)\n        screen = cv2.imread(screen_image_filename)\n        h, w, _ = screen.shape\n        # center pointer\n        pointer = np.array([h // 2,  w // 2])\n        red_range=np.array([[0, 0, 150], [100, 100, 255]])\n        is_red = cv2.countNonZero(cv2.inRange(screen[pointer[0],pointer[1]].reshape(1,1,3), red_range[0], red_range[1]))\n        if is_red:\n            shoot(0.5,0.5)\n            time.sleep(POST_WAIT_TIME)\n            continue\n        if not detect_target.endswith(' .'):\n            detect_target += ' .'\n        _, boxes, logits, phrases = gd_detector.detect(screen_image_filename, detect_target, box_threshold=0.4)\n        # enemy detection\n        follow_theta, follow_info = circle_detector.detect(minimap_image_filename,detect_mode='red', debug=debug)\n        logger.debug(f'turn: {follow_theta}')\n        if abs(follow_theta)<=360:",
+        "type": "code",
+        "location": "/cradle/gameio/composite_skills/auto_shoot.py:71-97"
+    },
+    "159": {
+        "file_id": 17,
+        "content": "This code takes a screenshot of the game screen and minimap, checks if the pointer is over a red area, detects targets and enemies using object detection, and determines the target's direction for aiming. If an enemy is detected, it aims at the enemy within a specified angle range and continues the loop.",
+        "type": "comment"
+    },
+    "160": {
+        "file_id": 17,
+        "content": "            follow_theta = np.sign(follow_theta) * np.clip(abs(follow_theta),0,180)\n            terminal_flags.append(0)\n        else:\n            terminal_flags.append(1)\n            # if sum(terminal_flags[-CONTINUE_NO_ENEMY_FREQ:]) == CONTINUE_NO_ENEMY_FREQ:\n            #     logger.debug(f'From step {step} to {step-CONTINUE_NO_ENEMY_FREQ} no enemy detected! Shooting is terminated.')\n            #     return\n        if debug:\n            cv2.imwrite(os.path.join(save_dir, f\"red_detect_{timestep}.jpg\"), follow_info['vis'])\n        if not phrases:\n            if abs(follow_theta)<=360:\n                turn(follow_theta)\n                time.sleep(POST_WAIT_TIME)\n            continue\n        # sort according to areas\n        areas = [(b[2]*b[3]).item() for b in boxes]\n        area_ascend_index = np.argsort(areas)\n        boxes = torch.stack([boxes[i] for i in area_ascend_index])\n        logits = torch.stack([logits[i] for i in area_ascend_index])\n        phrases = [phrases[i] for i in area_ascend_index]\n        if SHOOT_PEOPLE_TARGET_NAME in detect_target.lower():",
+        "type": "code",
+        "location": "/cradle/gameio/composite_skills/auto_shoot.py:98-122"
+    },
+    "161": {
+        "file_id": 17,
+        "content": "This code is part of an auto-shooting system. It checks if the enemy has been detected and determines whether shooting should continue or be terminated. If no enemy has been detected for a certain number of steps, shooting will be terminated. The code also sorts the detected boxes based on their area, and selects phrases based on the sorted areas.",
+        "type": "comment"
+    },
+    "162": {
+        "file_id": 17,
+        "content": "            if len(boxes) > 1:\n                index = 0\n                dis = 1.5\n                for i in range(len(boxes)):\n                    down_mid = (boxes[i, 0], boxes[i, 1] + boxes[i, 3] / 2)\n                    distance = torch.sum(torch.abs(torch.tensor(down_mid) - torch.tensor((0.5, 1.0))))\n                    if distance < dis:\n                        dis = distance\n                        index = i\n                boxes = torch.cat([boxes[:index], boxes[index + 1:]])\n                logits = torch.cat([logits[:index], logits[index + 1:]])\n                phrases.pop(index)\n                logger.debug(f'dis:{dis}  remove{index}')\n            elif len(boxes) == 1:\n                boxes = torch.tensor(boxes[1:])\n                logits = torch.tensor(logits[1:])\n                phrases.pop(0)\n        if debug:\n            annotated_frame = annotate(image_source=screen, boxes=boxes, logits=logits, phrases=phrases)\n            cv2.imwrite(os.path.join(save_dir, f\"annotated_{timestep}.jpg\"), annotated_frame)",
+        "type": "code",
+        "location": "/cradle/gameio/composite_skills/auto_shoot.py:124-149"
+    },
+    "163": {
+        "file_id": 17,
+        "content": "This code section is used for removing duplicate or unnecessary boxes from the input image. It checks if there are more than one box, then finds the closest box to a specific point and removes it if necessary. If there's only one box, it removes that single box as well. It also annotates the updated image with the remaining boxes and phrases, saving it for further use.",
+        "type": "comment"
+    },
+    "164": {
+        "file_id": 17,
+        "content": "        xyxy = box_convert(boxes=boxes * torch.Tensor([w, h, w, h]), in_fmt=\"cxcywh\", out_fmt=\"xyxy\").numpy().astype(int)\n        is_shoot = False\n        for j, (detect_xyxy, detect_object, detect_confidence) in enumerate(zip(xyxy, phrases, logits)):\n            if debug:\n                logger.debug(f'detect_xyxy is {detect_xyxy},detect_object is {detect_object},shoot_xy is {int((detect_xyxy[0] + detect_xyxy[2]) / 2)},{int((detect_xyxy[1] + detect_xyxy[3]) / 2)}')\n            # exclude the person occupied large area (threshold: 0.1)\n            s_w = SHOOT_PEOPLE_TARGET_NAME in detect_object.lower()  # true represents shoot wolves\n            if s_w and boxes[j][2] * boxes[j][3] > 0.06:\n                continue\n            if detect_object in detect_target:\n                shoot_x = boxes[j][0]\n                shoot_y = boxes[j][1]\n                if debug:\n                    cv2.arrowedLine(annotated_frame, (config.game_resolution[0] // 2, config.game_resolution[1] // 2), (\n                     ",
+        "type": "code",
+        "location": "/cradle/gameio/composite_skills/auto_shoot.py:152-172"
+    },
+    "165": {
+        "file_id": 17,
+        "content": "This code checks the detected objects and their coordinates within a specific format. It filters out large human-occupied areas, continues if a certain object is detected, and updates shoot_x and shoot_y variables based on the detected box's location. Debug information is printed or a line is drawn on an annotated frame.",
+        "type": "comment"
+    },
+    "166": {
+        "file_id": 17,
+        "content": "   int((detect_xyxy[0] + detect_xyxy[2]) / 2), int((detect_xyxy[1] + detect_xyxy[3]) / 2)),(0, 255, 0), 2, tipLength=0.1)\n                    cv2.imwrite(os.path.join(save_dir, f\"annotated_{detect_object}_{timestep}.jpg\"), annotated_frame)\n                logger.debug(f'pixel is {shoot_x},{shoot_y}')\n                shoot(shoot_x, shoot_y)\n                time.sleep(POST_WAIT_TIME)\n                is_shoot = True\n                break\n        if not is_shoot or (is_shoot and np.random.uniform(0,1) < .2): # turn\n            follow_theta, follow_info = circle_detector.detect(minimap_image_filename,detect_mode='red', debug=debug)\n            logger.debug(f'turn: {follow_theta}')\n            if abs(follow_theta)<=360:\n                follow_theta = np.sign(follow_theta) * np.clip(abs(follow_theta),0,180)\n                turn(follow_theta)\n                time.sleep(POST_WAIT_TIME)\n            if debug:\n                cv2.imwrite(os.path.join(save_dir, f\"red_detect_{timestep}.jpg\"), follow_info['vis'])\n__all__ = [",
+        "type": "code",
+        "location": "/cradle/gameio/composite_skills/auto_shoot.py:172-194"
+    },
+    "167": {
+        "file_id": 17,
+        "content": "This code detects a target object and if it's detected, it shoots at the target. If not detected or with low detection probability, it turns to follow a red circle on the minimap. It also saves annotated images and logs pixel coordinates for shooting. The post-wait time ensures actions are spaced out appropriately.",
+        "type": "comment"
+    },
+    "168": {
+        "file_id": 17,
+        "content": "    \"shoot_people\",\n    \"shoot_wolves\"\n]",
+        "type": "code",
+        "location": "/cradle/gameio/composite_skills/auto_shoot.py:195-197"
+    },
+    "169": {
+        "file_id": 17,
+        "content": "The code defines a list of two strings \"shoot_people\" and \"shoot_wolves\". These strings could be used as action identifiers for shooting different targets in the game.",
+        "type": "comment"
+    },
+    "170": {
+        "file_id": 18,
+        "content": "/cradle/gameio/composite_skills/follow.py",
+        "type": "filepath"
+    },
+    "171": {
+        "file_id": 18,
+        "content": "This code is for a follow skill in the Cradle game, using CV_follow_circles function to prioritize yellow/gray circles. It initializes variables and queues, takes screenshots, OCR detection, and finds circle direction/distance. The follow function updates player position based on target theta, performs warm-up move, checks stuck situations, and moves robot randomly to get unstuck.",
+        "type": "summary"
+    },
+    "172": {
+        "file_id": 18,
+        "content": "import time, os\nfrom collections import deque\nimport numpy as np\nimport cv2\nfrom cradle.config import Config\nfrom cradle.log import Logger\nfrom cradle.gameio.atomic_skills.move import turn, move_forward\nfrom cradle.gameio.lifecycle.ui_control import take_screenshot, CircleDetector\nfrom cradle.gameio.skill_registry import register_skill\nfrom cradle.utils.image_utils import minimap_movement_detection\nfrom cradle import constants\nconfig = Config()\nlogger = Logger()\nMAX_FOLLOW_ITERATIONS = 40\n@register_skill(\"follow\")\ndef follow():\n    \"\"\"\n    Follow target on the minimap.\n    \"\"\"\n    cv_follow_circles(MAX_FOLLOW_ITERATIONS, debug=False)\ndef cv_follow_circles(\n        iterations,\n        follow_dis_threshold=50,\n        debug=False,\n):\n    '''\n    Prioritize following the yellow circle. If not detected, then follow the gray circle.\n    '''\n    save_dir = config.work_dir\n    follow_dis_threshold *= config.resolution_ratio\n    is_move = False\n    circle_detector = CircleDetector(config.resolution_ratio)\n    previous_distance, previous_theta, counter = 0, 0, 0",
+        "type": "code",
+        "location": "/cradle/gameio/composite_skills/follow.py:1-43"
+    },
+    "173": {
+        "file_id": 18,
+        "content": "This code is for a \"follow\" skill in the Cradle game. It utilizes the CV_follow_circles function to prioritize following the yellow circle on the minimap, and if not detected, it follows the gray circle. The function takes iterations, follow distance threshold, and debug parameters as inputs. It initializes variables for saving directory, resolution ratio, CircleDetector instance, previous distance, previous theta, and counter.",
+        "type": "comment"
+    },
+    "174": {
+        "file_id": 18,
+        "content": "    max_q_size = 2\n    minimap_image_filename_q = deque(maxlen=max_q_size)\n    condition_q = deque(maxlen=max_q_size)\n    for step in range(iterations):\n        if debug:\n            logger.write(f'Go into combat #{step}')\n        if config.ocr_different_previous_text:\n            logger.write(\"The text is different from the previous one.\")\n            config.ocr_enabled = False # disable ocr\n            config.ocr_different_previous_text = False  # reset\n            break\n        timestep = time.time()\n        _, minimap_image_filename = take_screenshot(timestep, config.game_region, config.minimap_region, draw_axis=False)\n        minimap_image_filename_q.append(minimap_image_filename)\n        adjacent_minimaps = list(minimap_image_filename_q)[::max_q_size-1] if len(minimap_image_filename_q)>=max_q_size else None\n        # Find direction to follow\n        follow_theta, follow_info = circle_detector.detect(minimap_image_filename, debug=debug)\n        follow_dis = follow_info[constants.DISTANCE_TYPE]\n        if abs(follow_theta) <= 360 and step == 0:",
+        "type": "code",
+        "location": "/cradle/gameio/composite_skills/follow.py:44-70"
+    },
+    "175": {
+        "file_id": 18,
+        "content": "This code initializes two queues, one for minimap image filenames and the other for conditions. It then goes through a loop of iterations, taking screenshots at each step. If the OCR detects different text from previous steps, it disables OCR, resets the flag, and breaks the loop. The code stores minimap image filenames in the queue and retrieves adjacent filenames if the queue size is greater than max_q_size. It then uses circle_detector to find the direction and distance for following and checks if it's the first step or not.",
+        "type": "comment"
+    },
+    "176": {
+        "file_id": 18,
+        "content": "            turn(follow_theta)\n            move_forward(1) # warm up\n        if debug:\n            logger.debug(\n                f\"step {step:03d} | timestep {timestep} done | follow theta: {follow_theta:.2f} | follow distance: {follow_dis:.2f} | follow confidence: {follow_info['confidence']:.3f}\")\n            cv2.circle(follow_info['vis'], follow_info['center'], 1, (0, 255, 0), 2)\n            cv2.imwrite(os.path.join(save_dir, f\"minimap_{timestep}_follow_template.jpg\"), follow_info['vis'])\n        if debug and follow_dis < follow_dis_threshold:\n            logger.write('Keep with the companion')\n        if abs(follow_theta) <= 360 and step > 0:\n            turn(follow_theta)\n            if not is_move:\n                move_forward(0.8)\n                is_move = True\n            else:\n                move_forward(0.3)\n        else:\n            is_move = False\n        # Check stuck\n        if adjacent_minimaps:\n            condition, img_matches, average_distance = minimap_movement_detection(*adjacent_minimaps, threshold = 5)",
+        "type": "code",
+        "location": "/cradle/gameio/composite_skills/follow.py:72-100"
+    },
+    "177": {
+        "file_id": 18,
+        "content": "This code is part of a follow function in a game context. It updates the player's position based on the target theta, performs a warm-up move, and logs/visualizes its progress if debug mode is enabled. If the distance to the target is below a certain threshold, it sends a \"Keep with the companion\" message. The code then adjusts the rotation and movement based on the follow_theta and checks for stuck situations by detecting minimap movement.",
+        "type": "comment"
+    },
+    "178": {
+        "file_id": 18,
+        "content": "            if debug:\n                cv2.imwrite(os.path.join(save_dir, f\"minimap_{timestep}_bfmatch.jpg\"),img_matches)\n            condition_q.append(~condition)\n            condition = all(condition_q)\n        else:\n            condition = abs(previous_distance - follow_dis) < 0.5 and abs(previous_theta - follow_theta) < 0.5\n        if condition:\n            if debug:\n                logger.debug('Move randomly to get unstuck')\n            turn(180),move_forward(np.random.randint(1, 6))\n            time.sleep(1)  # improve stability\n            turn(-90),move_forward(np.random.randint(1, 6))\n        previous_distance, previous_theta = follow_dis, follow_theta\n__all__ = [\n    \"follow\",\n]",
+        "type": "code",
+        "location": "/cradle/gameio/composite_skills/follow.py:102-123"
+    },
+    "179": {
+        "file_id": 18,
+        "content": "If debug mode is on, save the image of image matches at a specific directory. If not stuck, move robot randomly to get unstuck and wait for stability improvement. Update previous_distance and previous_theta with current values.",
+        "type": "comment"
+    },
+    "180": {
+        "file_id": 19,
+        "content": "/cradle/gameio/composite_skills/go_to_icon.py",
+        "type": "filepath"
+    },
+    "181": {
+        "file_id": 19,
+        "content": "The code uses template matching, Kalman filter threshold, and OCR adjustments for icon detection to control a robot/vehicle in reaching specified icons while handling obstacles and logging information.",
+        "type": "summary"
+    },
+    "182": {
+        "file_id": 19,
+        "content": "import os, time, math\nimport cv2\nimport numpy as np\nfrom MTM import matchTemplates\nfrom cradle.gameio.atomic_skills.move import turn, move_forward\nfrom cradle.gameio.lifecycle.ui_control import take_screenshot\nfrom cradle.config import Config\nfrom cradle.log import Logger\nfrom cradle.gameio.skill_registry import register_skill\nfrom cradle.utils.file_utils import assemble_project_path\nconfig = Config()\nlogger = Logger()\nDEFAULT_GO_TO_ICON_ITERATIONS = 20\nDEFAULT_GO_TO_HORSE_ITERATIONS = DEFAULT_GO_TO_ICON_ITERATIONS\n@register_skill(\"go_to_horse\")\ndef go_to_horse():\n    \"\"\"\n    Best way to go to the closest horse. Uses the minimap. Horses are useful to travel mid to long distances.\n    \"\"\"\n    go_to_icon(\"horse\", iterations=DEFAULT_GO_TO_HORSE_ITERATIONS, debug=False)\n# @register_skill(\"go_to_icon\")\ndef go_to_icon(target: str = \"horse\", iterations=DEFAULT_GO_TO_ICON_ITERATIONS, debug: bool = False):\n    \"\"\"\n    Navigates to the closed icon of the target in the minimap.\n    Parameters:\n    - target: Name of the target icon type on the minimap. The default value is \"horse\"",
+        "type": "code",
+        "location": "/cradle/gameio/composite_skills/go_to_icon.py:1-35"
+    },
+    "183": {
+        "file_id": 19,
+        "content": "The code defines two skills, \"go_to_horse\" and \"go_to_icon\". \"go_to_horse\" navigates to the closest horse icon on the minimap, while \"go_to_icon\" navigates to a specified target icon on the minimap. Both skills use the \"go_to_icon\" function for navigation. The code imports necessary modules, sets default values, and registers the skills using the skill registry.",
+        "type": "comment"
+    },
+    "184": {
+        "file_id": 19,
+        "content": "    \"\"\"\n    cv_go_to_icon(iterations, template_file=f'./res/icons/{target}.jpg', debug=debug)\ndef get_theta(origin_x, origin_y, center_x, center_y):\n    '''\n    The origin of the image coordinate system is usually located in the upper left corner of the image, with the x-axis to the right indicating a positive direction and the y-axis to the down indicating a positive direction. Using vertical upward as the reference line, i.e. the angle between it and the negative direction of the y-axis\n    '''\n    theta = math.atan2(center_x - origin_x, origin_y - center_y)\n    theta = math.degrees(theta)\n    return theta\n# @TODO: This should be merged with the one in utils/template_matching.py\ndef match_template(src_file, template_file, template_resize_scale = 1, debug=False):\n    srcimg = cv2.imread(assemble_project_path(src_file))\n    template = cv2.imread(assemble_project_path(template_file))\n    origin = (srcimg.shape[0] // 2, srcimg.shape[1] //2)\n    # resize\n    if template_resize_scale != 1:\n        template = cv2.resize(template, (0, 0), fx=template_resize_scale, fy=template_resize_scale)",
+        "type": "code",
+        "location": "/cradle/gameio/composite_skills/go_to_icon.py:36-58"
+    },
+    "185": {
+        "file_id": 19,
+        "content": "The code defines two functions: `cv_go_to_icon` and `match_template`. `cv_go_to_icon` calculates the angle between the origin of an image and a target point, while `match_template` reads in two images, resizes the second if needed, and possibly performs template matching to find the location of the template within the source image. The code is part of a larger project related to image processing.",
+        "type": "comment"
+    },
+    "186": {
+        "file_id": 19,
+        "content": "    detection = matchTemplates([('', cv2.resize(template, (0, 0), fx=s, fy=s)) for s in [1]],\n                               srcimg,\n                               N_object=1,\n                               method=cv2.TM_CCOEFF_NORMED,\n                               maxOverlap=0.1)\n    (x, y, h, w), confidence = detection['BBox'].iloc[0], detection['Score'].iloc[0]\n    center_x = x + w // 2\n    center_y = y + h // 2\n    # go towards it\n    theta = get_theta(*origin, center_x, center_y)\n    dis = np.sqrt((center_x - origin[0]) ** 2 + (center_y - origin[1]) ** 2)\n    # KalmanFilter threshold = 0.59\n    measure = {'confidence': confidence, 'distance': dis, 'bounding_box': (x, y, h, w)}\n    if debug:\n        logger.debug(f\"confidence: {confidence:.3f}, distance: {dis:.3f}, theta: {theta:.3f}\")\n        vis = srcimg.copy()\n        cv2.rectangle(vis, (x,y), (x + w, y + h), (0, 0, 255), 2)\n        cv2.putText(vis, f'{confidence:.3f}', (x,y), cv2.FONT_HERSHEY_SIMPLEX, .5, (0, 0, 255), 1, cv2.LINE_AA)\n        cv2.arrowedLine(vis, origin, (center_x, center_y), (0, 255, 0), 2, tipLength=0.1)",
+        "type": "code",
+        "location": "/cradle/gameio/composite_skills/go_to_icon.py:60-82"
+    },
+    "187": {
+        "file_id": 19,
+        "content": "Code performs template matching to detect an icon, calculates its position and distance from the origin, and applies Kalman filter threshold to create a measure. If debugging is enabled, it logs confidence, distance, and displays the icon's bounding box and arrowed line on the source image.",
+        "type": "comment"
+    },
+    "188": {
+        "file_id": 19,
+        "content": "        measure['vis'] = vis\n        #cv2.imshow(\"vis\", measure['vis'])\n    return theta, measure\ndef cv_go_to_icon(\n        iterations,\n        template_file,\n        terminal_threshold=20,\n        debug=False,\n):\n    save_dir = config.work_dir\n    terminal_threshold *= config.resolution_ratio\n    check_success, prev_dis, prev_theta, counter, ride_attempt, ride_mod, dis_stat = False, 0, 0, 0, 0, 10, []\n    for step in range(iterations):\n        logger.write(f'Go to icon iter #{step}')\n        if config.ocr_different_previous_text:\n            logger.write(\"The text is different from the previous one.\")\n            config.ocr_enabled = False # disable ocr\n            config.ocr_different_previous_text = False  # reset\n            break\n        timestep = time.time()\n        # 1. Get observation screenshot\n        take_screenshot(timestep, config.game_region, config.minimap_region, draw_axis=False)\n        theta, info = match_template(os.path.join(save_dir, f\"minimap_{timestep}.jpg\"), template_file, config.resolution_ratio, debug)",
+        "type": "code",
+        "location": "/cradle/gameio/composite_skills/go_to_icon.py:84-115"
+    },
+    "189": {
+        "file_id": 19,
+        "content": "This function, cv_go_to_icon(), takes iterations, template_file, terminal_threshold (threshold for the algorithm to stop), and debug as inputs. It measures theta using match_template() on an observation screenshot and image template. The function checks if the OCR output is different from the previous one and adjusts OCR settings accordingly.",
+        "type": "comment"
+    },
+    "190": {
+        "file_id": 19,
+        "content": "        dis, confidence = info['distance'], info['confidence']\n        if debug:\n            cv2.imwrite(os.path.join(save_dir, f\"minimap_{timestep}_detect.jpg\"), info['vis'])\n        if dis < terminal_threshold and abs(theta) < 90:  # begin to settle\n            logger.write('Success! Reached the icon.')\n            return True\n        # 2. Check stuck\n        if abs(prev_dis - dis) < 0.5 and abs(prev_theta - theta) < 0.5:\n            counter += 1\n            if counter >= 1:\n                if debug:\n                    logger.debug('Move randomly to get unstuck')\n                for _ in range(2):\n                    turn(np.random.randint(30, 60) if np.random.rand()<0.5 else -np.random.randint(30, 60))\n                    move_forward(np.random.randint(2, 4))\n        else:\n            counter = 0\n        # 3. Move\n        turn(theta)\n        move_forward(1.5)\n        time.sleep(0.5)\n        if debug:\n            logger.debug(f\"step {step:03d} | timestep {timestep} done | theta: {theta:.2f} | distance: {dis:.2f} | confidence: {confidence:.3f} {'below threshold' if confidence < 0.5 else ''}\")",
+        "type": "code",
+        "location": "/cradle/gameio/composite_skills/go_to_icon.py:116-143"
+    },
+    "191": {
+        "file_id": 19,
+        "content": "This code appears to be a part of an AI system that controls a robot or vehicle to reach a specified icon. It checks if the robot has reached the icon, handles cases where it may get stuck, and then proceeds to turn and move towards the icon while logging relevant information.",
+        "type": "comment"
+    },
+    "192": {
+        "file_id": 19,
+        "content": "        prev_dis, prev_theta = dis, theta\n    logger.error(f'Go to icon failed to reach icon.')\n    return False  # failed\n__all__ = [\n    \"go_to_horse\",\n]",
+        "type": "code",
+        "location": "/cradle/gameio/composite_skills/go_to_icon.py:145-153"
+    },
+    "193": {
+        "file_id": 19,
+        "content": "This code defines a function \"go_to_horse\" that attempts to move the game's icon. If it fails to reach the icon, it logs an error and returns False. The logger is used for error messages, and only one function is exported from this file, which is \"go_to_horse\".",
+        "type": "comment"
+    },
+    "194": {
+        "file_id": 20,
+        "content": "/cradle/gameio/composite_skills/navigation.py",
+        "type": "filepath"
+    },
+    "195": {
+        "file_id": 20,
+        "content": "This code creates a navigation skill for game characters using OpenCV, detects contours and lines, and computes turn angles considering deviations. It displays images, takes input, and outputs the real turn angle.",
+        "type": "summary"
+    },
+    "196": {
+        "file_id": 20,
+        "content": "import time\nimport os\nimport math\nimport cv2\nimport numpy as np\nfrom cradle.config import Config\nfrom cradle.log import Logger\nfrom cradle.gameio.atomic_skills.move import turn, move_forward, stop_horse\nfrom cradle.gameio.lifecycle.ui_control import take_screenshot\nfrom cradle.gameio.skill_registry import register_skill\nfrom cradle.gameio.composite_skills.go_to_icon import match_template\nconfig = Config()\nlogger = Logger()\nDEFAULT_NAVIGATION_ITERATIONS = 100\nNAVIGATION_TERMINAL_THRESHOLD = 100\n@register_skill(\"navigate_path\")\ndef navigate_path(iterations = DEFAULT_NAVIGATION_ITERATIONS, debug = False):\n    \"\"\"\n    Navigates an existing waypoint path in the minimap.\n    Parameters:\n    - iterations: How many maximum calculation loops to navigate. Default value is 100.\n    - debug: Whether to show debug information. Default value is False.\n    \"\"\"\n    time.sleep(1)\n    cv_navigation(iterations, debug)\ndef cv_navigation(total_iterations, terminal_threshold=NAVIGATION_TERMINAL_THRESHOLD, debug = False):\n    game_screen_region = config.game_region",
+        "type": "code",
+        "location": "/cradle/gameio/composite_skills/navigation.py:1-37"
+    },
+    "197": {
+        "file_id": 20,
+        "content": "This code defines a navigation skill that navigates an existing waypoint path in the minimap. It has parameters for maximum iterations and debug mode. The `cv_navigation` function handles the actual navigation process using OpenCV. The game region is defined from the configuration file.",
+        "type": "comment"
+    },
+    "198": {
+        "file_id": 20,
+        "content": "    minimap_region = config.minimap_region\n    save_dir = config.work_dir\n    terminal_threshold *= config.resolution_ratio\n    warm_up = True\n    waypoint_marker_filename = './res/icons/red_marker.jpg'\n    try:\n        for step in range(total_iterations):\n            if config.ocr_different_previous_text:\n                logger.write(\"The text is different from the previous one.\")\n                config.ocr_enabled = False  # disable ocr\n                config.ocr_different_previous_text = False  # reset\n                break\n            timestep = time.time()\n            logger.debug(f\"step {step}, {timestep}\")\n            if step > 0:\n                if abs(turn_angle) > 65:\n                    stop_horse()\n                    time.sleep(0.3)\n                    warm_up = True\n                turn(turn_angle)\n                if warm_up:\n                    move_forward(1)\n                    warm_up = False\n                else:\n                    move_forward(0.3)\n                time.sleep(0.1) # avoid running too fast",
+        "type": "code",
+        "location": "/cradle/gameio/composite_skills/navigation.py:38-69"
+    },
+    "199": {
+        "file_id": 20,
+        "content": "This code segment is responsible for navigating a game character. It checks if the text from OCR is different from the previous iteration and disables OCR if it is. It also controls the horse's movement by turning, moving forward, stopping if necessary, and ensures it doesn't move too fast. The code logs information at each step for debugging purposes.",
+        "type": "comment"
+    }
+}

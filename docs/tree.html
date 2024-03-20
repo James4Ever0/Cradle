@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="github-markdown.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <title>Project structure of: BAAI-Agents/Cradle</title>
+    <style>
+        .directory:hover {
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        :target {
+            background-color: yellow !important;
+        }
+
+        .folded::before {
+            content: '\25B6';
+            margin-right: 8px;
+            /* Add space between marker and text */
+        }
+
+        .expanded::before {
+            content: '\25BC';
+            margin-right: 8px;
+            /* Add space between marker and text */
+        }
+    </style>
+    <script>
+        function toggleVisibility(element) {
+            let mclass = element.getAttribute("class");
+            if (mclass == "expanded") {
+                element.setAttribute('class', 'folded');
+            } else {
+                element.setAttribute('class', 'expanded');
+            }
+            const siblings = element.parentNode.children;
+            for (const sibling of siblings) {
+                if (sibling !== element) {
+                    sibling.style.display = (sibling.style.display === 'none') ? 'block' : 'none';
+                }
+            }
+        }
+    </script>
+    <style>
+        .markdown-body {
+            box-sizing: border-box;
+            min-width: 200px;
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 45px;
+        }
+
+        @media (max-width: 767px) {
+            .markdown-body {
+                padding: 15px;
+            }
+
+            .partial-repository-url {
+                display: none;
+            }
+        }
+
+        ul {
+            list-style: none;
+        }
+        #feeling-lucky:hover{
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <article class="markdown-body">
+        <h2>Project structure<span hierarchy="0" class="partial-repository-url"> of: BAAI-Agents/Cradle</span><div style="float: right;"><a title="Document index" style="margin:3.5px;" href="index.html"><i class="bi bi-search"></i></a><a title="Feeling lucky" style="margin:3.5px;" id="feeling-lucky" href="#"><i class="bi bi-dice-3"></i></a><a title="Expand tree" style="margin:3.5px;" href="tree.html?full=true" id="expand-tree"><i class="bi bi-caret-down-square"></i></a></div></h2>
+<ul>
+<li><span hierarchy="0" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/"><code>Cradle</code></strong> <em>AI Tools &amp; Models for Game Control</em></span><ul>
+<li><span hierarchy="1" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/cache/"><code>cache</code></strong></span><ul>
+<li><a class="file_link" href="index.html?q=/cache/GroundingDINO_SwinB_cfg.py" id="/cache/GroundingDINO_SwinB_cfg.py"><code>GroundingDINO&UnderBar;SwinB&UnderBar;cfg&period;py</code></a> <em>Configures DINO SwinB model with specified parameters.</em></li>
+</ul>
+</li>
+<li><span hierarchy="1" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/conf/"><code>conf</code></strong> <em>OpenAI and Azure configuration files directory.</em></span><ul>
+<li><a class="file_link" href="index.html?q=/conf/azure_vis_config.json" id="/conf/azure_vis_config.json"><code>azure&UnderBar;vis&UnderBar;config&period;json</code></a> <em>Azure OpenAI model config for API, URL, models, and version.</em></li>
+<li><a class="file_link" href="index.html?q=/conf/openai_config.json" id="/conf/openai_config.json"><code>openai&UnderBar;config&period;json</code></a> <em>OpenAI config: API key, models, Azure flag.</em></li>
+</ul>
+</li>
+<li><span hierarchy="1" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/cradle/"><code>cradle</code></strong> <em>OpenCV template matching, JSON, image utility library with decorator</em></span><ul>
+<li><span hierarchy="2" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/cradle/agent/"><code>agent</code></strong> <em>Intelligent agent with decision-making, memory and task management from cradle.agent module</em></span><ul>
+<li><a class="file_link" href="index.html?q=/cradle/agent/__init__.py" id="/cradle/agent/__init__.py"><code>&UnderBar;&UnderBar;init&UnderBar;&UnderBar;&period;py</code></a> <em>Agent class importable from cradle.agent module</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/agent/agent.py" id="/cradle/agent/agent.py"><code>agent&period;py</code></a> <em>Intelligent agent with decision-making, memory, and task management.</em></li>
+</ul>
+</li>
+<li><span hierarchy="2" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/cradle/config/"><code>config</code></strong> <em>Config initialization for app settings and parameters.</em></span><ul>
+<li><a class="file_link" href="index.html?q=/cradle/config/__init__.py" id="/cradle/config/__init__.py"><code>&UnderBar;&UnderBar;init&UnderBar;&UnderBar;&period;py</code></a> <em>Initializes Config class and sets <strong>all</strong> to include only "Config".</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/config/config.py" id="/cradle/config/config.py"><code>config&period;py</code></a> <em>Config class for app settings and parameters initialization.</em></li>
+</ul>
+</li>
+<li><a class="file_link" href="index.html?q=/cradle/constants.py" id="/cradle/constants.py"><code>constants&period;py</code></a> <em>Cradle constants for data handling and processing.</em></li>
+<li><span hierarchy="2" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/cradle/gameio/"><code>gameio</code></strong> <em>Game IO management and related tasks.</em></span><ul>
+<li><a class="file_link" href="index.html?q=/cradle/gameio/__init__.py" id="/cradle/gameio/__init__.py"><code>&UnderBar;&UnderBar;init&UnderBar;&UnderBar;&period;py</code></a> <em>GameIO: IO, GameManager import &amp; include.</em></li>
+<li><span hierarchy="3" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/cradle/gameio/atomic_skills/"><code>atomic&UnderBar;skills</code></strong> <em>Explore, purchase atomic skills, combat, map interactions.</em></span><ul>
+<li><a class="file_link" href="index.html?q=/cradle/gameio/atomic_skills/__init__.py" id="/cradle/gameio/atomic_skills/__init__.py"><code>&UnderBar;&UnderBar;init&UnderBar;&UnderBar;&period;py</code></a> <em>Atomic Skills package import and utilities.</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/gameio/atomic_skills/buy.py" id="/cradle/gameio/atomic_skills/buy.py"><code>buy&period;py</code></a> <em>Seamless game browsing and purchasing with Atomic Skills.</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/gameio/atomic_skills/combat.py" id="/cradle/gameio/atomic_skills/combat.py"><code>combat&period;py</code></a> <em>Combat Python Skills: Aim, Weapons, Shoot, Fight</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/gameio/atomic_skills/map.py" id="/cradle/gameio/atomic_skills/map.py"><code>map&period;py</code></a> <em>Interact with map using keys in Atomic Skills.</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/gameio/atomic_skills/move.py" id="/cradle/gameio/atomic_skills/move.py"><code>move&period;py</code></a> <em>Control character movement with atomic skills and interact with horse.</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/gameio/atomic_skills/sell.py" id="/cradle/gameio/atomic_skills/sell.py"><code>sell&period;py</code></a> <em>Sell game skills: buy/sell products, switch types with 'e'/'q'.</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/gameio/atomic_skills/trade_utils.py" id="/cradle/gameio/atomic_skills/trade_utils.py"><code>trade&UnderBar;utils&period;py</code></a> <em>Interact with game shopkeepers for product selection.</em></li>
+</ul>
+</li>
+<li><span hierarchy="3" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/cradle/gameio/composite_skills/"><code>composite&UnderBar;skills</code></strong> <em>Composite game skills: targeting, following, obstacle avoidance.</em></span><ul>
+<li><a class="file_link" href="index.html?q=/cradle/gameio/composite_skills/auto_shoot.py" id="/cradle/gameio/composite_skills/auto_shoot.py"><code>auto&UnderBar;shoot&period;py</code></a> <em>Automated game AI targets and shoots enemies.</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/gameio/composite_skills/follow.py" id="/cradle/gameio/composite_skills/follow.py"><code>follow&period;py</code></a> <em>Follow skill for Cradle game, prioritizing yellow/gray circles. OCR detection and movement updates.</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/gameio/composite_skills/go_to_icon.py" id="/cradle/gameio/composite_skills/go_to_icon.py"><code>go&UnderBar;to&UnderBar;icon&period;py</code></a> <em>Icon-guided robot navigation and obstacle avoidance.</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/gameio/composite_skills/navigation.py" id="/cradle/gameio/composite_skills/navigation.py"><code>navigation&period;py</code></a> <em>Navigation skill for game characters using OpenCV</em></li>
+</ul>
+</li>
+<li><a class="file_link" href="index.html?q=/cradle/gameio/game_manager.py" id="/cradle/gameio/game_manager.py"><code>game&UnderBar;manager&period;py</code></a> <em>GameManager: controls, captures, manages.</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/gameio/io_env.py" id="/cradle/gameio/io_env.py"><code>io&UnderBar;env&period;py</code></a> <em>Manages IO, logs warnings, handles game events with AutoHotkey/pydirectinput.</em></li>
+<li><span hierarchy="3" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/cradle/gameio/lifecycle/"><code>lifecycle</code></strong></span><ul>
+<li><a class="file_link" href="index.html?q=/cradle/gameio/lifecycle/ui_control.py" id="/cradle/gameio/lifecycle/ui_control.py"><code>ui&UnderBar;control&period;py</code></a> <em>Game management and error logging with OpenCV.</em></li>
+</ul>
+</li>
+<li><a class="file_link" href="index.html?q=/cradle/gameio/skill_registry.py" id="/cradle/gameio/skill_registry.py"><code>skill&UnderBar;registry&period;py</code></a> <em>Skill Registry: Libraries, Retrieval, Conflict Prevention</em></li>
+<li><span hierarchy="3" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/cradle/gameio/video/"><code>video</code></strong> <em>Video-based OCR and frame extraction tools for game recording</em></span><ul>
+<li><a class="file_link" href="index.html?q=/cradle/gameio/video/VideoEasyOCRExtractor.py" id="/cradle/gameio/video/VideoEasyOCRExtractor.py"><code>VideoEasyOCRExtractor&period;py</code></a> <em>Video-based OCR extractor using OpenCV</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/gameio/video/VideoFrameExtractor.py" id="/cradle/gameio/video/VideoFrameExtractor.py"><code>VideoFrameExtractor&period;py</code></a> <em>Python script for video frame extraction using <code>JSONStructure</code> and <code>VideoSubFinderWXW</code>.</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/gameio/video/VideoRecorder.py" id="/cradle/gameio/video/VideoRecorder.py"><code>VideoRecorder&period;py</code></a> <em>Multi-threaded VideoRecorder with OCR support</em></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span hierarchy="2" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/cradle/log/"><code>log</code></strong> <em>Colorful image logger for text and JSON.</em></span><ul>
+<li><a class="file_link" href="index.html?q=/cradle/log/__init__.py" id="/cradle/log/__init__.py"><code>&UnderBar;&UnderBar;init&UnderBar;&UnderBar;&period;py</code></a> <em>Imports Logger class, directly importable.</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/log/logger.py" id="/cradle/log/logger.py"><code>logger&period;py</code></a> <em>Colorful logger with image processing in text and JSON.</em></li>
+</ul>
+</li>
+<li><span hierarchy="2" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/cradle/memory/"><code>memory</code></strong> <em>Manage chat memory with vectors.</em></span><ul>
+<li><a class="file_link" href="index.html?q=/cradle/memory/__init__.py" id="/cradle/memory/__init__.py"><code>&UnderBar;&UnderBar;init&UnderBar;&UnderBar;&period;py</code></a> <em>Imports and exposes memory classes.</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/memory/base.py" id="/cradle/memory/base.py"><code>base&period;py</code></a> <em>Base class for memory operations with methods and inheritance.</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/memory/basic_vector_memory.py" id="/cradle/memory/basic_vector_memory.py"><code>basic&UnderBar;vector&UnderBar;memory&period;py</code></a> <em>Basic Vector Memory: Basic class for vector memory. JSON queries, load/save.</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/memory/local_memory.py" id="/cradle/memory/local_memory.py"><code>local&UnderBar;memory&period;py</code></a> <em>LocalMemory: JSON-based local storage for tasks with memory path support.</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/memory/short_term_memory.py" id="/cradle/memory/short_term_memory.py"><code>short&UnderBar;term&UnderBar;memory&period;py</code></a> <em>Manage chat memory with vector stores, similarity search, and embedding.</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/memory/vector_store.py" id="/cradle/memory/vector_store.py"><code>vector&UnderBar;store&period;py</code></a> <em>Vector Store Interface Abstract Class</em></li>
+</ul>
+</li>
+<li><span hierarchy="2" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/cradle/planner/"><code>planner</code></strong> <em>Data-driven decision making base planner class.</em></span><ul>
+<li><a class="file_link" href="index.html?q=/cradle/planner/__init__.py" id="/cradle/planner/__init__.py"><code>&UnderBar;&UnderBar;init&UnderBar;&UnderBar;&period;py</code></a> <em>Imports BasePlanner from base module.</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/planner/base.py" id="/cradle/planner/base.py"><code>base&period;py</code></a> <em>Base planner class for data gathering, decision-making, and success detection.</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/planner/planner.py" id="/cradle/planner/planner.py"><code>planner&period;py</code></a> <em>Python Planner: Gathers, Manages, and Processes Data</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/planner/util.py" id="/cradle/planner/util.py"><code>util&period;py</code></a> <em>Utility function to retrieve values from dictionaries or objects.</em></li>
+</ul>
+</li>
+<li><span hierarchy="2" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/cradle/provider/"><code>provider</code></strong> <em>OpenAI provider initialization and functions.</em></span><ul>
+<li><a class="file_link" href="index.html?q=/cradle/provider/__init__.py" id="/cradle/provider/__init__.py"><code>&UnderBar;&UnderBar;init&UnderBar;&UnderBar;&period;py</code></a> <em>Sets up providers for LLMs, embeddings.</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/provider/base_embedding.py" id="/cradle/provider/base_embedding.py"><code>base&UnderBar;embedding&period;py</code></a> <em>Base embedding model provider class with abstract methods</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/provider/base_llm.py" id="/cradle/provider/base_llm.py"><code>base&UnderBar;llm&period;py</code></a> <em>Base LLM provider class with abstract assemble_prompt method</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/provider/gd_provider.py" id="/cradle/provider/gd_provider.py"><code>gd&UnderBar;provider&period;py</code></a> <em>Image captioning and object detection functions with Singleton annotations.</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/provider/openai.py" id="/cradle/provider/openai.py"><code>openai&period;py</code></a> <em>OpenAI provider initialization and functions.</em></li>
+</ul>
+</li>
+<li><span hierarchy="2" class="expanded" onclick="toggleVisibility(this)" ><strong class="directory" id="/cradle/utils/"><code>utils</code></strong> <em>Image, JSON, and string manipulation utility library with OpenCV decorator for template matching.</em></span><ul>
+<li><a class="file_link" href="index.html?q=/cradle/utils/__init__.py" id="/cradle/utils/__init__.py"><code>&UnderBar;&UnderBar;init&UnderBar;&UnderBar;&period;py</code></a> <em>Cradle utils: Imports, exposes Singleton classes.</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/utils/check.py" id="/cradle/utils/check.py"><code>check&period;py</code></a> <em>Checks planner params and file paths for template items</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/utils/encoding_utils.py" id="/cradle/utils/encoding_utils.py"><code>encoding&UnderBar;utils&period;py</code></a> <em>Encode/decode base64 data utilities.</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/utils/file_utils.py" id="/cradle/utils/file_utils.py"><code>file&UnderBar;utils&period;py</code></a> <em>File utilities for project paths and resources.</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/utils/image_utils.py" id="/cradle/utils/image_utils.py"><code>image&UnderBar;utils&period;py</code></a> <em>Compare two minimap images for movement using ORB features and threshold.</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/utils/json_utils.py" id="/cradle/utils/json_utils.py"><code>json&UnderBar;utils&period;py</code></a> <em>Python JSON handling utilities with regex matching and parsing.</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/utils/singleton.py" id="/cradle/utils/singleton.py"><code>singleton&period;py</code></a> <em>Ensures single instance of class via Singleton metaclass.</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/utils/string_utils.py" id="/cradle/utils/string_utils.py"><code>string&UnderBar;utils&period;py</code></a> <em>String hash utility</em></li>
+<li><a class="file_link" href="index.html?q=/cradle/utils/template_matching.py" id="/cradle/utils/template_matching.py"><code>template&UnderBar;matching&period;py</code></a> <em>Image template matching OpenCV decorator, formats output.</em></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="file_link" href="index.html?q=/prototype_runner.py" id="/prototype_runner.py"><code>prototype&UnderBar;runner&period;py</code></a> <em>Multi-functional AI game prototype manager.</em></li>
+<li><a class="file_link" href="index.html?q=/README.md" id="/README.md"><code>README&period;md</code></a> <em>Cradle: AI-driven game control framework.</em></li>
+<li><a class="file_link" href="index.html?q=/requirements.txt" id="/requirements.txt"><code>requirements&period;txt</code></a> <em>Python project requirements: libraries listed</em></li>
+</ul>
+</li>
+</ul>
+    </article>
+    <script type="text/javascript">
+        function getQueryParams() {
+            var search = window.location.search.substring(1); // Remove leading '?'
+            var queryParams = {};
+            search.split('&').forEach(function (pair) {
+                var parts = pair.split('=');
+                var key = decodeURIComponent(parts[0]);
+                var value = decodeURIComponent(parts[1]);
+                queryParams[key] = value;
+            });
+            return queryParams;
+        }
+
+        const queryParams = getQueryParams(window.location.search);
+        const show_full = queryParams.full == "true";
+        //const is_random = queryParams.random == 'true';
+        function feelingLucky() {
+            var elements = document.getElementsByClassName("file_link");
+            var randomIndex = Math.floor(Math.random() * elements.length);
+            window.location = elements[randomIndex].href;
+        }
+        //if (is_random) {feelingLucky();}
+        document.getElementById("feeling-lucky").onclick = feelingLucky;
+        if (!show_full) {
+            const spans = document.querySelectorAll('span');
+            for (let span of spans) {
+                if (span.getAttribute("hierarchy") == '0') { continue }
+                toggleVisibility(span);
+            }
+        } else {
+            const expand_elem = document.getElementById('expand-tree');
+            expand_elem.setAttribute("href", "tree.html");
+            expand_elem.setAttribute("title", "Undo expand");
+            expand_elem.innerHTML = '<i class="bi bi-caret-up-square"></i>'
+        }
+
+    </script>
+</body>
+
+</html>

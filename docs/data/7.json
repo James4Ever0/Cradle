@@ -1,0 +1,133 @@
+{
+    "700": {
+        "file_id": 54,
+        "content": "            image_introduction = []\n            for i in range(len(image_memory), 0, -1):\n                if augmented_image_memory[-i] != constants.NO_IMAGE:\n                    image_introduction.append(\n                        {\n                            \"introduction\": img_prompt_decision_making[-i][\"introduction\"],\n                            \"path\":augmented_image_memory[-i],\n                            \"assistant\": img_prompt_decision_making[-i][\"assistant\"]\n                        })\n                else:\n                    image_introduction.append(\n                        {\n                            \"introduction\": img_prompt_decision_making[-i][\"introduction\"],\n                            \"path\":image_memory[-i],\n                            \"assistant\": img_prompt_decision_making[-i][\"assistant\"]\n                        })\n            input[\"image_introduction\"] = image_introduction\n            input[\"task_description\"] = task_description\n            # Minimap info tracking\n            if constants.MINIMAP_INFORMATION in response_keys:",
+        "type": "code",
+        "location": "/prototype_runner.py:305-326"
+    },
+    "701": {
+        "file_id": 54,
+        "content": "This code initializes an empty list \"image_introduction\". It then iterates through the \"augmented_image_memory\" and \"img_prompt_decision_making\" lists in reverse order, adding dictionaries to \"image_introduction\" based on conditions. These dictionaries contain information related to image introductions, paths, and assistants. Finally, it assigns the \"image_introduction\" list and a \"task_description\" variable to the \"input\" dictionary. The code also checks if \"constants.MINIMAP_INFORMATION\" is in \"response_keys\".",
+        "type": "comment"
+    },
+    "702": {
+        "file_id": 54,
+        "content": "                minimap_information = data[\"res_dict\"][constants.MINIMAP_INFORMATION]\n                logger.write(f\"{constants.MINIMAP_INFORMATION}: {minimap_information}\")\n                minimap_info_str = \"\"\n                for key, value in minimap_information.items():\n                    if value:\n                        for index, item in enumerate(value):\n                            minimap_info_str = minimap_info_str + key + ' ' + str(index) + ': angle '  + str(int(item['theta'])) + ' degree' + '\\n'\n                minimap_info_str = minimap_info_str.rstrip('\\n')\n                logger.write(f'minimap_info_str: {minimap_info_str}')\n                input[constants.MINIMAP_INFORMATION] = minimap_info_str\n            data = planner.decision_making(input = input)\n            skill_steps = data['res_dict']['actions']\n            if skill_steps is None:\n                skill_steps = []\n            logger.write(f'R: {skill_steps}')\n            # Filter nop actions in list\n            skill_steps = [ i for i in skill_steps if i != '']",
+        "type": "code",
+        "location": "/prototype_runner.py:327-349"
+    },
+    "703": {
+        "file_id": 54,
+        "content": "The code retrieves minimap information and formats it for logging. It then proceeds to get skill steps from the decision-making process, filters out any empty or 'nop' actions, and logs the final list of non-empty actions (R).",
+        "type": "comment"
+    },
+    "704": {
+        "file_id": 54,
+        "content": "            if len(skill_steps) == 0:\n                skill_steps = ['']\n            skill_steps = skill_steps[:number_of_execute_skills]\n            logger.write(f'Skill Steps: {skill_steps}')\n            gm.unpause_game()\n            # @TODO: Rename GENERAL_GAME_INTERFACE\n            if pre_screen_classification.lower() == constants.GENERAL_GAME_INTERFACE and (screen_classification.lower() == constants.MAP_INTERFACE or screen_classification.lower() == constants.SATCHEL_INTERFACE) and pre_action:\n                exec_info = gm.execute_actions([pre_action])\n            start_frame_id = videocapture.get_current_frame_id()\n            exec_info = gm.execute_actions(skill_steps)\n            cur_screen_shot_path, _ = gm.capture_screen()\n            end_frame_id = videocapture.get_current_frame_id()\n            gm.pause_game(screen_classification.lower())\n            # exec_info also has the list of successfully executed skills. skill_steps is the full list, which may differ if there were execution errors.",
+        "type": "code",
+        "location": "/prototype_runner.py:350-371"
+    },
+    "705": {
+        "file_id": 54,
+        "content": "This code segment checks if skill_steps list is empty, then assigns a non-empty value. It limits the number of execute skills based on number_of_execute_skills. It logs Skill Steps, unpauses the game and performs actions using General Game Interface (possibly needs renaming) under specific conditions. It captures pre and post screen shots and pauses the game upon completion. The code also notes any execution errors and provides a list of successfully executed skills in exec_info.",
+        "type": "comment"
+    },
+    "706": {
+        "file_id": 54,
+        "content": "            pre_action = exec_info[\"last_skill\"]\n            pre_decision_making_reasoning = ''\n            if 'res_dict' in data.keys() and 'reasoning' in data['res_dict'].keys():\n                pre_decision_making_reasoning = data['res_dict']['reasoning']\n            pre_screen_classification = screen_classification\n            memory.add_recent_history(\"action\", pre_action)\n            memory.add_recent_history(\"decision_making_reasoning\", pre_decision_making_reasoning)\n            # For such cases with no expected response, we should define a retry limit\n            logger.write(f'Decision reasoning: {pre_decision_making_reasoning}')\n            # Information summary preparation\n            if use_information_summary and len(memory.get_recent_history(\"decision_making_reasoning\", memory.max_recent_steps)) == memory.max_recent_steps:\n                input = planner.information_summary_.input_map\n                logger.write(f'> Information summary call...')\n                images = memory.get_recent_history('image', config.event_count)",
+        "type": "code",
+        "location": "/prototype_runner.py:372-389"
+    },
+    "707": {
+        "file_id": 54,
+        "content": "Code retrieves the last skill executed, any previous decision-making reasoning, and updates memory with recent history. It checks if there's a need for an information summary call based on recent steps and event count, then logs messages.",
+        "type": "comment"
+    },
+    "708": {
+        "file_id": 54,
+        "content": "                reasonings = memory.get_recent_history('decision_making_reasoning', config.event_count)\n                image_introduction = [{\"path\": images[event_i],\"assistant\": \"\",\"introduction\": 'This is the {} screenshot of recent events. The description of this image: {}'.format(['first','second','third','fourth','fifth'][event_i], reasonings[event_i])} for event_i in range(config.event_count)]\n                input[\"image_introduction\"] = image_introduction\n                input[\"previous_summarization\"] = memory.get_summarization()\n                input[\"task_description\"] = task_description\n                input[\"event_count\"] = str(config.event_count)\n                # >> Calling INFORMATION SUMMARY\n                logger.write(f'>> Calling INFORMATION SUMMARY')\n                data = planner.information_summary(input = input)\n                info_summary = data['res_dict']['info_summary']\n                entities_and_behaviors = data['res_dict']['entities_and_behaviors']\n                logger.write(f'R: Summary: {info_summary}')",
+        "type": "code",
+        "location": "/prototype_runner.py:390-404"
+    },
+    "709": {
+        "file_id": 54,
+        "content": "The code retrieves recent reasoning history and creates an image introduction list with the corresponding reasonings. It then adds this to the input along with previous summarization, task description, and event count. Finally, it calls the information summary function and logs relevant information.",
+        "type": "comment"
+    },
+    "710": {
+        "file_id": 54,
+        "content": "                logger.write(f'R: entities_and_behaviors: {entities_and_behaviors}')\n                memory.add_summarization(info_summary)\n            memory.add_recent_history(\"image\", cur_screen_shot_path)\n            # Success detection preparation\n            if use_success_detection:\n                input = planner.success_detection_.input_map\n                image_introduction = [\n                    {\n                        \"introduction\": input[\"image_introduction\"][-2][\"introduction\"],\n                        \"path\": memory.get_recent_history(\"image\", k=2)[0],\n                        \"assistant\": input[\"image_introduction\"][-2][\"assistant\"]\n                    },\n                    {\n                        \"introduction\": input[\"image_introduction\"][-1][\"introduction\"],\n                        \"path\": memory.get_recent_history(\"image\", k=1)[0],\n                        \"assistant\": input[\"image_introduction\"][-1][\"assistant\"]\n                    }\n                ]\n                input[\"image_introduction\"] = image_introduction",
+        "type": "code",
+        "location": "/prototype_runner.py:405-425"
+    },
+    "711": {
+        "file_id": 54,
+        "content": "This code is preparing for success detection by creating an input map and adding image introductions to it. It retrieves the most recent images from memory and assigns them to the relevant introductions in the input map. Finally, it updates the \"image_introduction\" field of the input map with the newly created image introductions.",
+        "type": "comment"
+    },
+    "712": {
+        "file_id": 54,
+        "content": "                input[\"task_description\"] = task_description\n                input[\"previous_action\"] = memory.get_recent_history(\"action\", k=1)[-1]\n                input[\"previous_reasoning\"] = memory.get_recent_history(\"decision_making_reasoning\", k=1)[-1]\n                # >> Calling SUCCESS DETECTION\n                logger.write(f'>> Calling SUCCESS DETECTION')\n                data = planner.success_detection(input = input)\n                success = data['res_dict']['success']\n                success_reasoning = data['res_dict']['reasoning']\n                success_criteria = data['res_dict']['criteria']\n                memory.add_recent_history(\"success_detection_reasoning\", success_reasoning)\n                logger.write(f'Success: {success}')\n                logger.write(f'Success criteria: {success_criteria}')\n                logger.write(f'Success reason: {success_reasoning}')\n            gm.store_skills()\n            memory.save()\n        except KeyboardInterrupt:\n            logger.write('KeyboardInterrupt Ctrl+C detected, exiting.')",
+        "type": "code",
+        "location": "/prototype_runner.py:427-449"
+    },
+    "713": {
+        "file_id": 54,
+        "content": "This code is calling the \"success_detection\" function to determine if a task has been completed successfully. It retrieves the previous action and reasoning from memory, then logs the results of the detection. If there's a KeyboardInterrupt, it exits the program.",
+        "type": "comment"
+    },
+    "714": {
+        "file_id": 54,
+        "content": "            gm.cleanup_io()\n            videocapture.finish_capture()\n            break\n    gm.cleanup_io()\n    videocapture.finish_capture()\nif __name__ == '__main__':\n    parser = argparse.ArgumentParser()\n    parser.add_argument(\n        \"--providerConfig\",\n        type=str,\n        default=\"./conf/openai_config.json\",\n    )\n    args = parser.parse_args()\n    config.set_fixed_seed()\n    # only change the input for different sub-modules\n    # the tempaltes are now fixed\n    planner_params = {\n        \"__check_list__\": [\n            \"decision_making\",\n            \"gather_information\",\n            \"success_detection\",\n            \"information_summary\",\n            \"gather_text_information\"\n        ],\n        \"prompt_paths\": {\n            \"inputs\": {\n                \"decision_making\": \"./res/prompts/inputs/decision_making.json\",\n                \"gather_information\": \"./res/prompts/inputs/gather_information.json\",\n                \"success_detection\": \"./res/prompts/inputs/success_detection.json\",\n                \"self_reflection\": \"./res/prompts/inputs/self_reflection.json\",",
+        "type": "code",
+        "location": "/prototype_runner.py:450-488"
+    },
+    "715": {
+        "file_id": 54,
+        "content": "The code is setting up the necessary parameters and configurations for a specific software module. It uses an argument parser to handle command-line arguments, sets a fixed seed for reproducibility, and initializes various prompts from different input files. The main functionality is likely related to AI decision making or planning, utilizing different sub-modules with predefined templates for processing inputs.",
+        "type": "comment"
+    },
+    "716": {
+        "file_id": 54,
+        "content": "                \"information_summary\": \"./res/prompts/inputs/information_summary.json\",\n                \"gather_text_information\": \"./res/prompts/inputs/gather_text_information.json\"\n            },\n            \"templates\": {\n                \"decision_making\": \"./res/prompts/templates/decision_making.prompt\",\n                \"gather_information\": \"./res/prompts/templates/gather_information.prompt\",\n                \"success_detection\": \"./res/prompts/templates/success_detection.prompt\",\n                \"self_reflection\": \"./res/prompts/templates/self_reflection.prompt\",\n                \"information_summary\": \"./res/prompts/templates/information_summary.prompt\",\n                \"gather_text_information\": \"./res/prompts/templates/gather_text_information.prompt\"\n            },\n        }\n    }\n    skill_library = ['turn', 'move_forward', 'turn_and_move_forward', 'follow', 'aim', 'shoot', 'shoot_wolves', 'select_weapon', 'select_sidearm', 'fight', 'mount_horse']\n    task_description =  \"\"\n    config.ocr_fully_ban = True # not use local OCR-checks",
+        "type": "code",
+        "location": "/prototype_runner.py:489-506"
+    },
+    "717": {
+        "file_id": 54,
+        "content": "The code defines paths for various JSON and prompt template files used in the application. It also includes a list of skills available in the skill library, and a configuration setting that disables local OCR checks.",
+        "type": "comment"
+    },
+    "718": {
+        "file_id": 54,
+        "content": "    config.ocr_enabled = False\n    config.skill_retrieval = True\n    trigger_pipeline_loop(args.providerConfig, planner_params, task_description, skill_library, use_success_detection = False, use_self_reflection = True, use_information_summary = True)",
+        "type": "code",
+        "location": "/prototype_runner.py:507-510"
+    },
+    "719": {
+        "file_id": 54,
+        "content": "This code segment sets OCR (Optical Character Recognition) as disabled, enables skill retrieval, and triggers a pipeline loop with specific parameters: no success detection, self-reflection enabled, and information summary enabled.",
+        "type": "comment"
+    },
+    "720": {
+        "file_id": 55,
+        "content": "/requirements.txt",
+        "type": "filepath"
+    },
+    "721": {
+        "file_id": 55,
+        "content": "This code is a requirements list for a Python project. It includes libraries and packages such as backoff, openai, python-dotenv, numpy, tiktoken, colorama, pydirectinput, pyautogui, ahk, opencv-python, opencv-contrib-python, pillow, Multi-Template-Matching, imageio[ffmpeg], mss, aiohttp, easyocr, spacy, chardet. These are necessary for the project's functionality.",
+        "type": "summary"
+    },
+    "722": {
+        "file_id": 55,
+        "content": "backoff==2.2.1\nopenai==1.2.3\npython-dotenv==1.0.0\nnumpy==1.24.3\ntiktoken==0.5.1\ncolorama\npydirectinput==1.0.4\npyautogui==0.9.54\nahk==1.3.0\nahk[binary]\nopencv-python==4.8.1.78\nopencv-contrib-python==4.8.1.78\npillow==10.2.0\nMulti-Template-Matching==1.6.6\nimageio[ffmpeg]\nmss==9.0.1\naiohttp\neasyocr==1.7.1\nspacy==3.7.2\nchardet==5.2.0",
+        "type": "code",
+        "location": "/requirements.txt:1-20"
+    },
+    "723": {
+        "file_id": 55,
+        "content": "This code is a requirements list for a Python project. It includes libraries and packages such as backoff, openai, python-dotenv, numpy, tiktoken, colorama, pydirectinput, pyautogui, ahk, opencv-python, opencv-contrib-python, pillow, Multi-Template-Matching, imageio[ffmpeg], mss, aiohttp, easyocr, spacy, chardet. These are necessary for the project's functionality.",
+        "type": "comment"
+    }
+}

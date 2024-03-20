@@ -1,0 +1,543 @@
+{
+    "400": {
+        "file_id": 29,
+        "content": "def _replacer(text, encoded_images, image_paths, work_dir):\n    if image_paths is None or len(image_paths) == 0:\n        image_paths = ['<$img_placeholder$>']\n    for i in range(len(encoded_images)):\n        if len(image_paths) == 1 and len(encoded_images) > len(image_paths):\n            paths_idx = 0\n            text = text.replace(encoded_images[i], image_paths[paths_idx])\n        else:\n            key = hash_text_sha256(encoded_images[i])\n            encoded_image = encoded_images[i]\n            if key not in image_paths.keys() or image_paths[key] == '<$bin_placeholder$>':\n                # Re-construct image, then replace\n                file_name = f\"base64_rec_{i}.jpg\"\n                path = os.path.join(work_dir, file_name)\n                with open(path, \"wb\") as f:\n                    f.write(decode_base64(encoded_image))\n                image_paths[key] = path\n            else:\n                path = image_paths[key]\n                if not os.path.exists(path):\n                    with open(path, \"wb\") as f:",
+        "type": "code",
+        "location": "/cradle/log/logger.py:159-186"
+    },
+    "401": {
+        "file_id": 29,
+        "content": "This code defines a function _replacer that takes in text, encoded_images, image_paths, and work_dir as parameters. It handles the case where image_paths is None or empty by replacing them with '<$img_placeholder$>'. If there are more encoded images than image paths, it assigns the first path to all remaining images. For each encoded image, it checks if a corresponding key exists in image_paths dictionary or if its value is '<$bin_placeholder$>'. If so, it reconstructs the image by writing the decoded base64 data to a file and updates image_paths accordingly. Finally, it replaces the text with the corresponding image path.",
+        "type": "comment"
+    },
+    "402": {
+        "file_id": 29,
+        "content": "                        f.write(decode_base64(encoded_image))\n            text = text.replace(encoded_image, json.dumps(image_paths[key], ensure_ascii=False).strip('\"'))\n    return text\ndef _extract_image_hashes(text):\n    map = dict()\n    hash_list = _extract_text_between_tokens(text, \"|>.\", \".<|\", escape = True)\n    for i in range(len(hash_list)):\n        # Extract mapping info\n        hash_info = hash_list[i].split(\" \")\n        map[hash_info[2].split(\",\")[0]] = hash_info[4]\n        # Remove line from log\n        text = text.replace(hash_list[i], \"\")\n    return (map, text)\ndef process_string(input_str):\n    processed_str = input_str.replace(\"\\\\\", \"\\\\\\\\\")\n    processed_str = processed_str.replace(\"'text': \\\"\", \"'text': '\").replace(\".\\\"}]}\", \".'}]}\")\n    processed_str = processed_str.replace(\"\\\"\", \"\\\\\\\"\")\n    try:\n        msgs = ast.literal_eval(processed_str)\n        json_obj = msgs\n    except SyntaxError as e:\n        print(f\"Syntax error: {e}\")\n        print(\"Error may be near:\", processed_str[max(0, e.offset - 10):e.offset + 10])",
+        "type": "code",
+        "location": "/cradle/log/logger.py:187-222"
+    },
+    "403": {
+        "file_id": 29,
+        "content": "This code is responsible for processing a given input string. It replaces certain characters with their escaped versions, and then attempts to evaluate the processed string as a JSON object using `ast.literal_eval()`. If an error occurs during evaluation, it prints the SyntaxError message and a nearby section of the problematic string. The code also defines two additional functions: `_extract_image_hashes()` that extracts image hash information from a text string, and `decode_base64()` (not shown) which decodes Base64 encoded strings.",
+        "type": "comment"
+    },
+    "404": {
+        "file_id": 29,
+        "content": "    except json.JSONDecodeError as e: #SyntaxError\n        print()\n        error_position = e.pos\n        start = max(0, error_position - 10)  # Show 10 characters before the error position\n        end = min(len(processed_str), error_position + 10)  # Show 10 characters after the error position\n        span = processed_str[start:end]\n        print(f'Error near: {span}')\n        print(f'Exact error position: {error_position}')\n    return json_obj\ndef process_log_messages(work_dir):\n    log_path = os.path.join(work_dir, \"logs/cradle.log\")\n    with open(log_path, \"r\", encoding=\"utf-8\") as fd:\n        log = fd.read()\n    filter_list = ['|>..<|', 'httpcore.http11 - DEBUG', 'httpcore.connection - DEBUG', 'asyncio - DEBUG', 'httpx - DEBUG', 'matplotlib.pyplot - DEBUG', 'openai._base_client - DEBUG - Request options:']\n    log_lines = []\n    for line in log.split('\\n'):\n        if any(substring in line for substring in filter_list):\n            continue\n        log_lines.append(line)\n    log = '\\n'.join(log_lines)",
+        "type": "code",
+        "location": "/cradle/log/logger.py:223-249"
+    },
+    "405": {
+        "file_id": 29,
+        "content": "This code snippet handles JSON decoding errors and displays the error location by printing a span of 10 characters before and after the position. It also defines a function, `process_log_messages`, which filters log lines based on specific keywords and joins them back into a single string.",
+        "type": "comment"
+    },
+    "406": {
+        "file_id": 29,
+        "content": "    hash_file_maps, log = _extract_image_hashes(log)\n    encoded_images = _extract_text_between_tokens(log)\n    log = _replacer(log, encoded_images, hash_file_maps, work_dir)\n    md_log = []\n    img_start_token = ';base64,'\n    img_end_token = 'g\"'\n    msg_start_token = '[{\"role\": \"system\",'\n    msg_end_token = '}]}]'\n    for line in log.split('\\n'):\n        if msg_start_token in line:\n            candidates = _extract_text_between_tokens(line, msg_start_token, msg_end_token, escape=True)\n            if len(candidates) > 0:\n                msgs = f'{msg_start_token}{candidates[0]}{msg_end_token}'#.replace('\\\\', '\\\\\\\\')\n                obj = json.loads(msgs)\n                obj_str = json.dumps(obj, indent=4, ensure_ascii=False)\n                line = \"\\n````text\\n\" + obj_str + \"\\n````\\n\\n\"\n        if img_start_token in line:\n            candidates = _extract_text_between_tokens(line, img_start_token, img_end_token)\n            for candidate in candidates:\n                norm_path = os.path.normpath(candidate+'g')",
+        "type": "code",
+        "location": "/cradle/log/logger.py:251-275"
+    },
+    "407": {
+        "file_id": 29,
+        "content": "The code reads a log file and identifies sections containing either system messages or images. It extracts these sections, converts them to valid JSON format, and replaces the original line in the log with formatted text/code blocks for readability. The extracted image paths are also normalized.",
+        "type": "comment"
+    },
+    "408": {
+        "file_id": 29,
+        "content": "                norm_work_dir = PureWindowsPath(os.path.normpath(work_dir)).as_posix()\n                rel_path = PureWindowsPath(os.path.relpath(norm_path, norm_work_dir)).as_posix()\n                new_substxt = \"\\n````\\n\" + f'![{norm_path}](../{rel_path})'.replace('\\\\','/').replace('//','/') + \"\\n````text\\n\"\n                line = line.replace(candidate, new_substxt)\n        elif re.match('^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2},\\d{3}', line):\n            line = f'{line}\\n'\n        if any(substring in line for substring in filter_list):\n            continue\n        md_log.append(line)\n    log = '\\n'.join(md_log)\n    return log",
+        "type": "code",
+        "location": "/cradle/log/logger.py:276-290"
+    },
+    "409": {
+        "file_id": 29,
+        "content": "This code snippet normalizes file paths and replaces a candidate string with Markdown formatted text for image links, handling specific formats, and excluding lines matching a filter list. It then joins the processed lines into a single log string before returning it.",
+        "type": "comment"
+    },
+    "410": {
+        "file_id": 30,
+        "content": "/cradle/memory/__init__.py",
+        "type": "filepath"
+    },
+    "411": {
+        "file_id": 30,
+        "content": "This code imports various memory classes from cradle's memory module and adds them to the __all__ list, indicating they are publicly exposed. This allows users to import these specific memory classes when using the cradle package.",
+        "type": "summary"
+    },
+    "412": {
+        "file_id": 30,
+        "content": "from cradle.memory.base import BaseMemory\nfrom cradle.memory.vector_store import VectorStore\nfrom cradle.memory.basic_vector_memory import BasicVectorMemory\nfrom cradle.memory.local_memory import LocalMemory\n__all__ = [\n    \"VectorStore\",\n    \"BaseMemory\",\n    \"BasicVectorMemory\",\n    \"LocalMemory\"\n]",
+        "type": "code",
+        "location": "/cradle/memory/__init__.py:1-11"
+    },
+    "413": {
+        "file_id": 30,
+        "content": "This code imports various memory classes from cradle's memory module and adds them to the __all__ list, indicating they are publicly exposed. This allows users to import these specific memory classes when using the cradle package.",
+        "type": "comment"
+    },
+    "414": {
+        "file_id": 31,
+        "content": "/cradle/memory/base.py",
+        "type": "filepath"
+    },
+    "415": {
+        "file_id": 31,
+        "content": "This code is an abstract base class for memory operations with methods such as get_recent_history, add_summarization, and load/save functions. It's designed to be inherited by more specific implementations of the memory functionality.",
+        "type": "summary"
+    },
+    "416": {
+        "file_id": 31,
+        "content": "import abc\nfrom typing import (\n    Any,\n    Iterable,\n    List,\n    Dict,\n    Union,\n    Tuple,\n    Optional,\n)\nfrom cradle.config.config import Config\nImage = Any\nconfig = Config()\nclass BaseMemory:\n    \"\"\"Base class for all memories.\"\"\"\n    @abc.abstractmethod\n    def add(\n        self,\n        **kwargs,\n    ) -> None:\n        \"\"\"Add data to memory.\n        Args:\n            **kwargs: Other keyword arguments that subclasses might use.\n        \"\"\"\n        pass\n    @abc.abstractmethod\n    def similarity_search(\n        self,\n        data: Union[str, Image],\n        top_k: int,\n        **kwargs: Any,\n    ) -> List[Union[str, Image]]:\n        \"\"\"Retrieve the keys from the store.\n        Args:\n            data: the query data.\n            top_k: the number of results to return.\n            **kwargs: Other keyword arguments that subclasses might use.\n        Returns:\n            the corresponding values from the memory.\n        \"\"\"\n        pass\n    @abc.abstractmethod\n    def add_recent_history(\n        self,\n        key: str,\n        info: Any,",
+        "type": "code",
+        "location": "/cradle/memory/base.py:1-59"
+    },
+    "417": {
+        "file_id": 31,
+        "content": "The code is a base class for memory implementations that require adding data, similarity searching using query data and number of results, and adding recent history. It imports necessary types and modules, uses ABC to define abstract methods, and includes a Config object for configuration settings.",
+        "type": "comment"
+    },
+    "418": {
+        "file_id": 31,
+        "content": "    ) -> None:\n        pass\n    @abc.abstractmethod\n    def get_recent_history(\n        self,\n        key: str,\n        k: int = 1,\n    ) -> List[Any]:\n        pass\n    @abc.abstractmethod\n    def add_summarization(self, hidden_state: str) -> None:\n        pass\n    @abc.abstractmethod\n    def get_summarization(self) -> str:\n        pass\n    @abc.abstractmethod\n    def load(self) -> None:\n        \"\"\"Load the memory from persistence.\"\"\"\n    @abc.abstractmethod\n    def save(self) -> None:\n        \"\"\"Save the memory to persistence.\"\"\"",
+        "type": "code",
+        "location": "/cradle/memory/base.py:60-90"
+    },
+    "419": {
+        "file_id": 31,
+        "content": "This code defines an abstract base class for memory operations, including get_recent_history, add_summarization, get_summarization, load, and save methods. The class is designed to be inherited by more specific implementations of the memory functionality.",
+        "type": "comment"
+    },
+    "420": {
+        "file_id": 32,
+        "content": "/cradle/memory/basic_vector_memory.py",
+        "type": "filepath"
+    },
+    "421": {
+        "file_id": 32,
+        "content": "The code defines the `BasicVectorMemory` class for memory management, initializing variables and providing an `add` method to add data. It allows similarity search based on queries and can load/save data from local files using JSON format.",
+        "type": "summary"
+    },
+    "422": {
+        "file_id": 32,
+        "content": "from typing import (\n    List,\n    Dict,\n    Union,\n    Optional,\n)\nimport os\nfrom cradle.config import Config\nfrom cradle.log import Logger\nfrom cradle.provider.base_embedding import EmbeddingProvider\nfrom cradle.memory.base import BaseMemory, Image\nfrom cradle.memory.vector_store import VectorStore\nfrom cradle.utils.json_utils import load_json, save_json\nconfig = Config()\nlogger = Logger()\nclass BasicVectorMemory(BaseMemory):\n    storage_filename = \"vector_memory.json\"\n    def __init__(\n        self,\n        memory_path: str,\n        vectorstores: VectorStore,\n        embedding_provider: EmbeddingProvider,\n        memory: Optional[Dict] = None,\n    ):\n        if memory is None:\n            self.memory: Dict = {}\n        else:\n            self.memory = memory\n        self.memory_path = memory_path\n        self.vectorstores = vectorstores\n        self.embedding_provider = embedding_provider\n    def add(\n        self,\n        data: Dict[str, Union[str, Image]],\n    ) -> None:\n        \"\"\"Add data to memory.\n        Args:\n            data: the mapping from unique name (id) to text/image.",
+        "type": "code",
+        "location": "/cradle/memory/basic_vector_memory.py:1-47"
+    },
+    "423": {
+        "file_id": 32,
+        "content": "This code defines the `BasicVectorMemory` class, which inherits from `BaseMemory`. It initializes variables like `storage_filename`, `memory`, `memory_path`, `vectorstores`, and `embedding_provider`. The `__init__` function takes in parameters such as `memory_path`, `vectorstores`, `embedding_provider`, and an optional `memory` parameter. It also has a method called `add` that takes in data in the form of a mapping from unique names to text or images, allowing users to add data to memory.",
+        "type": "comment"
+    },
+    "424": {
+        "file_id": 32,
+        "content": "        \"\"\"\n        keys: List[str] = list(data.keys())\n        embeddings = []\n        for k in keys:\n            embeddings.append(self.embedding_provider.embed_query(data[k][\"description\"]))\n            instruction = data[k][\"instruction\"]\n            screenshot = data[k][\"screenshot\"]\n            timestep = data[k][\"timestep\"]\n            description = data[k][\"description\"]\n            inventory = data[k][\"inventory\"]\n            self.memory[k] = {\n                \"instruction\": instruction,\n                \"screenshot\": screenshot,\n                \"timestep\": timestep,\n                \"description\": description,\n                \"inventory\": inventory,\n            }\n        self.vectorstores['description'].add_embeddings(keys, embeddings)\n    def similarity_search(\n        self,\n        data: Union[str, Image],\n        top_k: int = 3,\n        **kwargs,\n    ) -> List[Union[str, Image]]:\n        \"\"\"Retrieve the keys from the vectorstore.\n        Args:\n            data: the query data.\n            top_k: the number of results to return.",
+        "type": "code",
+        "location": "/cradle/memory/basic_vector_memory.py:48-82"
+    },
+    "425": {
+        "file_id": 32,
+        "content": "This code initializes a list of embeddings by looping through keys in the data and appending embeddings for each key's description using an embedding provider. It then stores the keys with their associated values in memory, and adds embeddings to the vectorstore for the 'description' index. The `similarity_search` function retrieves keys based on a query and returns top_k results.",
+        "type": "comment"
+    },
+    "426": {
+        "file_id": 32,
+        "content": "            **kwargs: Other keyword arguments that subclasses might use.\n        Returns:\n            the corresponding values from the memory.\n        \"\"\"\n        query_embedding = self.embedding_provider.embed_query(data)\n        key_and_score = self.vectorstores['description'].similarity_search(query_embedding, top_k)\n        return [self.memory[k] for k, score in key_and_score]\n    def recent_search(\n        self,\n        recent_k: int = 3,\n        **kwargs,\n    ) -> List[Union[str, Image]]:\n        \"\"\"Retrieve the recent k keys\n        Args:\n            recent_k: the number of results to return.\n            **kwargs: Other keyword arguments that subclasses might use.\n        Returns:\n            the corresponding values of the recent k memory.\n        \"\"\"\n        keys = list(self.memory.keys()) # the order of adding\n        recent_k = min(recent_k,len(keys))\n        return [self.memory[k] for k in keys[len(keys) - recent_k : len(keys)]]\n    def load(self):\n        self.load()\n    def load(\n        cls,\n        memory_path: str,",
+        "type": "code",
+        "location": "/cradle/memory/basic_vector_memory.py:83-120"
+    },
+    "427": {
+        "file_id": 32,
+        "content": "This code defines a class with methods for searching and loading data from memory. The `basic_vector_memory` class provides an embedding-based search function using similarity scores to find relevant results, as well as a method to retrieve recent keys based on their order of addition to the memory. The class also includes a load function that can be used to load data from a given memory path.",
+        "type": "comment"
+    },
+    "428": {
+        "file_id": 32,
+        "content": "        vectorstore: VectorStore,\n        embedding_provider: EmbeddingProvider,\n    ) -> \"BasicVectorMemory\":\n        \"\"\"Load the memory from the local file.\"\"\"\n        memory = load_json(os.path.join(cls.memory_path, cls.storage_filename))\n        return cls(\n            memory_path=memory_path,\n            vectorstore=vectorstore,\n            embedding_provider=embedding_provider,\n            memory=memory,\n        )\n    def save(self) -> None:\n        \"\"\"Save the memory to the local file.\"\"\"\n        save_json(file_path = os.path.join(self.memory_path, self.storage_filename), json_dict = self.memory, indent = 4)\n        self.vectorstores.save()",
+        "type": "code",
+        "location": "/cradle/memory/basic_vector_memory.py:121-139"
+    },
+    "429": {
+        "file_id": 32,
+        "content": "This code snippet is a class method for loading and saving memory from/to a local file. The load method takes the memory path and storage filename as parameters, loads the JSON data from the specified file path, creates an instance of BasicVectorMemory with the loaded memory, vectorstore, and embedding_provider, and returns it. The save method saves the memory to a local file with the specified memory path and storage filename using JSON data format. It also calls the save method of the vectorstores instance to save them as well.",
+        "type": "comment"
+    },
+    "430": {
+        "file_id": 33,
+        "content": "/cradle/memory/local_memory.py",
+        "type": "filepath"
+    },
+    "431": {
+        "file_id": 33,
+        "content": "The code defines a class, LocalMemory, that extends BaseMemory and offers JSON-based local memory storage with features like memory path, loading/saving data, and handling task duration for tasks such as summarization and task guidance.",
+        "type": "summary"
+    },
+    "432": {
+        "file_id": 33,
+        "content": "from typing import (\n    Any,\n    List,\n    Dict,\n    Union,\n    Tuple,\n)\nimport os\nfrom cradle.config import Config\nfrom cradle import constants\nfrom cradle.log import Logger\nfrom cradle.memory.base import BaseMemory, Image\nfrom cradle.utils.json_utils import load_json, save_json\nconfig = Config()\nlogger = Logger()\nclass LocalMemory(BaseMemory):\n    storage_filename = \"memory.json\"\n    def __init__(\n        self,\n        memory_path: str = '',\n        max_recent_steps: int = 5\n    ) -> None:\n        self.max_recent_steps = max_recent_steps\n        self.memory_path = memory_path\n        self.task_duration = 3\n        self.recent_history = {\"image\": [],\n                               constants.AUGMENTED_IMAGES_MEM_BUCKET:[],\n                               \"action\": [],\n                               \"decision_making_reasoning\": [],\n                               \"success_detection_reasoning\": [],\n                               \"self_reflection_reasoning\": [],\n                               \"image_description\":[],\n                               \"task_guidance\":[],",
+        "type": "code",
+        "location": "/cradle/memory/local_memory.py:1-41"
+    },
+    "433": {
+        "file_id": 33,
+        "content": "Class LocalMemory extends BaseMemory and provides a memory storage using JSON files. It has an attribute \"memory_path\" for the storage location, \"max_recent_steps\" to limit recent steps history, and other attributes like \"task_duration\", \"recent_history\". It uses load_json and save_json functions for reading and writing data.",
+        "type": "comment"
+    },
+    "434": {
+        "file_id": 33,
+        "content": "                               \"dialogue\":[],\n                               \"task_description\":[],\n                               \"skill_library\":[],\n                               \"summarization\":\"The player is playing the game Red Dead Redemption for the PC.\",\n                               \"long_horizon_task\":\"\",\n                               \"last_task_guidance\":\"\",\n                               \"last_task_duration\": self.task_duration}\n    def add_recent_history(\n        self,\n        key: str,\n        info: Any,\n    ) -> None:\n        \"\"\"Add recent info (skill/image/reasoning) to memory.\"\"\"\n        self.recent_history[key].append(info)\n        if len(self.recent_history[key]) > self.max_recent_steps:\n            self.recent_history[key].pop(0)\n    def get_recent_history(\n        self,\n        key: str,\n        k: int = 1,\n    ) -> List[Any]:\n        \"\"\"Query recent info (skill/image/reasoning) from memory.\"\"\"\n        if len(self.recent_history[key]) == 0:\n            return [\"\"]\n        return self.recent_history[key][-k:] if len(self.recent_history[key]) >= k else self.recent_history[key]",
+        "type": "code",
+        "location": "/cradle/memory/local_memory.py:42-75"
+    },
+    "435": {
+        "file_id": 33,
+        "content": "This code defines a class with attributes for dialogue, task description, skill library, and summarization. It also includes methods to add recent information to memory, retrieve recent information, and set the last task duration.",
+        "type": "comment"
+    },
+    "436": {
+        "file_id": 33,
+        "content": "    def add_summarization(self, summary: str) -> None:\n        self.recent_history[\"summarization\"] = summary\n    def get_summarization(self) -> str:\n        return self.recent_history[\"summarization\"]\n    def add_task_guidance(self, task_description: str, long_horizon: bool) -> None:\n        self.recent_history['last_task_guidance'] = task_description\n        self.recent_history['last_task_duration'] = self.task_duration\n        if long_horizon:\n            self.recent_history['long_horizon_task'] = task_description\n    def get_task_guidance(self, use_last = True) -> str:\n        if use_last:\n            return self.recent_history['last_task_guidance']\n        else:\n            self.recent_history['last_task_duration'] -= 1\n            if self.recent_history['last_task_duration']>=0:\n                return self.recent_history['last_task_guidance']\n            else:\n                return self.recent_history['long_horizon_task']\n    def load(self, load_path = None) -> None:\n        \"\"\"Load the memory from the local file.\"\"\"",
+        "type": "code",
+        "location": "/cradle/memory/local_memory.py:78-105"
+    },
+    "437": {
+        "file_id": 33,
+        "content": "This code defines several methods for handling memory tasks. The `add_summarization` method adds a summary to recent history, while the `get_summarization` method retrieves it. The `add_task_guidance` method adds a task description and duration to recent history, while the `get_task_guidance` method retrieves either the last or previous task guidance based on a boolean parameter. Finally, the `load` method loads memory from a local file.",
+        "type": "comment"
+    },
+    "438": {
+        "file_id": 33,
+        "content": "        # @TODO load and store whole memory\n        if load_path != None:\n            if os.path.exists(os.path.join(load_path, self.storage_filename)):\n                self.recent_history = load_json(os.path.join(load_path, self.storage_filename))\n                logger.write(f\"{os.path.join(load_path, self.storage_filename)} has been loaded.\")\n            else:\n                logger.error(f\"{os.path.join(load_path, self.storage_filename)} does not exist.\")\n    def save(self) -> None:\n        \"\"\"Save the memory to the local file.\"\"\"\n        # @TODO load and store whole memory\n        save_json(file_path = os.path.join(self.memory_path, self.storage_filename), json_dict = self.recent_history, indent = 4)",
+        "type": "code",
+        "location": "/cradle/memory/local_memory.py:106-118"
+    },
+    "439": {
+        "file_id": 33,
+        "content": "This code checks if a file exists at the specified path, then loads and stores the memory in that file. If it doesn't exist, an error is logged. The `save()` function saves the memory to the local file with proper formatting using JSON.",
+        "type": "comment"
+    },
+    "440": {
+        "file_id": 34,
+        "content": "/cradle/memory/short_term_memory.py",
+        "type": "filepath"
+    },
+    "441": {
+        "file_id": 34,
+        "content": "The code introduces `ConversationUnit` and `ConversationMemory` classes for managing conversation memory in chat applications. It utilizes vector stores for data retrieval, performs similarity search, embeds queries, adds embeddings to vector stores, and handles saving/loading memory.",
+        "type": "summary"
+    },
+    "442": {
+        "file_id": 34,
+        "content": "from typing import (\n    List,\n    Dict,\n    Union,\n    Optional,\n)\nfrom dataclasses import dataclass, fields\nimport time\nimport json\nimport os\nfrom cradle.config import Config\nfrom cradle.log import Logger\nfrom cradle.provider.base_embedding import EmbeddingProvider\nfrom cradle.memory.base import BaseMemory, Image\nfrom cradle.memory import VectorStore\ncfg = Config()\nlogger = Logger()\n@dataclass\nclass ConversationUnit:\n    \"\"\"A basic unit of memory.\n    Attributes:\n        messages: The messages of the conversation input.\n        response: The response of the language model.\n    Example Usage:\n        mu = MemoryUnit(\n            messages=[\n                {\n                    \"role\": \"user\",\n                    \"text\": \"Hello, I am a user.\",\n                },\n            ],\n            response={\n                \"role\": \"system\",\n                \"text\": \"Hello, I am a system.\",\n            },\n        )\n    \"\"\"\n    messages: str\n    response: str\n    def __iter__(self):\n        for field in fields(self):\n            value = getattr(self, field.name)",
+        "type": "code",
+        "location": "/cradle/memory/short_term_memory.py:1-49"
+    },
+    "443": {
+        "file_id": 34,
+        "content": "The code defines a `ConversationUnit` class with `messages` and `response` attributes, representing a basic unit of memory. It also includes an `__iter__` method to iterate over the fields of the class. This class is used in conversation-based applications for storing input messages and system responses.",
+        "type": "comment"
+    },
+    "444": {
+        "file_id": 34,
+        "content": "            yield field.name, value\nclass ConversationMemory(BaseMemory):\n    def __init__(\n        self,\n        memory_path: str,\n        vectorstores: Dict[str, VectorStore],\n        embedding_provider: EmbeddingProvider,\n        memory: Optional[Dict] = None,\n    ) -> None:\n        if memory is None:\n            self.memory: Dict[str, ConversationUnit] = {}\n        else:\n            self.memory = memory\n        self.memory_path = memory_path\n        self.vectorstores = vectorstores\n        self.embedding_provider = embedding_provider\n    def add(\n        self,\n        messages: str,\n        response: str,\n        **kwargs,\n    ) -> None:\n        \"\"\"Add data to memory.\n        Args:\n            messages: the messages of the conversation input.\n            response: the response of the language model.\n            **kwargs: Other keyword arguments that subclasses might use.\n        \"\"\"\n        name = time.strftime(\"%Y-%m-%d-%H:%M:%S\", time.localtime())  # the unique id of the added unit.\n        mem_unit = ConversationUnit(",
+        "type": "code",
+        "location": "/cradle/memory/short_term_memory.py:50-83"
+    },
+    "445": {
+        "file_id": 34,
+        "content": "The code snippet represents a memory class named ConversationMemory, which inherits from BaseMemory. It initializes the memory (a dictionary) if it's None or updates it with existing data. The add method allows adding conversation messages and responses to this memory. A unique name is assigned based on current timestamp while creating a new ConversationUnit object.",
+        "type": "comment"
+    },
+    "446": {
+        "file_id": 34,
+        "content": "            messages=messages,\n            response=response,\n        )\n        self.memory[name] = mem_unit\n        embeddings = self.embedding_provider.embed_query(mem_unit.messages)\n        self.vectorstores[\"message\"].add_embeddings([name], [embeddings])\n    def similarity_search(\n        self,\n        query: Union[str, Image],\n        top_k: int = 3,\n        **kwargs,\n    ) -> List[Union[str, Image]]:\n        \"\"\"Retrieve the keys from the vectorstores.\n        Args:\n            query: the query data.\n            top_k: the number of results to return.\n            **kwargs: Other keyword arguments that subclasses might use.\n        Returns:\n            the corresponding values from the memory.\n        \"\"\"\n        query_embedding = self.embedding_provider.embed_query(query)\n        key_and_score = self.vectorstores[\"message\"].similarity_search(query_embedding, top_k)\n        return [self.memory[k] for k, score in key_and_score]\n    def load(\n        cls,\n        memory_path: str,\n        vectorstores: Dict[str, VectorStore],",
+        "type": "code",
+        "location": "/cradle/memory/short_term_memory.py:84-116"
+    },
+    "447": {
+        "file_id": 34,
+        "content": "The code defines a class with methods to store and retrieve data, using vector stores for similarity search. It embeds queries, adds embeddings to vector stores, and retrieves corresponding values from memory based on query results.",
+        "type": "comment"
+    },
+    "448": {
+        "file_id": 34,
+        "content": "        embedding_provider: EmbeddingProvider,\n    ) -> \"ConversationMemory\":\n        \"\"\"Load the memory from the local file.\"\"\"\n        with open(os.path.join(memory_path, \"memory.json\"), \"r\") as rf:\n            memory = json.load(rf)\n        return cls(\n            memory_path=memory_path,\n            vectorstores=vectorstores,\n            embedding_provider=embedding_provider,\n            memory=memory,\n        )\n    def save(self) -> None:\n        \"\"\"Save the memory to the local file.\"\"\"\n        with open(os.path.join(self.memory_path, \"memory.json\"), \"w\") as f:\n            json.dump(self.memory, f, indent=2)\n        for k, v in self.vectorstores.items():\n            v.save(name=k)",
+        "type": "code",
+        "location": "/cradle/memory/short_term_memory.py:117-136"
+    },
+    "449": {
+        "file_id": 34,
+        "content": "This code loads and saves the conversation memory from/to a local file. It uses json to read or write the memory data, and also handles vectorstores saving.",
+        "type": "comment"
+    },
+    "450": {
+        "file_id": 35,
+        "content": "/cradle/memory/vector_store.py",
+        "type": "filepath"
+    },
+    "451": {
+        "file_id": 35,
+        "content": "This code defines an abstract base class `VectorStore` for a vector store interface, with methods for adding embeddings, deleting entries, and performing similarity search. An ABC method is also provided for saving a FAISS index and key mapping to disk.",
+        "type": "summary"
+    },
+    "452": {
+        "file_id": 35,
+        "content": "import abc\nfrom typing import (\n    Any,\n    Iterable,\n    List,\n    Dict,\n    Union,\n    Tuple,\n    Optional,\n)\nclass VectorStore(abc.ABC):\n    \"\"\"Interface for vector store.\"\"\"\n    @abc.abstractmethod\n    def add_embeddings(\n        self,\n        keys: List[str],\n        embeddings: Iterable[List[float]],\n        **kwargs: Any,\n    ) -> None:\n        \"\"\"Add embeddings to the vectorstore.\n        Args:\n            keys: list of metadatas associated with the embedding.\n            embeddings: Iterable of embeddings to add to the vectorstore.\n            kwargs: vectorstore specific parameters\n        \"\"\"\n    @abc.abstractmethod\n    def delete(self, keys: List[str] = None, **kwargs: Any) -> bool:\n        \"\"\"Delete by keys.\n        Args:\n            keys: List of keys to delete.\n            **kwargs: Other keyword arguments that subclasses might use.\n        Returns:\n            bool: True if deletion is successful,\n            False otherwise, None if not implemented.\n        \"\"\"\n    @abc.abstractmethod\n    def similarity_search(",
+        "type": "code",
+        "location": "/cradle/memory/vector_store.py:1-45"
+    },
+    "453": {
+        "file_id": 35,
+        "content": "This code defines an abstract base class `VectorStore` for a vector store interface, with three methods: `add_embeddings`, `delete`, and `similarity_search`. The `add_embeddings` method allows adding embeddings to the vector store along with their metadata. The `delete` method deletes entries from the vector store based on specified keys. Lastly, the `similarity_search` method performs similarity search operations on the vector store.",
+        "type": "comment"
+    },
+    "454": {
+        "file_id": 35,
+        "content": "        self,\n        embedding: List[float],\n        top_k: int,\n        **kwargs: Any,\n    ) -> List[Tuple[str, float]]:\n        \"\"\"Return keys most similar to query.\"\"\"\n    @abc.abstractmethod\n    def save(self, name: str) -> None:\n        \"\"\"Save FAISS index and index_to_key to disk.\"\"\"",
+        "type": "code",
+        "location": "/cradle/memory/vector_store.py:46-55"
+    },
+    "455": {
+        "file_id": 35,
+        "content": "This code defines an abstract base class (ABC) method for saving a FAISS index and the associated key mapping to disk, with parameters self, embedding (a list of floats), top_k (an integer), and any additional keyword arguments. The return type is a list of tuples representing keys and their similarity scores.",
+        "type": "comment"
+    },
+    "456": {
+        "file_id": 36,
+        "content": "/cradle/planner/__init__.py",
+        "type": "filepath"
+    },
+    "457": {
+        "file_id": 36,
+        "content": "Imports the BasePlanner class from the base module.",
+        "type": "summary"
+    },
+    "458": {
+        "file_id": 36,
+        "content": "from .base import BasePlanner",
+        "type": "code",
+        "location": "/cradle/planner/__init__.py:1-1"
+    },
+    "459": {
+        "file_id": 36,
+        "content": "Imports the BasePlanner class from the base module.",
+        "type": "comment"
+    },
+    "460": {
+        "file_id": 37,
+        "content": "/cradle/planner/base.py",
+        "type": "filepath"
+    },
+    "461": {
+        "file_id": 37,
+        "content": "This code defines a base class, BasePlanner, for planners with abstract methods for gathering information, decision making, and success detection. It imports necessary modules and classes for configuration and logging.",
+        "type": "summary"
+    },
+    "462": {
+        "file_id": 37,
+        "content": "import abc\nfrom typing import (\n    Any,\n    Dict,\n    List,\n    Literal,\n    Optional,\n    Sequence,\n    Set,\n    Tuple,\n    Union,\n)\nimport json\nfrom cradle.config import Config\nfrom cradle.log import Logger\nconfig = Config()\nlogger = Logger()\nclass BasePlanner():\n    def __init__(self,\n                 ):\n        pass\n    @abc.abstractmethod\n    def gather_information(self, *args, **kwargs) -> Dict[str, Any]:\n        \"\"\"\n        gather information for the task\n        :param args:\n        :param kwargs:\n        :return:\n        \"\"\"\n        pass\n    @abc.abstractmethod\n    def decision_making(self, *args, **kwargs) -> Dict[str, Any]:\n        \"\"\"\n        generate the next skill\n        :param args:\n        :param kwargs:\n        :return:\n        \"\"\"\n        pass\n    @abc.abstractmethod\n    def success_detection(self, *args, **kwargs) -> Dict[str, Any]:\n        \"\"\"\n        detect whether the task is success\n        :param args:\n        :param kwargs:\n        :return:\n        \"\"\"\n        pass",
+        "type": "code",
+        "location": "/cradle/planner/base.py:1-55"
+    },
+    "463": {
+        "file_id": 37,
+        "content": "This code defines a base class, BasePlanner, for planners with abstract methods for gathering information, decision making, and success detection. It imports necessary modules and classes for configuration and logging.",
+        "type": "comment"
+    },
+    "464": {
+        "file_id": 38,
+        "content": "/cradle/planner/planner.py",
+        "type": "filepath"
+    },
+    "465": {
+        "file_id": 38,
+        "content": "The code gathers parallel data, manages exceptions and logs progress. It extracts video info, processes data by sorting/removing redundancies, detects objects using asyncio event loop, and defines classes for object detection, LLM success detection, AI planner tasks. The code initializes modules for decision making and reflection, and generates prompts with planner function capabilities.",
+        "type": "summary"
+    },
+    "466": {
+        "file_id": 38,
+        "content": "import time\nimport json\nimport os\nfrom typing import Dict, Any, List\nimport time\nimport asyncio\nfrom cradle.config import Config\nfrom cradle.gameio.video.VideoFrameExtractor import JSONStructure\nfrom cradle.log import Logger\nfrom cradle.planner.base import BasePlanner\nfrom cradle.provider.base_llm import LLMProvider\nfrom cradle.utils.check import check_planner_params\nfrom cradle.utils.file_utils import assemble_project_path, read_resource_file\nfrom cradle.utils.json_utils import load_json, parse_semi_formatted_text\nfrom cradle import constants\nconfig = Config()\nlogger = Logger()\nPROMPT_EXT = \".prompt\"\nJSON_EXT = \".json\"\nasync def gather_information_get_completion_parallel(llm_provider, text_input_map, current_frame_path, time_stamp,\n                                                     text_input, get_text_template, i,video_prefix,gathered_information_JSON):\n    logger.write(f\"Start gathering text information from the {i + 1}th frame\")\n    text_input = text_input_map if text_input is None else text_input\n    image_introduction = text_input[\"image_introduction\"]",
+        "type": "code",
+        "location": "/cradle/planner/planner.py:1-31"
+    },
+    "467": {
+        "file_id": 38,
+        "content": "The code is importing necessary libraries, defining constants and functions for gathering information parallelly from frames using LLMProvider. The function takes llm_provider, text_input_map, current_frame_path, time_stamp, text_input, get_text_template, i (frame index), video_prefix and gathered_information_JSON as parameters to gather text information from the frame. It logs the progress of gathering text information. The text_input parameter is optional. The image_introduction is extracted from the text_input dictionary.",
+        "type": "comment"
+    },
+    "468": {
+        "file_id": 38,
+        "content": "    # Set the last frame path as the current frame path\n    image_introduction[-1] = {\n        \"introduction\": image_introduction[-1][\"introduction\"],\n        \"path\": f\"{current_frame_path}\",\n        \"assistant\": image_introduction[-1][\"assistant\"]\n    }\n    text_input[\"image_introduction\"] = image_introduction\n    message_prompts = llm_provider.assemble_prompt(template_str=get_text_template, params=text_input)\n    logger.debug(f'{logger.UPSTREAM_MASK}{json.dumps(message_prompts, ensure_ascii=False)}\\n')\n    success_flag = False\n    while not success_flag:\n        try:\n            response, info = await llm_provider.create_completion_async(message_prompts)\n            logger.debug(f'{logger.DOWNSTREAM_MASK}{response}\\n')\n            # Convert the response to dict\n            processed_response = parse_semi_formatted_text(response)\n            success_flag = True\n        except Exception as e:\n            logger.error(f\"Response is not in the correct format: {e}, retrying...\")\n            success_flag = False",
+        "type": "code",
+        "location": "/cradle/planner/planner.py:33-55"
+    },
+    "469": {
+        "file_id": 38,
+        "content": "The code sets the last frame path as current, updates text input and generates message prompts. It then tries to create a completion using llm_provider while handling exceptions if response format is incorrect.",
+        "type": "comment"
+    },
+    "470": {
+        "file_id": 38,
+        "content": "            # wait 2 seconds for the next request and retry\n            await asyncio.sleep(2)\n    # Convert the response to dict\n    if processed_response is None or len(response) == 0:\n        logger.warn('Empty response in gather text information call')\n        logger.debug(\"response\", response, \"processed_response\", processed_response)\n    objects = processed_response\n    objects_index = str(video_prefix) + '_' + time_stamp\n    gathered_information_JSON.add_instance(objects_index, objects)\n    logger.write(f\"Finish gathering text information from the {i + 1}th frame\")\n    return True\ndef gather_information_get_completion_sequence(llm_provider, text_input_map, current_frame_path, time_stamp,\n                                               text_input, get_text_template, i, video_prefix, gathered_information_JSON):\n    logger.write(f\"Start gathering text information from the {i + 1}th frame\")\n    text_input = text_input_map if text_input is None else text_input\n    image_introduction = text_input[\"image_introduction\"]",
+        "type": "code",
+        "location": "/cradle/planner/planner.py:57-79"
+    },
+    "471": {
+        "file_id": 38,
+        "content": "The code waits for 2 seconds, checks if the response is empty and logs a warning message if it is, converts the response to a dictionary, assigns a unique index based on video prefix and timestamp, adds the converted response to gathered_information_JSON, logs completion of gathering text information from the frame, and returns True. The function starts gathering text info for the current frame by checking if there's an existing text input, using the appropriate source, introduces the image with text input, and assigns unique index based on video prefix and timestamp.",
+        "type": "comment"
+    },
+    "472": {
+        "file_id": 38,
+        "content": "    # Set the last frame path as the current frame path\n    image_introduction[-1] = {\n        \"introduction\": image_introduction[-1][\"introduction\"],\n        \"path\": f\"{current_frame_path}\",\n        \"assistant\": image_introduction[-1][\"assistant\"]\n    }\n    text_input[\"image_introduction\"] = image_introduction\n    message_prompts = llm_provider.assemble_prompt(template_str=get_text_template, params=text_input)\n    logger.debug(f'{logger.UPSTREAM_MASK}{json.dumps(message_prompts, ensure_ascii=False)}\\n')\n    response, info = llm_provider.create_completion(message_prompts)\n    logger.debug(f'{logger.DOWNSTREAM_MASK}{response}\\n')\n    success_flag = False\n    while not success_flag:\n        try:\n            # Convert the response to dict\n            processed_response = parse_semi_formatted_text(response)\n            success_flag = True\n        except Exception as e:\n            logger.error(f\"Response is not in the correct format: {e}, retrying...\")\n            success_flag = False\n            time.sleep(2)",
+        "type": "code",
+        "location": "/cradle/planner/planner.py:81-106"
+    },
+    "473": {
+        "file_id": 38,
+        "content": "Sets last frame path as current frame path. Retrieves text input and updates image_introduction list. Assembles prompt using llm_provider template and params, logs upstream message prompts. Creates completion using llm_provider, logs downstream response. Uses a loop to handle incorrect response format by parsing the semi-formatted text and retrying after 2 seconds if failed.",
+        "type": "comment"
+    },
+    "474": {
+        "file_id": 38,
+        "content": "    # Convert the response to dict\n    if processed_response is None or len(response) == 0:\n        logger.warn('Empty response in gather text information call')\n        logger.debug(\"response\", response, \"processed_response\", processed_response)\n    objects = processed_response\n    objects_index = str(video_prefix) + '_' + time_stamp\n    gathered_information_JSON.add_instance(objects_index, objects)\n    logger.write(f\"Finish gathering text information from the {i + 1}th frame\")\n    return True\nasync def get_completion_in_parallel(llm_provider, text_input_map, extracted_frame_paths, text_input,get_text_template,video_prefix,gathered_information_JSON):\n    tasks =[]\n    for i, (current_frame_path, time_stamp) in enumerate(extracted_frame_paths):\n        task=gather_information_get_completion_parallel(llm_provider, text_input_map, current_frame_path, time_stamp,\n                                                   text_input, get_text_template, i,video_prefix,gathered_information_JSON)\n        tasks.append(task)",
+        "type": "code",
+        "location": "/cradle/planner/planner.py:108-130"
+    },
+    "475": {
+        "file_id": 38,
+        "content": "This code is defining a function called `get_completion_in_parallel` that takes in arguments like llm_provider, text_input_map, extracted_frame_paths, and other parameters. The function creates tasks for each frame path and time stamp pair in the extracted_frame_paths list. It appends these tasks to a list called 'tasks'.",
+        "type": "comment"
+    },
+    "476": {
+        "file_id": 38,
+        "content": "        # wait 2 seconds for the next request\n        time.sleep(2)\n    return await asyncio.gather(*tasks)\ndef get_completion_in_sequence(llm_provider, text_input_map, extracted_frame_paths, text_input,get_text_template,video_prefix,gathered_information_JSON):\n    for i, (current_frame_path, time_stamp) in enumerate(extracted_frame_paths):\n        gather_information_get_completion_sequence(llm_provider, text_input_map, current_frame_path, time_stamp,\n                                                   text_input, get_text_template, i,video_prefix,gathered_information_JSON)\n    return True\nclass ScreenClassification():\n    def __init__(self,\n                 input_example: Dict = None,\n                 template: Dict = None,\n                 llm_provider: LLMProvider = None,\n                 ):\n        self.input_example = input_example\n        self.template = template\n        self.llm_provider = llm_provider\n    def _pre(self, *args, input=None, screenshot_file=None, **kwargs):\n        return input, screenshot_file",
+        "type": "code",
+        "location": "/cradle/planner/planner.py:132-158"
+    },
+    "477": {
+        "file_id": 38,
+        "content": "The code defines a class ScreenClassification that takes input example, template, and llm_provider as parameters. It has an _pre method which takes optional input and screenshot_file as parameters and returns them. The get_completion_in_sequence function waits for 2 seconds before gathering information using llm_provider and returns True.",
+        "type": "comment"
+    },
+    "478": {
+        "file_id": 38,
+        "content": "    def __call__(self, *args, input=None, screenshot_file=None, **kwargs):\n        raise NotImplementedError('ScreenClassification is not implemented independently yet')\n    def _post(self, *args, data=None, **kwargs):\n        return data\nclass GatherInformation():\n    def __init__(self,\n                 input_map: Dict = None,\n                 template: str = None,\n                 icon_replacer: Any = None,\n                 object_detector: Any = None,\n                 llm_provider: LLMProvider = None,\n                 text_input_map: Dict = None,\n                 get_text_template: str = None,\n                 frame_extractor: Any = None\n                 ):\n        self.input_map = input_map\n        self.template = template\n        self.icon_replacer = icon_replacer\n        self.object_detector = object_detector\n        self.llm_provider = llm_provider\n        self.text_input_map = text_input_map\n        self.get_text_template = get_text_template\n        self.frame_extractor = frame_extractor\n    def _pre(self, *args, input: Dict[str, Any] = None, **kwargs) -> Dict[str, Any]:",
+        "type": "code",
+        "location": "/cradle/planner/planner.py:160-190"
+    },
+    "479": {
+        "file_id": 38,
+        "content": "The code contains a class named \"ScreenClassification\" that is not implemented yet. It has an unimplemented method \"__call__\". The file also includes the class \"GatherInformation\", which requires various inputs such as input_map, template, icon_replacer, etc., and provides a method \"_pre\" for preprocessing.",
+        "type": "comment"
+    },
+    "480": {
+        "file_id": 38,
+        "content": "        return input\n    def __call__(self, *args, input: Dict[str, Any] = None, class_=None, **kwargs) -> Dict[str, Any]:\n        gather_infromation_configurations = input[\"gather_information_configurations\"]\n        frame_extractor_gathered_information = None\n        icon_replacer_gathered_information = None\n        object_detector_gathered_information = None\n        llm_description_gathered_information = None\n        input = self.input_map if input is None else input\n        input = self._pre(input=input)\n        image_files = []\n        if \"image_introduction\" in input.keys():\n            for image_info in input[\"image_introduction\"]:\n                image_files.append(image_info[\"path\"])\n        flag = True\n        processed_response = {}\n        # Gather information by frame extractor\n        if gather_infromation_configurations[\"frame_extractor\"] is True:\n            logger.write(f\"Using frame extractor to gather information\")\n            if self.frame_extractor is not None:\n                text_input = input[\"text_input\"]",
+        "type": "code",
+        "location": "/cradle/planner/planner.py:191-221"
+    },
+    "481": {
+        "file_id": 38,
+        "content": "The code is a part of a planner class. It takes an input dictionary, gathers information based on the given configurations and uses a frame extractor to gather information if specified in the configuration. It also checks for image files in the input and processes the response.",
+        "type": "comment"
+    },
+    "482": {
+        "file_id": 38,
+        "content": "                video_path = input[\"video_clip_path\"]\n                if \"test_text_image\" in input.keys() and input[\"test_text_image\"]:  # offline test\n                    extracted_frame_paths = input[\"test_text_image\"]\n                else:  # online run\n                    # extract the text information of the whole video\n                    # run the frame_extractor to get the key frames\n                    extracted_frame_paths = self.frame_extractor.extract(video_path=video_path)\n                # Gather information by Icon replacer\n                if gather_infromation_configurations[\"icon_replacer\"] is True:\n                    logger.write(f\"Using icon replacer to gather information\")\n                    if self.icon_replacer is not None:\n                        try:\n                            extracted_frame_paths = self._replace_icon(extracted_frame_paths)\n                        except Exception as e:\n                            logger.error(f\"Error in gather information by Icon replacer: {e}\")",
+        "type": "code",
+        "location": "/cradle/planner/planner.py:222-239"
+    },
+    "483": {
+        "file_id": 38,
+        "content": "This code segment handles video information gathering for the planner. If an offline test is specified, it uses provided frame paths. Otherwise, it extracts frames using `frame_extractor` and applies `icon_replacer` if configured to gather information. Exceptions are logged for any errors during processing.",
+        "type": "comment"
+    },
+    "484": {
+        "file_id": 38,
+        "content": "                            flag = False\n                    else:\n                        logger.warn('Icon replacer is not set, skipping gather information by Icon replacer')\n                # For each keyframe, use llm to get the text information\n                video_prefix = os.path.basename(video_path).split('.')[0].split('_')[-1]  # Different video should have differen prefix for avoiding the same time stamp\n                frame_extractor_gathered_information = JSONStructure()\n                if config.parallel_request_gather_information:\n                    # Create completions in parallel\n                    logger.write(f\"Start gathering text information from the whole video in parallel\")\n                    loop = asyncio.new_event_loop()\n                    asyncio.set_event_loop(loop)\n                    try:\n                        loop.run_until_complete(\n                            get_completion_in_parallel(self.llm_provider, self.text_input_map, extracted_frame_paths,\n            ",
+        "type": "code",
+        "location": "/cradle/planner/planner.py:240-258"
+    },
+    "485": {
+        "file_id": 38,
+        "content": "This code sets a flag to False if the Icon replacer is not set, and then skips gathering information by Icon replacer. It also gathers text information from the whole video in parallel using asyncio event loop and runs until completion with get_completion_in_parallel function.",
+        "type": "comment"
+    },
+    "486": {
+        "file_id": 38,
+        "content": "                                           text_input,self.get_text_template,video_prefix,frame_extractor_gathered_information))\n                    except KeyboardInterrupt:\n                        tasks = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]\n                        for task in tasks:\n                            task.cancel()\n                        loop.run_until_complete(asyncio.gather(*tasks, return_exceptions=True))\n                    finally:\n                        loop.close()\n                else:\n                    logger.write(f\"Start gathering text information from the whole video in sequence\")\n                    get_completion_in_sequence(self.llm_provider, self.text_input_map, extracted_frame_paths,\n                                               text_input,self.get_text_template,video_prefix,frame_extractor_gathered_information)\n                frame_extractor_gathered_information.sort_index_by_timestamp()\n                logger.write(f\"Finish gathering text information from the whole video\")",
+        "type": "code",
+        "location": "/cradle/planner/planner.py:258-276"
+    },
+    "487": {
+        "file_id": 38,
+        "content": "The code is handling user interrupts by cancelling any running tasks and closing the loop. If not interrupted, it starts gathering text information from the whole video sequence using a separate function get_completion_in_sequence(). Finally, it sorts the gathered information by timestamp and logs that the process has finished.",
+        "type": "comment"
+    },
+    "488": {
+        "file_id": 38,
+        "content": "            else:\n                logger.warn('Frame extractor is not set, skipping gather information by frame extractor')\n                frame_extractor_gathered_information = None\n            # Get dialogue information from the gathered_information_JSON at the subfounder find the dialogue frames\n            if frame_extractor_gathered_information is not None:\n                dialogues = [item[\"values\"] for item in frame_extractor_gathered_information.search_type_across_all_indices(\"dialogue\")]\n            else:\n                if self.frame_extractor is not None:\n                    msg = \"No gathered_information_JSON received, so no dialogue information is provided.\"\n                else:\n                    msg = \"No gathered_information_JSON available, no Frame Extractor in use.\"\n                logger.warn(msg)\n                dialogues = []\n            # Update the <$task_description$> in the gather_information template with the latest task_description\n            all_task_guidance = frame_extractor_gathered_information.search_type_across_all_indices(constants.TASK_GUIDANCE)",
+        "type": "code",
+        "location": "/cradle/planner/planner.py:278-295"
+    },
+    "489": {
+        "file_id": 38,
+        "content": "Code handles the case when FrameExtractor is not set. If FrameExtractor is not set, it logs a warning message and sets frame_extractor_gathered_information to None. It then checks if there is any gathered_information_JSON. If present, it extracts dialogue information from it. If no JSON or FrameExtractor is available, it logs another warning and sets dialogues as an empty list. Finally, it updates the task_description using all_task_guidance.",
+        "type": "comment"
+    },
+    "490": {
+        "file_id": 38,
+        "content": "            # Remove the content of \"task is none\"\n            all_task_guidance = [task_guidance for task_guidance in all_task_guidance if constants.NONE_TASK_OUTPUT not in task_guidance[\"values\"].lower()]\n            if len(all_task_guidance) != 0:\n                # New task guidance is found, use the latest one\n                last_task_guidance = max(all_task_guidance, key=lambda x: x['index'])['values']\n                input[constants.TASK_DESCRIPTION] = last_task_guidance # this is for the input of the gather_information\n            # @TODO: summary the dialogue and use it\n        # Gather information by LLM provider\n        if gather_infromation_configurations[\"llm_description\"] is True:\n            logger.write(f\"Using llm description to gather information\")\n            try:\n                # Call the LLM provider for gather information json\n                message_prompts = self.llm_provider.assemble_prompt(template_str=self.template, params=input)\n                logger.debug(f'{logger.UPSTREAM_MASK}{json.dumps(message_prompts, ensure_ascii=False)}\\n')",
+        "type": "code",
+        "location": "/cradle/planner/planner.py:297-314"
+    },
+    "491": {
+        "file_id": 38,
+        "content": "This code removes \"none\" task guidance, selects the latest non-none task guidance if available, stores it in last_task_guidance and assigns it to input for gathering information. It then uses LLM description to assemble prompts for the LLM provider.",
+        "type": "comment"
+    },
+    "492": {
+        "file_id": 38,
+        "content": "                gather_information_success_flag = False\n                while gather_information_success_flag is False:\n                    try:\n                        response, info = self.llm_provider.create_completion(message_prompts)\n                        logger.debug(f'{logger.DOWNSTREAM_MASK}{response}\\n')\n                        # Convert the response to dict\n                        processed_response = parse_semi_formatted_text(response)\n                        gather_information_success_flag = True\n                    except Exception as e:\n                        logger.error(f\"Response of image description is not in the correct format: {e}, retrying...\")\n                        gather_information_success_flag = False\n                        # Wait 2 seconds for the next request and retry\n                        time.sleep(2)\n                llm_description_gathered_information = processed_response\n            except Exception as e:\n                logger.error(f\"Error in gather image description information: {e}\")",
+        "type": "code",
+        "location": "/cradle/planner/planner.py:316-336"
+    },
+    "493": {
+        "file_id": 38,
+        "content": "This code continuously retries to gather information until a valid response is obtained, then processes the response and stores it in llm_description_gathered_information.",
+        "type": "comment"
+    },
+    "494": {
+        "file_id": 38,
+        "content": "                flag = False\n        # Assemble the gathered_information_JSON\n        if flag:\n            objects = []\n            if icon_replacer_gathered_information is not None and \"objects\" in icon_replacer_gathered_information:\n                objects.extend(icon_replacer_gathered_information[\"objects\"])\n            if object_detector_gathered_information is not None and \"objects\" in object_detector_gathered_information:\n                objects.extend(object_detector_gathered_information[\"objects\"])\n            if llm_description_gathered_information is not None and \"objects\" in llm_description_gathered_information:\n                objects.extend(llm_description_gathered_information[\"objects\"])\n            objects = list(set(objects))\n            processed_response[\"objects\"] = objects\n            # Merge the gathered_information_JSON to the processed_response\n            processed_response[\"gathered_information_JSON\"] = frame_extractor_gathered_information\n            if len(all_task_guidance) == 0:",
+        "type": "code",
+        "location": "/cradle/planner/planner.py:337-358"
+    },
+    "495": {
+        "file_id": 38,
+        "content": "Flag checks if any information was gathered. If flag is True, combines \"objects\" from multiple sources and removes duplicates. Adds unique objects to processed_response and includes gathered_information_JSON. Checks if task guidance list is empty.",
+        "type": "comment"
+    },
+    "496": {
+        "file_id": 38,
+        "content": "                processed_response[constants.LAST_TASK_GUIDANCE] = \"\"\n            else:\n                processed_response[constants.LAST_TASK_GUIDANCE] = last_task_guidance\n        # Gather information by object detector, which is grounding dino.\n        if gather_infromation_configurations[\"object_detector\"] is True:\n            logger.write(f\"Using object detector to gather information\")\n            if self.object_detector is not None:\n                try:\n                    target_object_name = processed_response[constants.TARGET_OBJECT_NAME].lower() \\\n                        if constants.NONE_TARGET_OBJECT_OUTPUT not in processed_response[constants.TARGET_OBJECT_NAME].lower() else \"\"\n                    image_source, boxes, logits, phrases = self.object_detector.detect(image_path=image_files[0],\n                                                                                       text_prompt= target_object_name,\n                                                                                       box_threshold=0.4, device='cuda')",
+        "type": "code",
+        "location": "/cradle/planner/planner.py:359-373"
+    },
+    "497": {
+        "file_id": 38,
+        "content": "The code sets the last task guidance value in the processed response if it exists, otherwise leaves it empty. It then uses object detector to gather information by checking if the configuration allows it and if the object detector is not None. It detects objects in an image using the object detector, setting the target object name based on the response and applying a box threshold of 0.4. Finally, it utilizes the 'cuda' device for detection.",
+        "type": "comment"
+    },
+    "498": {
+        "file_id": 38,
+        "content": "                    processed_response[\"boxes\"] = boxes\n                    processed_response[\"logits\"] = logits\n                    processed_response[\"phrases\"] = phrases\n                except Exception as e:\n                    logger.error(f\"Error in gather information by object detector: {e}\")\n                    flag = False\n                try:\n                    minimap_detection_objects = self.object_detector.process_minimap_targets(image_files[0])\n                    processed_response.update({constants.MINIMAP_INFORMATION:minimap_detection_objects})\n                except Exception as e:\n                    logger.error(f\"Error in gather information by object detector for minimap: {e}\")\n                    flag = False\n        success = self._check_success(data=processed_response)\n        data = dict(\n            flag=flag,\n            success=success,\n            input=input,\n            res_dict=processed_response,\n        )\n        data = self._post(data=data)\n        return data\n    def _post(self, *args, data: Dict[str, Any] = None, **kwargs) -> Dict[str, Any]:",
+        "type": "code",
+        "location": "/cradle/planner/planner.py:374-404"
+    },
+    "499": {
+        "file_id": 38,
+        "content": "Function collects object detection results and updates a response dictionary. In case of exception, logs the error and sets flag to False. Retrieves minimap object detection data and adds it to the response dictionary. Finally, checks success and returns a combined dictionary with flag, success, input, and processed response.",
+        "type": "comment"
+    }
+}

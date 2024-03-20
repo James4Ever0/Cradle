@@ -1,0 +1,541 @@
+{
+    "0": {
+        "file_id": 0,
+        "content": "/README.md",
+        "type": "filepath"
+    },
+    "1": {
+        "file_id": 0,
+        "content": "The Cradle framework focuses on computer control, reasoning, and skill curation in a standardized environment. Users install specific packages and follow guidelines for game setup using OpenAI provider and Infra code. This Python-based code enables running Red Dead Redemption II game framework agent with adjusted interface settings and requests citation when used.",
+        "type": "summary"
+    },
+    "2": {
+        "file_id": 0,
+        "content": "# Cradle: Towards General Computer Control\n<div align=\"center\">\n[[Website]](https://baai-agents.github.io/Cradle/)\n[[Arxiv]](https://arxiv.org/abs/2403.03186)\n[[PDF]](https://arxiv.org/pdf/2403.03186.pdf)\n[![Python Version](https://img.shields.io/badge/Python-3.10-blue.svg)]()\n[![GitHub license](https://img.shields.io/badge/MIT-blue)]()\n![](docs/images/cradle-intro.png)\nThe Cradle framework is a first attempt at General Computer Control (GCC). Cradle supports agents to ace any computer task by enabling strong reasoning abilities, self-improvment, and skill curation, in a standardized general environment with minimal requirements.\n<img src=\"docs/images/rd2_task_grid_03.gif\" width=\"320\" height=\"180\"/> <img src=\"docs/images/rd2_task_grid_02.gif\" width=\"320\" height=\"180\"/> </br>\n<img src=\"docs/images/rd2_task_grid_01.gif\" width=\"320\" height=\"180\"/> <img src=\"docs/images/rd2_task_grid_04.gif\" width=\"320\" height=\"180\"/>\n## Videos\n<a alt=\"Watch the video\" href=\"https://www.youtube.com/watch?v=Cx-D708BedY\"><img src=\"docs/images/video1.jpg\" width=\"33%\" /></a>",
+        "type": "code",
+        "location": "/README.md:1-20"
+    },
+    "3": {
+        "file_id": 0,
+        "content": "This code is the README.md file for the Cradle framework, which aims to achieve General Computer Control by enabling agents with strong reasoning abilities, self-improvement, and skill curation in a standardized general environment. The repository includes resources such as the website, Arxiv paper, PDF, and requirements for Python version 3.10.",
+        "type": "comment"
+    },
+    "4": {
+        "file_id": 0,
+        "content": "&nbsp;&nbsp;\n<a alt=\"Watch the video\" href=\"https://www.youtube.com/watch?v=Oa4Ese8mMD0\"><img src=\"docs/images/video2.jpg\" width=\"33%\" /></a>\nClick on either of the video thumbnails above to watch them on YouTube.\n</div>\n# Notice\nWe are still working on further cleaning up the code and constantly updating it. We are also extending Cradle to more games and software. Feel free to reach out!\n# Project Setup\nPlease setup your environment as:\n```bash\nconda create --name cradle-dev python=3.10\nconda activate cradle-dev\npip3 install -r requirements.txt\n```\n### To install GroundingDino:\nDownload its weights to the cache directory:\n```bash\nmkdir cache\ncd cache\ncurl -L -C - -O https://github.com/IDEA-Research/GroundingDINO/releases/download/v0.1.0-alpha2/groundingdino_swinb_cogcoor.pth\ncd ..\n```\n**Note:**\nYou should have a CUDA environment, please make sure you have properly installed CUDA dependencies first. You can use the following command to detect it on Linux.\n```bash\nnvcc -V\n```\nOr search for its environment variab",
+        "type": "code",
+        "location": "/README.md:21-59"
+    },
+    "5": {
+        "file_id": 0,
+        "content": "Video thumbnails are available for watching on YouTube. The code provides instructions to set up the project environment, including creating a conda environment, activating it, and installing necessary packages. Users are advised to have CUDA environment installed before proceeding. GroundingDino is downloaded from the specified link into the cache directory.",
+        "type": "comment"
+    },
+    "6": {
+        "file_id": 0,
+        "content": "le: CUDA_HOME or CUDA_PATH. On Windows it should be something like \"C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v11.8\" and on Linux like \"/usr/local/cuda\".\nIf you don't get the specific version, you should download cudatoolkit and cuDNN first (version 11.8 is recommended).\nIf you don't download CUDA correctly, after installing GroundingDino, the code will produce:\n```bash\nNameError: name '_C' is not defined\n```\nIf this happened, please re-setup CUDA and pytorch, reclone the git and perform all installation steps again.\nOn Windows install from https://developer.nvidia.com/cuda-11-8-0-download-archive (Linux packages also available).\nMake sure pytorch is installed using the right CUDA dependencies.\n```bash\nconda install pytorch torchvision cudatoolkit=11.8 -c nvidia -c pytorch\n```\nIf this doesn't work, or you prefer the pip way, you can try something like:\n```bash\npip3 install --upgrade torch==2.1.1+cu118 -f https://download.pytorch.org/whl/torch_stable.html\npip3 install torchvision==0.16.1+cu118 -f https://download.pytorch.org/whl/torch_stable.html",
+        "type": "code",
+        "location": "/README.md:59-83"
+    },
+    "7": {
+        "file_id": 0,
+        "content": "This code provides instructions for setting up CUDA and pytorch correctly to avoid a \"NameError: name '_C' is not defined\" error. It suggests installing CUDA version 11.8 from the NVIDIA website, ensuring pytorch is installed with the right CUDA dependencies, and providing pip installation commands as alternatives if the conda method doesn't work.",
+        "type": "comment"
+    },
+    "8": {
+        "file_id": 0,
+        "content": "```\nNow, you should install the pre-compiled GroundingDino with the project dependencies. You can use the package in our repo and the following commands:\n```bash\ncd deps\npip install groundingdino-0.1.0-cp310-cp310-win_amd64.whl\ncd ..\n```\nOnce it is installed, we need to pre-download some required model files and set some environment variables.\n```bash\n# Define the necessary environment variables, this can be done in the .env file in the /cradle directory\nHUGGINGFACE_HUB_CACHE = \"./cache/hf\" # This can be the full path too, if the relative one doesn't work\n# Pre-download huggingface files needed by GroundingDino\n# This step may require a VPN connection\n# Windows user needs to run it in git bash\nmkdir $HUGGINGFACE_HUB_CACHE\nhuggingface-cli download bert-base-uncased config.json tokenizer.json vocab.txt tokenizer_config.json model.safetensors --cache-dir $HUGGINGFACE_HUB_CACHE\n# Define the last necessary environment variable, this can be done in the .env file in the /cradle directory\n# This step will avoid needing a VPN to run",
+        "type": "code",
+        "location": "/README.md:84-107"
+    },
+    "9": {
+        "file_id": 0,
+        "content": "Install GroundingDino with project dependencies using the provided package and commands. Pre-download required model files from HuggingFace and set environment variables to avoid needing a VPN during execution.",
+        "type": "comment"
+    },
+    "10": {
+        "file_id": 0,
+        "content": "TRANSFORMERS_OFFLINE = \"TRUE\"\n```\nIf for some reason there is some incompatibility in installing or running GroundingDino, it's recommended to recreate your environment.\nOnly if really necessary, you can try to clone and compile/install GroundingDino yourself.\n```bash\n# Clone\ncd ..\ngit clone https://github.com/IDEA-Research/GroundingDINO.git\ncd GroundingDINO\n# Build and install it\npip3 install -r requirements.txt\npip3 install .\ncd ../Cradle\n```\nIt should install without errors and now it will be available for any project using the same conda environment (cradle-dev).\nTo build the C++ code on Windows, you may need to install build tools.\nDownload them from https://visualstudio.microsoft.com/visual-cpp-build-tools/\nMake sure to select \"Desktop Environment with C++\" and include the 1st 3 optional packages:\n- MSVC v141 or higher\n- Windows SDK for your OS version\n- CMake tools\n### To install the videosubfinder for gather information module\nDownload the videosubfinder from https://sourceforge.net/projects/videosubfinder/ and extract the files into the res/tool/subfinder folder.",
+        "type": "code",
+        "location": "/README.md:108-139"
+    },
+    "11": {
+        "file_id": 0,
+        "content": "The code snippet provides instructions to clone, build and install GroundingDino if there are compatibility issues. It also suggests cloning the GitHub repository, installing dependencies using pip3, and specifying the C++ build tools for Windows. Additionally, it mentions how to install the videosubfinder for gather information module from SourceForge.",
+        "type": "comment"
+    },
+    "12": {
+        "file_id": 0,
+        "content": "The file structure should be like this:\n- res\n  - tool\n    - subfinder\n      - VideoSubFinderWXW.exe\n      - test.srt\n      - ...\n#### Tunning videosubfinder\nUse res/tool/general.clg to overwrite res/tool/subfinder/settings/general.cfg file.\nTo get the best extraction results, you can tune the subfinder by changing the parameters in the settings/general.cfg file. You may follow the readme me in Docs folder to get more information about the parameters.\nOnly modify it if absolutely necessary. Values have already been tuned to game scenario and environment setup.\n### To install the OCR tools\n```\n1. Option 1\n# Download best-matching version of specific model for your spaCy installation\npython -m spacy download en_core_web_lg\nor\n# pip install .tar.gz archive or .whl from path or URL\npip install https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.7.1/en_core_web_lg-3.7.1.tar.gz\n2. Option 2\n# Copy this url https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.7.1/en_core_web_lg-3.7.1.tar.gz",
+        "type": "code",
+        "location": "/README.md:141-166"
+    },
+    "13": {
+        "file_id": 0,
+        "content": "This code explains the file structure and provides instructions for installing OCR tools using spaCy library. Users can choose between two options: Option 1 involves downloading a specific model version, while Option 2 requires copying a provided URL. It also advises modifying settings files only when necessary as values have already been tuned.",
+        "type": "comment"
+    },
+    "14": {
+        "file_id": 0,
+        "content": "# Paste it in the browser and download the file to res/spacy/data\ncd res/spacy/data\npip install en_core_web_lg-3.7.1.tar.gz\n```\n## General guidelines\nAlways, **always**, **ALLWAYS** get the latest /main branch.\nAny file with text content in the project in the resources directory (./res) should be in UTF-8 encoding. Use the cradle.utils to open/save files.\n## Infra code\n### 1. OpenAI provider\nOpenAI provider now can expose embeddings and LLM from OpenAI and Azure together. Users only need to create one instance of each and pass the appropriate configuration.\nExample configurations are in /conf. To avoid exposing sensitive details, keys and other private info should be defined in environmental variables.\nThe suggested way to do it is to create a .env file in the root of the repository (never push this file to GitHub) where variables can be defined, and then mention the variable names in the configs.\nPlease check the examples below.\nSample .env file containing private info that should never be on git/GitHub:",
+        "type": "code",
+        "location": "/README.md:167-191"
+    },
+    "15": {
+        "file_id": 0,
+        "content": "This code instructs the user to navigate to a specific URL, download a file, change directory to \"res/spacy/data\", and then install the downloaded file using pip. It also provides guidelines for file encoding and opening/saving files using cradle.utils. The subsequent sections describe the Infra code, specifically mentioning OpenAI provider and the usage of .env files for storing private info not to be shared on GitHub.",
+        "type": "comment"
+    },
+    "16": {
+        "file_id": 0,
+        "content": "```\nOA_OPENAI_KEY = \"abc123abc123abc123abc123abc123ab\"\nAZ_OPENAI_KEY = \"123abc123abc123abc123abc123abc12\"\nAZ_BASE_URL = \"https://abc123.openai.azure.com/\"\n```\nSample config for an OpenAI provider:\n```\n{\n\t\"key_var\" : \"OA_OPENAI_KEY\",\n\t\"emb_model\": \"text-embedding-ada-002\",\n\t\"comp_model\": \"gpt-4-vision-preview\",\n\t\"is_azure\": false\n}\n```\n## RDR2 Install\nCradle currently focuses on [RDR2 game](https://www.rockstargames.com/reddeadredemption2). You can get it from any PC platform you prefer. However, the current codebase has been tested on MS Windows.\n## Game Settings\n### 1. Change settings before running the code.\n#### 1.1 Mouse mode\nChange mouse mode in the control setting to DirectInput.\n| Original interface | Changed interface |\n|------------|------------|\n| ![Original interface](docs/images/raw_input.png) | ![Changed interface](docs/images/direct_input.png) |\n#### 1.2 Control\nChange both two 'Tap and Hold Speed Control' to on, so we can press w twice to run, saving the need to press shift. Also make sure 'Aiming Mode' to 'Hold To Aim', so we need to keep pressing the mouse right button when aiming.",
+        "type": "code",
+        "location": "/README.md:192-223"
+    },
+    "17": {
+        "file_id": 0,
+        "content": "This code defines two OpenAI keys and a base URL for an Azure OpenAI provider. The sample config specifies the key variable, embedding model, completion model, and whether the provider is on Azure or not. The RDR2 installation section explains that Cradle focuses on the RDR2 game, provides instructions to change settings before running the code, and specifies to set mouse mode to DirectInput and adjust control settings for easier use.",
+        "type": "comment"
+    },
+    "18": {
+        "file_id": 0,
+        "content": "| Original interface | Changed interface |\n|------------|------------|\n| ![Original interface](docs/images/move_control_previous.png) | ![Changed interface](docs/images/move_control_now.png) |\n#### 1.3 Game screen\nThe recommended default resolution to use is 1920x1080, but it can vary if the **16:9** aspect ratio is preserved.  Other resolution is not fully tested. DO NOT change the aspect ratio. Also, remember to set the game Screen Type to **Windowed Borderless**.\n`SETTING -> GRAPHICS -> Resolution = 1920X1080` and  `Screen Type = Windowed Borderless`\n![game_position](docs/images/game_position.png)\n![resolution](docs/images/resolution.png)\n#### 1.4 Mini-map\nRemember to enlarge the icon to ensure the program is working well following: `SETTING -> DISPLAY ->  Radar Blip Size = Large` and  `SETTING -> DISPLAY ->  Map Blip Size = Large` and  `SETTING -> DISPLAY ->  Radar = Expanded` (or press Alt + X).\n![](docs/images/enlarge_minimap.png)\n![minimap_setting](docs/images/minimap_setting.png)\n#### 1.4 Subtitles",
+        "type": "code",
+        "location": "/README.md:224-243"
+    },
+    "19": {
+        "file_id": 0,
+        "content": "Original interface and changed interface images for move control.\nRecommended default resolution is 1920x1080 with 16:9 aspect ratio, set game Screen Type to Windowed Borderless.\nMini-map settings for better visibility: Radar Blip Size, Map Blip Size, and Expanded Radar.\nSubtitle option available in the code.",
+        "type": "comment"
+    },
+    "20": {
+        "file_id": 0,
+        "content": "Enable to show the speaker's name in the subtitles.\n![subtitles_setting](docs/images/subtitles.png)\n## Getting Started\nTo run the agent, follow these steps:\n1- Launch the RDR2 game\n2- To start from the beginning of Chapter #1, after you lauch the game, pass all introductory videos\n3- Pause the game\n4- Launch the framework agent with the command:\n```\npython prototype_runner.py \n```\n## Citation\nIf you find our work useful, please consider citing us!\n```\n@article{weihao2024cradle,\n  title     = {{Towards General Computer Control: A Multimodal Agent For Red Dead Redemption II As A Case Study}},\n  author    = {Weihao Tan and Ziluo Ding and Wentao Zhang and Boyu Li and Bohan Zhou and Junpeng Yue and Haochong Xia and Jiechuan Jiang and Longtao Zheng and Xinrun Xu and Yifei Bi and Pengjie Gu and Xinrun Wang and Börje F. Karlsson and Bo An and Zongqing Lu},\n  journal   = {arXiv:2403.03186},\n  month     = {March},\n  year      = {2024},\n  primaryClass={cs.AI}\n}\n```",
+        "type": "code",
+        "location": "/README.md:244-276"
+    },
+    "21": {
+        "file_id": 0,
+        "content": "This code provides instructions on how to run the framework agent for a Red Dead Redemption II game. It requires launching the game, pausing it, and then running the prototype_runner.py command with Python. The authors request a citation if their work is found useful.",
+        "type": "comment"
+    },
+    "22": {
+        "file_id": 1,
+        "content": "/cache/GroundingDINO_SwinB_cfg.py",
+        "type": "filepath"
+    },
+    "23": {
+        "file_id": 1,
+        "content": "This code defines the configuration for a machine learning model with specified parameters such as batch size, model name, backbone architecture, position embedding type, temperature values, intermediate layers to return, and various other features like transformer activation, noise scales, label ratios, etc. These settings are used to train or evaluate the model in a downstream task.",
+        "type": "summary"
+    },
+    "24": {
+        "file_id": 1,
+        "content": "batch_size = 1\nmodelname = \"groundingdino\"\nbackbone = \"swin_B_384_22k\"\nposition_embedding = \"sine\"\npe_temperatureH = 20\npe_temperatureW = 20\nreturn_interm_indices = [1, 2, 3]\nbackbone_freeze_keywords = None\nenc_layers = 6\ndec_layers = 6\npre_norm = False\ndim_feedforward = 2048\nhidden_dim = 256\ndropout = 0.0\nnheads = 8\nnum_queries = 900\nquery_dim = 4\nnum_patterns = 0\nnum_feature_levels = 4\nenc_n_points = 4\ndec_n_points = 4\ntwo_stage_type = \"standard\"\ntwo_stage_bbox_embed_share = False\ntwo_stage_class_embed_share = False\ntransformer_activation = \"relu\"\ndec_pred_bbox_embed_share = True\ndn_box_noise_scale = 1.0\ndn_label_noise_ratio = 0.5\ndn_label_coef = 1.0\ndn_bbox_coef = 1.0\nembed_init_tgt = True\ndn_labelbook_size = 2000\nmax_text_len = 256\ntext_encoder_type = \"bert-base-uncased\"\nuse_text_enhancer = True\nuse_fusion_layer = True\nuse_checkpoint = True\nuse_transformer_ckpt = True\nuse_text_cross_attention = True\ntext_dropout = 0.0\nfusion_dropout = 0.0\nfusion_droppath = 0.1\nsub_sentence_present = True",
+        "type": "code",
+        "location": "/cache/GroundingDINO_SwinB_cfg.py:1-43"
+    },
+    "25": {
+        "file_id": 1,
+        "content": "This code defines the configuration for a machine learning model with specified parameters such as batch size, model name, backbone architecture, position embedding type, temperature values, intermediate layers to return, and various other features like transformer activation, noise scales, label ratios, etc. These settings are used to train or evaluate the model in a downstream task.",
+        "type": "comment"
+    },
+    "26": {
+        "file_id": 2,
+        "content": "/conf/azure_vis_config.json",
+        "type": "filepath"
+    },
+    "27": {
+        "file_id": 2,
+        "content": "This configuration file defines Azure-based OpenAI model settings. It includes variables for API key, base URL, supported models, and default embedding/completion models. The is_azure flag confirms the Azure context, while api_version specifies the required version.",
+        "type": "summary"
+    },
+    "28": {
+        "file_id": 2,
+        "content": "{\n\t\"key_var\" : \"AZ_VIS_OPENAI_KEY\",\n\t\"base_var\": \"AZ_VIS_BASE_URL\",\n\t\"models\": {\n\t\t\"gpt-4v\": \"gpt-4v\",\n\t\t\"text-embedding-ada-002\": \"text-embedding-ada-002\"\n\t},\n\t\"emb_model\": \"text-embedding-ada-002\",\n\t\"comp_model\": \"gpt-4v\",\n\t\"is_azure\": true,\n\t\"api_version\": \"2024-02-15-preview\"\n}",
+        "type": "code",
+        "location": "/conf/azure_vis_config.json:1-12"
+    },
+    "29": {
+        "file_id": 2,
+        "content": "This configuration file defines Azure-based OpenAI model settings. It includes variables for API key, base URL, supported models, and default embedding/completion models. The is_azure flag confirms the Azure context, while api_version specifies the required version.",
+        "type": "comment"
+    },
+    "30": {
+        "file_id": 3,
+        "content": "/conf/openai_config.json",
+        "type": "filepath"
+    },
+    "31": {
+        "file_id": 3,
+        "content": "The provided JSON file contains configuration settings for OpenAI API. Key variables include the OpenAI API key, embedding model (text-embedding-ada-002), completion model (gpt-4-vision-preview), and a flag indicating if Azure is being used.",
+        "type": "summary"
+    },
+    "32": {
+        "file_id": 3,
+        "content": "{\n\t\"key_var\" : \"OA_OPENAI_KEY\",\n\t\"emb_model\": \"text-embedding-ada-002\",\n\t\"comp_model\": \"gpt-4-vision-preview\",\n\t\"is_azure\": false\n}",
+        "type": "code",
+        "location": "/conf/openai_config.json:1-6"
+    },
+    "33": {
+        "file_id": 3,
+        "content": "The provided JSON file contains configuration settings for OpenAI API. Key variables include the OpenAI API key, embedding model (text-embedding-ada-002), completion model (gpt-4-vision-preview), and a flag indicating if Azure is being used.",
+        "type": "comment"
+    },
+    "34": {
+        "file_id": 4,
+        "content": "/cradle/agent/__init__.py",
+        "type": "filepath"
+    },
+    "35": {
+        "file_id": 4,
+        "content": "This code imports the Agent class from the 'agent' module and adds it to the __all__ list, making it importable when using 'from cradle.agent import *'.",
+        "type": "summary"
+    },
+    "36": {
+        "file_id": 4,
+        "content": "from cradle.agent.agent import Agent\n__all__ = [\n    \"Agent\",\n]",
+        "type": "code",
+        "location": "/cradle/agent/__init__.py:1-5"
+    },
+    "37": {
+        "file_id": 4,
+        "content": "This code imports the Agent class from the 'agent' module and adds it to the __all__ list, making it importable when using 'from cradle.agent import *'.",
+        "type": "comment"
+    },
+    "38": {
+        "file_id": 5,
+        "content": "/cradle/agent/agent.py",
+        "type": "filepath"
+    },
+    "39": {
+        "file_id": 5,
+        "content": "The code imports cradle modules, defines a decision-making function, creates an Agent class with memory, game manager, and planner attributes, sets up tasks for the agent, handles in-game actions, logging, image capture, event summaries, memory updates, success detection, and manages task completion, exceptions, and non-paused skill execution.",
+        "type": "summary"
+    },
+    "40": {
+        "file_id": 5,
+        "content": "from cradle.config import Config\nfrom cradle.log import Logger\nfrom cradle.gameio import GameManager\nfrom cradle.planner.planner import Planner\nfrom cradle.memory import BaseMemory\nfrom cradle.gameio.atomic_skills.map import __all__ as map_skills\nfrom cradle.gameio.atomic_skills.buy import __all__ as buy_skills\nfrom cradle.gameio.atomic_skills.trade_utils import __all__ as trade_skills\nfrom cradle.gameio.atomic_skills.move import __all__ as move_skills\nfrom cradle.gameio.composite_skills.navigation import __all__ as nav_skills\nfrom cradle.gameio.composite_skills.go_to_icon import __all__ as go_skills\nconfig = Config()\nlogger = Logger()\n# This is an incomplete example with not complete quality code, just to bootstrap the repo.\n# For now, use the prototype_runner.py to run the agent loop.\ndef decision_making_args(planner, memory):\n    input = planner.decision_making_.input_map\n    input[\"task_description\"] = memory.get_recent_history(\"task_description\", k=1)[0]\n    image_introduction = [\n        {\n            \"introduction\": input[\"image_introduction\"][-2][\"introduction\"],",
+        "type": "code",
+        "location": "/cradle/agent/agent.py:1-27"
+    },
+    "41": {
+        "file_id": 5,
+        "content": "This code imports various modules from the \"cradle\" library and defines a function called `decision_making_args`. It takes in two arguments - `planner` and `memory`, which are objects of the `Planner` and `BaseMemory` classes, respectively. The function prepares input for the decision-making process by retrieving data from the `planner` object and the `memory` object. This function is used to gather information needed for making decisions in an agent's loop.",
+        "type": "comment"
+    },
+    "42": {
+        "file_id": 5,
+        "content": "            \"path\": memory.get_recent_history(\"image\", k=2)[0],\n            \"assistant\": input[\"image_introduction\"][-2][\"assistant\"]\n        },\n        {\n            \"introduction\": input[\"image_introduction\"][-1][\"introduction\"],\n            \"path\": memory.get_recent_history(\"image\", k=1)[0],\n            \"assistant\": input[\"image_introduction\"][-1][\"assistant\"]\n        }\n    ]\n    input[\"image_introduction\"] = image_introduction\n    input[\"previous_action\"] = memory.get_recent_history(\"action\", k=1)[-1]\n    input[\"previous_reasoning\"] = memory.get_recent_history(\"decision_making_reasoning\", k=1)[-1]\n    input['skill_library'] = memory.get_recent_history(\"skill_library\", k=1)[-1]\n    return input\ndef success_detection_args(planner, memory):\n    input = planner.success_detection_.input_map\n    input[\"task_description\"] = memory.get_recent_history(\"task_description\", k=1)[0]\n    image_introduction = [\n        {\n            \"introduction\": input[\"image_introduction\"][-2][\"introduction\"],\n            \"path\": memory.get_recent_history(\"image\", k=2)[0],",
+        "type": "code",
+        "location": "/cradle/agent/agent.py:28-52"
+    },
+    "43": {
+        "file_id": 5,
+        "content": "This code snippet retrieves and updates the input map for a success detection function. It gets recent history from memory, such as task descriptions, images, previous actions, reasoning, and skill libraries. The updated input map is then returned.",
+        "type": "comment"
+    },
+    "44": {
+        "file_id": 5,
+        "content": "            \"assistant\": input[\"image_introduction\"][-2][\"assistant\"]\n        },\n        {\n            \"introduction\": input[\"image_introduction\"][-1][\"introduction\"],\n            \"path\": memory.get_recent_history(\"image\", k=1)[0],\n            \"assistant\": input[\"image_introduction\"][-1][\"assistant\"]\n        }\n    ]\n    input[\"image_introduction\"] = image_introduction\n    input[\"previous_action\"] = memory.get_recent_history(\"action\", k=1)[-1]\n    input[\"previous_reasoning\"] = memory.get_recent_history(\"decision_making_reasoning\", k=1)[-1]\n    return input\nclass Agent:\n    def __init__(\n        self,\n        name,\n        memory : BaseMemory,\n        gm : GameManager,\n        planner : Planner\n    ):\n        self.name = name\n        self.memory = memory\n        self.gm = gm\n        self.planner = planner\n    def loop(self):\n        config.continuous_limit = 10\n        # Interaction Loop\n        loop_count = 0\n        last_executed_skill = None\n        current_sub_task = None\n        sub_task_args = None\n        sub_task_index = 0",
+        "type": "code",
+        "location": "/cradle/agent/agent.py:53-94"
+    },
+    "45": {
+        "file_id": 5,
+        "content": "The code defines an \"Agent\" class with a loop method and initializes its attributes. The agent's loop iterates continuously, managing its memory, game manager, and planner. It sets the continuous_limit to 10 and manages sub-tasks through loop_count, last_executed_skill, current_sub_task, sub_task_args, and sub_task_index variables.",
+        "type": "comment"
+    },
+    "46": {
+        "file_id": 5,
+        "content": "        # @TODO HACK\n        decomposed_task_steps          = [\"Go to the horse and mount it\",\n                                          \"Create waypoint to the saloon\",\n                                          \"Follow the red line to the saloon\",\n                                          \"Create waypoint to the store\",\n                                          \"Follow the red line to the store\",\n                                          \"Enter the store\",\n                                          \"Approach shopkeeper\",\n                                          \"Buy apple\"]\n        decomposed_task_description = [\"Your task is to go mount the horse.\",\n                                       \"Mark the \\\"Saloon\\\" on a Map as the Waypoint via the Index.\",\n                                       \"Go to the \\\"Saloon\\\"\",\n                                       \"Mark the \\\"General Store\\\" on a Map as the Waypoint via the Index.\",\n                                       \"Go to the \\\"General Store\\\"\",\n                                       \"Your task is to enter the general store.\",",
+        "type": "code",
+        "location": "/cradle/agent/agent.py:96-111"
+    },
+    "47": {
+        "file_id": 5,
+        "content": "This code defines a list of decomposed task steps and their descriptions for a specific task, possibly in a game or interactive scenario. It consists of instructions like going to locations, creating waypoints, following lines, and buying items.",
+        "type": "comment"
+    },
+    "48": {
+        "file_id": 5,
+        "content": "                                       \"Your task is to get close to the shopkeeper.\",\n                                       \"Your task is to buy one 'APPLE'.\"]\n        decomposed_task_skills =    [   go_skills,\n                                        map_skills,\n                                        nav_skills,\n                                        map_skills,\n                                        nav_skills,\n                                        move_skills,\n                                        move_skills,\n                                        trade_skills + buy_skills]\n        # Initial task description, should be passed in agent setup\n        main_task_description = \"Go to store and buy item.\"\n        logger.write(f\"Starting {self.name} loop w/ env {config.env_name}\")\n        logger.write(f\"Initial task: {main_task_description}\")\n        current_state_image = None\n        previous_state_image = None\n        # Uncomment here if you want to try to make things less undeterministic\n        config.set_fixed_seed()",
+        "type": "code",
+        "location": "/cradle/agent/agent.py:112-134"
+    },
+    "49": {
+        "file_id": 5,
+        "content": "The code is setting up the initial task for an agent, which involves going to a store and buying an item. It breaks down this task into a list of smaller subtasks involving skills like going, navigating, mapping, trading, and moving. The main_task_description provides a concise summary of the overall task. The code also sets up a logger to track the agent's progress in its loop with the environment specified by config.env_name.",
+        "type": "comment"
+    },
+    "50": {
+        "file_id": 5,
+        "content": "        # Which sub-task to start on, for debugging later steps in the flow\n        # But please try to run the whole thing, as the states starting from later are not fully the same\n        start_at_step = -1\n        use_information_summary = False\n        use_gathering_info = False\n        agent_success = False\n        # Start interaction loop\n        while not agent_success:\n            try:\n                if start_at_step >= 0 and start_at_step < len(decomposed_task_steps):\n                    # Jump configs to later stages...\n                    sub_task_index = start_at_step\n                    current_sub_task = decomposed_task_steps[sub_task_index]\n                    logger.write(f'Starting loop from sub-task #{sub_task_index} - {current_sub_task}')\n                    # So it doesn't reset in the next loop iteration\n                    start_at_step = -1\n                if current_sub_task is None:\n                    current_sub_task = decomposed_task_steps[sub_task_index]\n                sub_task_description = decomposed_task_description[sub_task_index]",
+        "type": "code",
+        "location": "/cradle/agent/agent.py:136-162"
+    },
+    "51": {
+        "file_id": 5,
+        "content": "This code initializes variables for controlling which sub-task to start on and whether to use summary or gathering info. It then enters an interaction loop, allowing the user to jump to later stages if needed before running the whole task. The logger writes information about the starting sub-task, and checks if the current sub-task is None before moving forward.",
+        "type": "comment"
+    },
+    "52": {
+        "file_id": 5,
+        "content": "                sub_task_skills = decomposed_task_skills[sub_task_index]\n                sub_task_skill_library = self.gm.get_skill_information(sub_task_skills)\n                self.memory.add_recent_history(\"task_description\", sub_task_description)\n                self.memory.add_recent_history(\"skill_library\", sub_task_skill_library)\n                logger.write(f\"Current sub-task: {current_sub_task}\")\n                # Stop if limit is reached\n                loop_count += 1\n                if (config.continuous_mode and\n                    config.continuous_limit > 0 and\n                    loop_count > config.continuous_limit\n                ):\n                    logger.warn(f\"Continuous Limit Reached: {config.continuous_limit} iteractions\")\n                    break\n                logger.write(f\"Loop iteration #{loop_count:0>3}\")\n                # Get environment input\n                logger.write(f\"> Capturing screen - state\")\n                current_state_image, _ = self.gm.capture_screen()\n                self.memory.add_recent_history(\"image\", current_state_image)",
+        "type": "code",
+        "location": "/cradle/agent/agent.py:163-185"
+    },
+    "53": {
+        "file_id": 5,
+        "content": "This code snippet retrieves sub-task skills and skill library, logs current sub-task, handles continuous mode limit, and captures the environment state.",
+        "type": "comment"
+    },
+    "54": {
+        "file_id": 5,
+        "content": "                self.pause_if_needed(last_executed_skill) # Decide to press pause or not based on skill\n                info_response = \"\"\n                # Prepare info gathering, not all steps use it\n                if use_gathering_info:\n                    # Gets the appropriate gathering information prompt inputs for the current sub-task\n                    args_func = sub_task_args[\"gathering_info\"]\n                    logger.write(f'> Gathering information call...')\n                    data = self.planner.gather_information(input=args_func(current_state_image))\n                    info_response = data[\"res_dict\"][\"description\"]\n                logger.write(f'R: Description: {info_response}')\n                current_context = info_response\n                # Prepare decision making\n                skills_to_execute = []\n                logger.write(f'> Decision making call...')\n                data = self.planner.decision_making(input=decision_making_args(self.planner, self.memory))\n                skills_to_execute = data['res_dict']['actions']",
+        "type": "code",
+        "location": "/cradle/agent/agent.py:187-209"
+    },
+    "55": {
+        "file_id": 5,
+        "content": "This code handles the pausing of skills based on the last executed skill, gathers information for a current sub-task if needed, and makes decisions for executing appropriate actions. It interacts with the planner to gather information and make decisions using input functions and stores the results in respective variables.",
+        "type": "comment"
+    },
+    "56": {
+        "file_id": 5,
+        "content": "                plan_reasoning = data['res_dict']['reasoning']\n                if skills_to_execute is None:\n                    skills_to_execute = []\n                logger.write(f'R: Skills: {skills_to_execute}')\n                logger.write(f'R: Reasoning: {plan_reasoning}')\n                skill_steps = skills_to_execute[:1] # Max steps to execute at once\n                logger.write(f'> Executing actions in game...')\n                logger.write(f'E: Skill Steps: {skill_steps}')\n                exec_info = self.gm.execute_actions(skill_steps)\n                tmp = exec_info[\"last_skill\"] # exec_info also has the list of successfully executed skills. skill_steps is the full list, which may differ if there were execution errors.\n                if tmp is not None and len(tmp) > 0:\n                    last_executed_skill = tmp\n                logger.write(f\"> Capturing screen - post actions. Last: {last_executed_skill}\")\n                self.memory.add_recent_history(\"action\", last_executed_skill)",
+        "type": "code",
+        "location": "/cradle/agent/agent.py:211-231"
+    },
+    "57": {
+        "file_id": 5,
+        "content": "This code executes skills in the game based on reasoning and stores information about executed skills in memory. It also logs relevant steps and results for tracking purposes.",
+        "type": "comment"
+    },
+    "58": {
+        "file_id": 5,
+        "content": "                self.memory.add_recent_history(\"decision_making_reasoning\", plan_reasoning)\n                current_state_image, _ = self.gm.capture_screen(include_minimap=False)\n                self.memory.add_recent_history(\"image\", current_state_image)\n                self.pause_if_needed(last_executed_skill) # Decide to press pause or not based on skill\n                # summarization starts\n                if use_information_summary:\n                    if len(self.memory.get_recent_history(\"decision_making_reasoning\", self.memory.max_recent_steps)) == self.memory.max_recent_steps:\n                        event_count = min(config.max_recent_steps,config.event_count)\n                        input = self.planner.information_summary_.input_map\n                        logger.write(f'> Information summary call...')\n                        images = self.memory.get_recent_history('image', event_count)\n                        reasonings = self.memory.get_recent_history('decision_making_reasoning', event_count)",
+        "type": "code",
+        "location": "/cradle/agent/agent.py:232-245"
+    },
+    "59": {
+        "file_id": 5,
+        "content": "This code snippet is adding recent history to the memory, capturing a current state image, and deciding whether or not to pause based on the skill being executed. It also checks if an information summary should be generated based on the maximum number of recent steps and the event count configuration.",
+        "type": "comment"
+    },
+    "60": {
+        "file_id": 5,
+        "content": "                        image_introduction = [{\"path\": images[event_i],\"assistant\": \"\",\"introduction\": 'This is the {} screenshot of recent events. The description of this image: {}'.format(['first','second','third','fourth','fifth'][event_i], reasonings[event_i])} for event_i in range(event_count)]\n                        input[\"image_introduction\"] = image_introduction\n                        input[\"previous_summarization\"] = self.memory.get_summarization()\n                        input[\"task_description\"] = sub_task_description\n                        input[\"event_count\"] = str(event_count)\n                        data = self.planner.information_summary(input = input)\n                        info_summary = data['res_dict']['info_summary']\n                        entities_and_behaviors = data['res_dict']['entities_and_behaviors']\n                        logger.write(f'R: Summary: {info_summary}')\n                        logger.write(f'R: Entities and behaviors: {entities_and_behaviors}')\n                        self.memory.add_summarization(info_summary)",
+        "type": "code",
+        "location": "/cradle/agent/agent.py:246-258"
+    },
+    "61": {
+        "file_id": 5,
+        "content": "The code constructs a list of image introductions with paths, assistant responses, and format descriptions. It then assigns this list to the input dictionary along with other relevant information. The code calls the planner's information_summary function with the input dictionary and stores the summary result and entities/behaviors in variables for further use. Finally, it logs the summary and entities/behaviors results and adds the summary to the memory.",
+        "type": "comment"
+    },
+    "62": {
+        "file_id": 5,
+        "content": "                # summarization ends\n                # Prepare success detection\n                logger.write(f'> Success detection call...')\n                data = self.planner.success_detection(input=success_detection_args(self.planner, self.memory))\n                # Check success\n                success = data['res_dict']['success']\n                success_reasoning = data['res_dict']['reasoning']\n                success_criteria = data['res_dict']['criteria']\n                self.memory.add_recent_history(\"success_detection_reasoning\", success_reasoning)\n                logger.write(f'R: Success: {success}')\n                logger.write(f'R: Success criteria: {success_criteria}')\n                logger.write(f'R: Success reason: {success_reasoning}')\n                # @TODO represent new state for next loop\n                if success:\n                    self.gm.exit_back_to_pause()\n                    logger.write(f'Finished sub-task: {current_sub_task}')\n                    sub_task_index += 1\n                    if sub_task_index >= len(decomposed_task_steps):",
+        "type": "code",
+        "location": "/cradle/agent/agent.py:259-283"
+    },
+    "63": {
+        "file_id": 5,
+        "content": "The code snippet is part of a task agent's logic. It prepares success detection, checks if the task was successful, and logs relevant information such as success criteria and reasoning. If successful, it exits back to pause mode and increments the sub-task index for the next iteration.",
+        "type": "comment"
+    },
+    "64": {
+        "file_id": 5,
+        "content": "                        logger.write(f'Finished task: {main_task_description}!!!')\n                        break\n                    else:\n                        # Move to the next subtask with the appropriate configs\n                        current_sub_task = decomposed_task_steps[sub_task_index]\n                        logger.write(f'New sub-task: {current_sub_task}')\n                # @TODO re-use post-action image for info gathering?\n                logger.write() #end of loop\n            except KeyboardInterrupt:\n                logger.write('KeyboardInterrupt Ctrl+C detected, exiting.')\n                self.gm.cleanup_io()\n                break\n    def pause_if_needed(self, last_executed_skill: str):\n        paused_skills = trade_skills + buy_skills + map_skills\n        to_remove = [\"close_map\", \"cancel_shopkeeper_interaction\"]\n        for e in to_remove:\n            paused_skills.remove(e)\n        if last_executed_skill not in paused_skills:\n            logger.warn(f\"!! Pausing after skill: {last_executed_skill} !!\")",
+        "type": "code",
+        "location": "/cradle/agent/agent.py:284-308"
+    },
+    "65": {
+        "file_id": 5,
+        "content": "Finished task log and move to next subtask (30-307); exception handling for KeyboardInterrupt, exits program with cleanup (283-307). Pauses if non-paused skill executed, warns logger (paused_skills defined in 313-315).",
+        "type": "comment"
+    },
+    "66": {
+        "file_id": 5,
+        "content": "            self.gm.pause_game()\n        else:\n            logger.warn(f\"!! Skipping pause for skill: {last_executed_skill} !!\")",
+        "type": "code",
+        "location": "/cradle/agent/agent.py:309-311"
+    },
+    "67": {
+        "file_id": 5,
+        "content": "Pauses the game if it's not already paused, otherwise logs a warning for skipping pause due to an ongoing skill execution.",
+        "type": "comment"
+    },
+    "68": {
+        "file_id": 6,
+        "content": "/cradle/config/__init__.py",
+        "type": "filepath"
+    },
+    "69": {
+        "file_id": 6,
+        "content": "This code imports the Config class from cradle.config.config and assigns it to the variable \"Config\". It then creates an empty list __all__ which will contain all publicly exported identifiers. The only identifier in this case is \"Config\", so it gets added to __all__.",
+        "type": "summary"
+    },
+    "70": {
+        "file_id": 6,
+        "content": "from cradle.config.config import Config\n__all__ = [\n    \"Config\",\n]",
+        "type": "code",
+        "location": "/cradle/config/__init__.py:1-5"
+    },
+    "71": {
+        "file_id": 6,
+        "content": "This code imports the Config class from cradle.config.config and assigns it to the variable \"Config\". It then creates an empty list __all__ which will contain all publicly exported identifiers. The only identifier in this case is \"Config\", so it gets added to __all__.",
+        "type": "comment"
+    },
+    "72": {
+        "file_id": 7,
+        "content": "/cradle/config/config.py",
+        "type": "filepath"
+    },
+    "73": {
+        "file_id": 7,
+        "content": "The Config class sets default settings for an application and initializes various parameters for a program, while handling single-system runs and verifying resolution. It also defines functions for continuous mode and log directory.",
+        "type": "summary"
+    },
+    "74": {
+        "file_id": 7,
+        "content": "from collections import namedtuple\nimport os\nimport time\nfrom pathlib import Path\nfrom dotenv import load_dotenv\nfrom colorama import Fore, Style, init as colours_on\nimport pyautogui\nfrom cradle import constants\nfrom cradle.utils import Singleton\nfrom cradle.utils.file_utils import assemble_project_path, get_project_root\nload_dotenv(verbose=True)\nclass Config(metaclass=Singleton):\n    \"\"\"\n    Configuration class.\n    \"\"\"\n    DEFAULT_GAME_RESOLUTION = (1920, 1080)\n    DEFAULT_GAME_SCREEN_RATIO = (16, 9)\n    DEFAULT_TEMPERATURE = 1.0\n    DEFAULT_SEED = None\n    DEFAULT_FIXED_SEED_VALUE = 42\n    DEFAULT_FIXED_TEMPERATURE_VALUE = 0.0\n    DEFAULT_POST_ACTION_WAIT_TIME = 3 # Currently in use in multiple places with this value\n    DEFAULT_MESSAGE_CONSTRUCTION_MODE = constants.MESSAGE_CONSTRUCTION_MODE_TRIPART\n    DEFAULT_OCR_CROP_REGION = (380, 720, 1920, 1080) # x1, y1, x2, y2, from top left to bottom right\n    root_dir = '.'\n    work_dir = './runs'\n    log_dir = './logs'\n    env_name = \"Red Dead Redemption 2\"\n    # config for frame extraction",
+        "type": "code",
+        "location": "/cradle/config/config.py:1-42"
+    },
+    "75": {
+        "file_id": 7,
+        "content": "Config class defines various default settings and configurations for the application, including game resolution, screen ratio, temperature value, seed, fixed values, post-action wait time, message construction mode, OCR crop region, root directory, work directory, log directory, and environment name. These settings are likely used throughout the codebase to control the behavior of different functions or processes.",
+        "type": "comment"
+    },
+    "76": {
+        "file_id": 7,
+        "content": "    VideoFrameExtractor_path = \"./res/tool/subfinder/VideoSubFinderWXW.exe\"\n    VideoFrameExtractor_placeholderfile_path = \"./res/tool/subfinder/test.srt\"\n    def __init__(self) -> None:\n        \"\"\"Initialize the Config class\"\"\"\n        self.debug_mode = False\n        self.continuous_mode = False\n        self.continuous_limit = 0\n        self.temperature = self.DEFAULT_TEMPERATURE\n        self.seed = self.DEFAULT_SEED\n        self.fixed_seed = False\n        if self.fixed_seed:\n            self.set_fixed_seed()\n        # Base resolution and region for the game in 4k, used for angle scaling\n        self.base_resolution = (3840, 2160)\n        self.base_minimap_region = (112, 1450, 640, 640)\n        # Full screen resolution for normalizing mouse movement\n        self.screen_resolution = pyautogui.size()\n        self.mouse_move_factor = self.screen_resolution[0] / self.base_resolution[0]\n        # Default LLM parameters\n        self.temperature = float(os.getenv(\"TEMPERATURE\", self.temperature))\n        self.max_tokens = int(os.getenv(\"MAX_TOKENS\", \"1024\"))",
+        "type": "code",
+        "location": "/cradle/config/config.py:43-71"
+    },
+    "77": {
+        "file_id": 7,
+        "content": "This code is initializing the Config class, setting default parameters such as debug mode, continuous mode, temperature, seed, and base resolution. It also normalizes mouse movement for full screen resolution and gets default LLM parameters from environment variables. The VideoFrameExtractor_path and VideoFrameExtractor_placeholderfile_path are defined for future use.",
+        "type": "comment"
+    },
+    "78": {
+        "file_id": 7,
+        "content": "        # Memory parameters\n        self.memory_backend = os.getenv(\"MEMORY_BACKEND\", \"local\")\n        self.max_recent_steps = 5\n        self.event_count = 5\n        self.memory_load_path = None\n        # Parallel request to LLM parameters\n        self.parallel_request_gather_information = True\n        #Skill retrieval\n        self.skill_from_local = True\n        self.skill_local_path = './res/skills'\n        self.skill_retrieval = False\n        self.skill_num = 10\n        self.skill_scope = 'Full' #'Full', 'Basic', and None\n        # video\n        self.video_fps = 8\n        self.duplicate_frames = 4\n        # self-reflection\n        self.max_images_in_self_reflection = 4\n        # decision-making\n        self.decision_making_image_num = 2\n        # OCR local checks\n        self.ocr_fully_ban = True # whether to fully turn-off OCR checks\n        self.ocr_enabled = False # whether to enable OCR during composite skill loop\n        self.ocr_similarity_threshold = 0.9  # cosine similarity, smaller than this threshold the text is considered to be different",
+        "type": "code",
+        "location": "/cradle/config/config.py:73-102"
+    },
+    "79": {
+        "file_id": 7,
+        "content": "This code appears to be initializing various parameters for a program. The parameters include memory backend, maximum recent steps and event count, parallel request settings, skill retrieval options, video FPS and duplicate frames, maximum images in self-reflection, decision-making image number, OCR settings, and more.",
+        "type": "comment"
+    },
+    "80": {
+        "file_id": 7,
+        "content": "        self.ocr_different_previous_text = False # whether the text is different from the previous one\n        self.ocr_check_composite_skill_names = [\n            \"shoot_people\",\n            \"shoot_wolves\",\n            \"follow\",\n            \"go_to_horse\",\n            \"navigate_path\"\n        ]\n        # Just for convenience of testing, will be removed in final version.\n        self.use_latest_memory_path = False\n        if self.use_latest_memory_path:\n            self._set_latest_memory_path()\n        self._set_dirs()\n        self._set_game_window_info()\n    def set_fixed_seed(self, is_fixed: bool = True, seed: int = DEFAULT_FIXED_SEED_VALUE, temperature: float = DEFAULT_FIXED_TEMPERATURE_VALUE) -> None:\n        \"\"\"Set the fixed seed values. By default, used the default values. Please avoid using different values.\"\"\"\n        self.fixed_seed = is_fixed\n        self.seed = seed\n        self.temperature = temperature\n    def set_continuous_mode(self, value: bool) -> None:\n        \"\"\"Set the continuous mode value.\"\"\"",
+        "type": "code",
+        "location": "/cradle/config/config.py:103-129"
+    },
+    "81": {
+        "file_id": 7,
+        "content": "The code initializes class variables and includes methods for setting fixed seed values and continuous mode. It also defines a list of composite skill names, sets the latest memory path (if enabled), and sets directories and game window information.",
+        "type": "comment"
+    },
+    "82": {
+        "file_id": 7,
+        "content": "        self.continuous_mode = value\n    def _set_dirs(self) -> None:\n        \"\"\"Setup directories needed for one system run.\"\"\"\n        self.root_dir = get_project_root()\n        self.work_dir = assemble_project_path(os.path.join(self.work_dir, str(time.time())))\n        Path(self.work_dir).mkdir(parents=True, exist_ok=True)\n        self.log_dir = os.path.join(self.work_dir, self.log_dir)\n        Path(self.log_dir).mkdir(parents=True, exist_ok=True)\n    def _set_game_window_info(self):\n        named_windows = pyautogui.getWindowsWithTitle(self.env_name)\n        # Fake game window info for testing cases with no running game\n        game_window = namedtuple('A', ['left', 'top', 'width', 'height'])\n        game_window.left = 0\n        game_window.top = 0\n        game_window.width = self.DEFAULT_GAME_RESOLUTION[0]\n        game_window.height = self.DEFAULT_GAME_RESOLUTION[1]\n        if len(named_windows) == 0:\n            self._config_warn(f'-----------------------------------------------------------------')",
+        "type": "code",
+        "location": "/cradle/config/config.py:130-156"
+    },
+    "83": {
+        "file_id": 7,
+        "content": "The code sets up directories for a single system run, creates a game window object if no actual game window is found, and contains functions to set continuous mode and define a log directory.",
+        "type": "comment"
+    },
+    "84": {
+        "file_id": 7,
+        "content": "            self._config_warn(f'Cannot find the env window. Assuming this is an offline test run!')\n            self._config_warn(f'-----------------------------------------------------------------')\n        else:\n            game_window = named_windows[0]\n            assert game_window.width >= self.DEFAULT_GAME_RESOLUTION[0] and game_window.height >= self.DEFAULT_GAME_RESOLUTION[1], 'The resolution of screen should at least be 1920 X 1080.'\n            assert game_window.width * self.DEFAULT_GAME_SCREEN_RATIO[1] == game_window.height * self.DEFAULT_GAME_SCREEN_RATIO[0], 'The screen ratio should be 16:9.'\n        self.game_resolution = (game_window.width, game_window.height)\n        self.game_region = (game_window.left, game_window.top, game_window.width, game_window.height)\n        self.resolution_ratio = self.game_resolution[0] / self.base_resolution[0]\n        self.minimap_region = self._calc_minimap_region(self.game_resolution)\n        self.minimap_region[0] += game_window.left\n        self.minimap_region[1] += game_window.top",
+        "type": "code",
+        "location": "/cradle/config/config.py:157-169"
+    },
+    "85": {
+        "file_id": 7,
+        "content": "This code checks if the environment window is found. If not, it assumes an offline test run. Otherwise, it verifies the screen resolution and ratio for the game window. It then sets the game resolution, game region, calculates the minimap region, and adjusts its coordinates based on the game window's position.",
+        "type": "comment"
+    },
+    "86": {
+        "file_id": 7,
+        "content": "        self.minimap_region = tuple(self.minimap_region)\n    def _calc_minimap_region(self, screen_region):\n        return [int(x * self.resolution_ratio ) for x in self.base_minimap_region]\n    def _config_warn(self, message):\n        colours_on()\n        print(Fore.RED + f' >>> WARNING: {message} ' + Style.RESET_ALL)\n    def _set_latest_memory_path(self):\n        path_list = os.listdir(self.work_dir)\n        path_list.sort()\n        if len(path_list) != 0:\n            self.skill_local_path = os.path.join(self.work_dir, path_list[-1])\n            self.memory_load_path = os.path.join(self.work_dir, path_list[-1])",
+        "type": "code",
+        "location": "/cradle/config/config.py:170-187"
+    },
+    "87": {
+        "file_id": 7,
+        "content": "self.minimap_region is set as a tuple of the minimap region coordinates\n_calc_minimap_region scales the base minimap region based on resolution_ratio\n_config_warn prints a warning message in red color\n_set_latest_memory_path finds the latest file in work_dir and sets it as skill_local_path and memory_load_path",
+        "type": "comment"
+    },
+    "88": {
+        "file_id": 8,
+        "content": "/cradle/constants.py",
+        "type": "filepath"
+    },
+    "89": {
+        "file_id": 8,
+        "content": "This code includes field names, tags, and constants for an application handling data from various sources, focusing on skill-related keys, LLM message types, and prompts.",
+        "type": "summary"
+    },
+    "90": {
+        "file_id": 8,
+        "content": "# Gather information expected fields\nACTION_GUIDANCE = 'action_guidance'\nITEM_STATUS = 'item_status'\nTASK_GUIDANCE = 'task_guidance'\nDIALOGUE = 'dialogue'\nGATHER_TEXT_REASONING = 'reasoning'\nIMAGE_DESCRIPTION = 'description'\nTARGET_OBJECT_NAME = 'target_object_name'\nGATHER_INFO_REASONING = 'reasoning_of_object'\nSCREEN_CLASSIFICATION = 'screen_classification'\nGENERAL_GAME_INTERFACE = 'general game interface without any menu'\nTRADE_INTERFACE = 'trade'\nMAP_INTERFACE = 'map'\nPAUSE_INTERFACE = 'pause'\nSATCHEL_INTERFACE = 'satchel'\nRADIAL_INTERFACE = 'radial menu'\nLAST_TASK_GUIDANCE = 'last_task_guidance'\nLAST_TASK_HORIZON = 'task_horizon'\nTASK_DESCRIPTION = 'task_description'\n# Tags used in prompt templates\nIMAGES_INPUT_TAG_NAME = 'image_introduction'\nIMAGE_INTRO_TAG_NAME = 'introduction'\nIMAGE_PATH_TAG_NAME = 'path'\nIMAGE_RESOLUTION_TAG_NAME = 'resolution'\nIMAGE_ASSISTANT_TAG_NAME = 'assistant'\nIMAGES_INPUT_TAG = f'<${IMAGES_INPUT_TAG_NAME}$>'\n# Minimap information\nMINIMAP_INFORMATION = 'minimap_information'\nRED_POINTS = 'red points'",
+        "type": "code",
+        "location": "/cradle/constants.py:1-31"
+    },
+    "91": {
+        "file_id": 8,
+        "content": "This code defines various field names for expected information, tags used in prompt templates, and minimap information. It seems to be part of a larger program that handles data from different sources.",
+        "type": "comment"
+    },
+    "92": {
+        "file_id": 8,
+        "content": "YELLOW_POINTS = 'yellow points'\nYELLOW_REGION = 'yellow region'\nGD_PROMPT = 'red points . yellow points . yellow region .'\n# Skill-related keys\nDISTANCE_TYPE = 'distance'\n# Local memory\nAUGMENTED_IMAGES_MEM_BUCKET = 'augmented_image'\nIMAGES_MEM_BUCKET = 'image'\nNO_IMAGE = '[None]'\n# LLM message type constants\nMESSAGE_CONSTRUCTION_MODE_TRIPART = 'tripartite'\nMESSAGE_CONSTRUCTION_MODE_PARAGRAPH = 'paragraph'\n# Prompts when output is None\nNONE_TASK_OUTPUT = \"null\"\nNONE_TARGET_OBJECT_OUTPUT = \"null\"",
+        "type": "code",
+        "location": "/cradle/constants.py:32-50"
+    },
+    "93": {
+        "file_id": 8,
+        "content": "Constants defined for the application, including skill-related keys, LLM message types, and prompts for None output.",
+        "type": "comment"
+    },
+    "94": {
+        "file_id": 9,
+        "content": "/cradle/gameio/__init__.py",
+        "type": "filepath"
+    },
+    "95": {
+        "file_id": 9,
+        "content": "Importing IOEnvironment and GameManager classes from respective modules, defining __all__ to include IOEnvironment and GameManager.",
+        "type": "summary"
+    },
+    "96": {
+        "file_id": 9,
+        "content": "from cradle.gameio.io_env import IOEnvironment\nfrom cradle.gameio.game_manager import GameManager\n__all__ = [\n    \"IOEnvironment\",\n    \"GameManager\",\n]",
+        "type": "code",
+        "location": "/cradle/gameio/__init__.py:1-7"
+    },
+    "97": {
+        "file_id": 9,
+        "content": "Importing IOEnvironment and GameManager classes from respective modules, defining __all__ to include IOEnvironment and GameManager.",
+        "type": "comment"
+    },
+    "98": {
+        "file_id": 10,
+        "content": "/cradle/gameio/atomic_skills/__init__.py",
+        "type": "filepath"
+    },
+    "99": {
+        "file_id": 10,
+        "content": "This code imports various functionalities from different modules within the atomic_skills package, which are used for buying, selling, map-related tasks, and trade utilities.",
+        "type": "summary"
+    }
+}

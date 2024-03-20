@@ -1,0 +1,290 @@
+{
+    "url": {
+        "full": "https://github.com/BAAI-Agents/Cradle",
+        "partial": "BAAI-Agents/Cradle"
+    },
+    "file_mapping": {
+        "0": {
+            "filepath": "/README.md",
+            "entry_id": 0,
+            "language_id": "plain-text"
+        },
+        "1": {
+            "filepath": "/cache/GroundingDINO_SwinB_cfg.py",
+            "entry_id": 22,
+            "language_id": "python"
+        },
+        "2": {
+            "filepath": "/conf/azure_vis_config.json",
+            "entry_id": 26,
+            "language_id": "json"
+        },
+        "3": {
+            "filepath": "/conf/openai_config.json",
+            "entry_id": 30,
+            "language_id": "json"
+        },
+        "4": {
+            "filepath": "/cradle/agent/__init__.py",
+            "entry_id": 34,
+            "language_id": "python"
+        },
+        "5": {
+            "filepath": "/cradle/agent/agent.py",
+            "entry_id": 38,
+            "language_id": "python"
+        },
+        "6": {
+            "filepath": "/cradle/config/__init__.py",
+            "entry_id": 68,
+            "language_id": "python"
+        },
+        "7": {
+            "filepath": "/cradle/config/config.py",
+            "entry_id": 72,
+            "language_id": "python"
+        },
+        "8": {
+            "filepath": "/cradle/constants.py",
+            "entry_id": 88,
+            "language_id": "python"
+        },
+        "9": {
+            "filepath": "/cradle/gameio/__init__.py",
+            "entry_id": 94,
+            "language_id": "python"
+        },
+        "10": {
+            "filepath": "/cradle/gameio/atomic_skills/__init__.py",
+            "entry_id": 98,
+            "language_id": "python"
+        },
+        "11": {
+            "filepath": "/cradle/gameio/atomic_skills/buy.py",
+            "entry_id": 102,
+            "language_id": "python"
+        },
+        "12": {
+            "filepath": "/cradle/gameio/atomic_skills/combat.py",
+            "entry_id": 114,
+            "language_id": "python"
+        },
+        "13": {
+            "filepath": "/cradle/gameio/atomic_skills/map.py",
+            "entry_id": 120,
+            "language_id": "python"
+        },
+        "14": {
+            "filepath": "/cradle/gameio/atomic_skills/move.py",
+            "entry_id": 128,
+            "language_id": "python"
+        },
+        "15": {
+            "filepath": "/cradle/gameio/atomic_skills/sell.py",
+            "entry_id": 136,
+            "language_id": "python"
+        },
+        "16": {
+            "filepath": "/cradle/gameio/atomic_skills/trade_utils.py",
+            "entry_id": 142,
+            "language_id": "python"
+        },
+        "17": {
+            "filepath": "/cradle/gameio/composite_skills/auto_shoot.py",
+            "entry_id": 152,
+            "language_id": "python"
+        },
+        "18": {
+            "filepath": "/cradle/gameio/composite_skills/follow.py",
+            "entry_id": 170,
+            "language_id": "python"
+        },
+        "19": {
+            "filepath": "/cradle/gameio/composite_skills/go_to_icon.py",
+            "entry_id": 180,
+            "language_id": "python"
+        },
+        "20": {
+            "filepath": "/cradle/gameio/composite_skills/navigation.py",
+            "entry_id": 194,
+            "language_id": "python"
+        },
+        "21": {
+            "filepath": "/cradle/gameio/game_manager.py",
+            "entry_id": 218,
+            "language_id": "python"
+        },
+        "22": {
+            "filepath": "/cradle/gameio/io_env.py",
+            "entry_id": 232,
+            "language_id": "python"
+        },
+        "23": {
+            "filepath": "/cradle/gameio/lifecycle/ui_control.py",
+            "entry_id": 270,
+            "language_id": "python"
+        },
+        "24": {
+            "filepath": "/cradle/gameio/skill_registry.py",
+            "entry_id": 306,
+            "language_id": "python"
+        },
+        "25": {
+            "filepath": "/cradle/gameio/video/VideoEasyOCRExtractor.py",
+            "entry_id": 344,
+            "language_id": "python"
+        },
+        "26": {
+            "filepath": "/cradle/gameio/video/VideoFrameExtractor.py",
+            "entry_id": 356,
+            "language_id": "python"
+        },
+        "27": {
+            "filepath": "/cradle/gameio/video/VideoRecorder.py",
+            "entry_id": 370,
+            "language_id": "python"
+        },
+        "28": {
+            "filepath": "/cradle/log/__init__.py",
+            "entry_id": 386,
+            "language_id": "python"
+        },
+        "29": {
+            "filepath": "/cradle/log/logger.py",
+            "entry_id": 390,
+            "language_id": "python"
+        },
+        "30": {
+            "filepath": "/cradle/memory/__init__.py",
+            "entry_id": 410,
+            "language_id": "python"
+        },
+        "31": {
+            "filepath": "/cradle/memory/base.py",
+            "entry_id": 414,
+            "language_id": "python"
+        },
+        "32": {
+            "filepath": "/cradle/memory/basic_vector_memory.py",
+            "entry_id": 420,
+            "language_id": "python"
+        },
+        "33": {
+            "filepath": "/cradle/memory/local_memory.py",
+            "entry_id": 430,
+            "language_id": "python"
+        },
+        "34": {
+            "filepath": "/cradle/memory/short_term_memory.py",
+            "entry_id": 440,
+            "language_id": "python"
+        },
+        "35": {
+            "filepath": "/cradle/memory/vector_store.py",
+            "entry_id": 450,
+            "language_id": "python"
+        },
+        "36": {
+            "filepath": "/cradle/planner/__init__.py",
+            "entry_id": 456,
+            "language_id": "python"
+        },
+        "37": {
+            "filepath": "/cradle/planner/base.py",
+            "entry_id": 460,
+            "language_id": "python"
+        },
+        "38": {
+            "filepath": "/cradle/planner/planner.py",
+            "entry_id": 464,
+            "language_id": "python"
+        },
+        "39": {
+            "filepath": "/cradle/planner/util.py",
+            "entry_id": 530,
+            "language_id": "python"
+        },
+        "40": {
+            "filepath": "/cradle/provider/__init__.py",
+            "entry_id": 534,
+            "language_id": "python"
+        },
+        "41": {
+            "filepath": "/cradle/provider/base_embedding.py",
+            "entry_id": 538,
+            "language_id": "python"
+        },
+        "42": {
+            "filepath": "/cradle/provider/base_llm.py",
+            "entry_id": 542,
+            "language_id": "python"
+        },
+        "43": {
+            "filepath": "/cradle/provider/gd_provider.py",
+            "entry_id": 548,
+            "language_id": "python"
+        },
+        "44": {
+            "filepath": "/cradle/provider/openai.py",
+            "entry_id": 562,
+            "language_id": "python"
+        },
+        "45": {
+            "filepath": "/cradle/utils/__init__.py",
+            "entry_id": 616,
+            "language_id": "python"
+        },
+        "46": {
+            "filepath": "/cradle/utils/check.py",
+            "entry_id": 620,
+            "language_id": "python"
+        },
+        "47": {
+            "filepath": "/cradle/utils/encoding_utils.py",
+            "entry_id": 626,
+            "language_id": "python"
+        },
+        "48": {
+            "filepath": "/cradle/utils/file_utils.py",
+            "entry_id": 630,
+            "language_id": "python"
+        },
+        "49": {
+            "filepath": "/cradle/utils/image_utils.py",
+            "entry_id": 634,
+            "language_id": "python"
+        },
+        "50": {
+            "filepath": "/cradle/utils/json_utils.py",
+            "entry_id": 640,
+            "language_id": "python"
+        },
+        "51": {
+            "filepath": "/cradle/utils/singleton.py",
+            "entry_id": 650,
+            "language_id": "python"
+        },
+        "52": {
+            "filepath": "/cradle/utils/string_utils.py",
+            "entry_id": 654,
+            "language_id": "python"
+        },
+        "53": {
+            "filepath": "/cradle/utils/template_matching.py",
+            "entry_id": 658,
+            "language_id": "python"
+        },
+        "54": {
+            "filepath": "/prototype_runner.py",
+            "entry_id": 670,
+            "language_id": "python"
+        },
+        "55": {
+            "filepath": "/requirements.txt",
+            "entry_id": 720,
+            "language_id": "plain-text"
+        }
+    },
+    "project_name": "Cradle",
+    "split_count": 8
+}

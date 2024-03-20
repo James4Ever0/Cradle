@@ -1,0 +1,546 @@
+{
+    "300": {
+        "file_id": 23,
+        "content": "            x,y,w,h = row['BBox']\n            text = row['TemplateName']\n            if showLabel:\n                text_size, baseline = cv2.getTextSize(text, cv2.FONT_HERSHEY_DUPLEX, labelScale, 1)\n                text_width, text_height = text_size\n                rectangle_pos = [(int(x - 0.2 * w), int(y - 0.15 * h)), (int(x + 1.2 * w), int(y + 1.05 * h))]\n                cv2.rectangle(outImage, rectangle_pos[0], rectangle_pos[1], color=boxColor, thickness=-1)\n                text_x = int((rectangle_pos[0][0] + rectangle_pos[1][0]) / 2 - text_width / 2)\n                text_y = int((rectangle_pos[0][1] + rectangle_pos[1][1]) / 2 + text_height / 2)\n                cv2.putText(outImage, text=text, org=(text_x, text_y), fontFace=cv2.FONT_HERSHEY_DUPLEX, fontScale=labelScale, color=labelColor, lineType=cv2.LINE_AA,thickness=1)\n        return outImage\n    def _get_mtm_match(self, image: np.ndarray, template: np.ndarray, template_name):\n        detection = matchTemplates([(template_name, cv2.resize(template, (round(template.shape[1] * s), round(template.shape[0] * s)))) for s in [0.9, 1, 1.1]],",
+        "type": "code",
+        "location": "/cradle/gameio/lifecycle/ui_control.py:410-428"
+    },
+    "301": {
+        "file_id": 23,
+        "content": "This code snippet calculates the bounding box coordinates and dimensions for a template image on an input image. It then draws the bounding box using cv2.rectangle() and adds text on top of the bounding box using cv2.putText(). The _get_mtm_match function performs non-maximum suppression (NMS) to find the best match for each template in the given input image.",
+        "type": "comment"
+    },
+    "302": {
+        "file_id": 23,
+        "content": "                                image,\n                                N_object=1,\n                                method=cv2.TM_CCOEFF_NORMED,\n                                maxOverlap=0.1)\n        if detection['Score'].iloc[0] > 0.75:\n            image = self._drawBoxesOnRGB(image, detection, boxThickness=-1, showLabel=True, boxColor=(255, 255, 255), labelColor=(0, 0, 0), labelScale=.62)\n        return {'info': detection, 'vis': image}\n    def _show(self, image, window_name='screen',show=True,save=''):\n        if save:\n            cv2.imwrite(save, image)\n        if show:\n            cv2.namedWindow(window_name, 0)\n            cv2.imshow(window_name, image)\n            cv2.waitKey(0)\n            cv2.destroyAllWindows()\n    # Image augmentation to mitigate VLM issues\n    def replace_icon(self, image_paths):\n        replaced_image_paths = []\n        for image_path in image_paths:\n            image = cv2.imread(image_path)\n            for template_file in self.template_paths:\n                template = cv2.imread(template_file)",
+        "type": "code",
+        "location": "/cradle/gameio/lifecycle/ui_control.py:429-459"
+    },
+    "303": {
+        "file_id": 23,
+        "content": "This code detects and draws objects on an image based on the detection score. If the score is above 0.75, it displays a box around the detected object. The code also includes functions to show or save the image, as well as image augmentation for VLM issues by replacing specific icons in the images.",
+        "type": "comment"
+    },
+    "304": {
+        "file_id": 23,
+        "content": "                template_name = os.path.splitext(os.path.basename(template_file))[0]\n                if 'left_mouse' in template_name:\n                    template_name = 'LM'\n                elif 'right_mouse' in template_name:\n                    template_name = 'RM'\n                elif 'mouse' in template_name:\n                    template_name = 'MS'\n                elif 'enter' in template_name:\n                    template_name = 'Ent'\n                detection = self._get_mtm_match(image, template, template_name)\n                image = detection['vis']\n            directory, filename = os.path.split(image_path)\n            save_path = os.path.join(directory, \"icon_replace_\"+filename)\n            self._show(image, save=save_path, show=False)\n            replaced_image_paths.append(save_path)\n        return replaced_image_paths",
+        "type": "code",
+        "location": "/cradle/gameio/lifecycle/ui_control.py:460-481"
+    },
+    "305": {
+        "file_id": 23,
+        "content": "This code extracts an image path and determines the template name based on specific keywords. It then replaces the image with a template-specific identifier and saves it to a new path. The replaced image paths are added to a list, which is returned at the end.",
+        "type": "comment"
+    },
+    "306": {
+        "file_id": 24,
+        "content": "/cradle/gameio/skill_registry.py",
+        "type": "filepath"
+    },
+    "307": {
+        "file_id": 24,
+        "content": "This code creates a SkillRegistry, imports libraries, and includes functions for skill retrieval, conflict prevention, and registry management. It filters the skill library based on 'skill_scope', sets embedding values, and stores skills in SKILL_REGISTRY and SKILL_INDEX.",
+        "type": "summary"
+    },
+    "308": {
+        "file_id": 24,
+        "content": "import re\nimport ast\nimport time\nfrom typing import Dict, Any, List, Tuple\nimport inspect\nimport copy\nimport os\nimport base64\nimport numpy as np\nfrom cradle.config import Config\nfrom cradle.log import Logger\nfrom cradle.utils.json_utils import load_json, save_json\nfrom cradle.gameio import IOEnvironment\nfrom cradle import constants\nconfig = Config()\nlogger = Logger()\nio_env = IOEnvironment()\nSKILL_REGISTRY = {}\nSKILL_INDEX = []\nSKILL_NAME_KEY = 'skill_name'\nSKILL_EMBEDDING_KEY = 'skill_emb'\nSKILL_CODE_KEY = 'skill_code'\nSKILL_CODE_HASH_KEY = 'skill_code_base64'\nEXPL_SKILL_LIB_FILE='skill_lib.json'\nBASIC_SKILL_LIB_FILE='skill_lib_basic.json'\nBASIC_SKILLS = ['shoot_wolves', 'follow', 'go_to_horse', 'turn_and_move_forward', 'turn', 'move_forward', 'navigate_path', 'shoot', 'select_weapon', 'select_sidearm', 'fight', 'mount_horse']\nMOVEMENT_SKILLS = ['turn', 'move_forward', 'turn_and_move_forward']\nMAP_SKILLS = ['select_previous_index_object', 'select_next_index_object']\nTRADE_SKILLS = ['select_upside_product', 'select_downside_product', 'select_rightside_product', 'select_leftside_product']",
+        "type": "code",
+        "location": "/cradle/gameio/skill_registry.py:1-34"
+    },
+    "309": {
+        "file_id": 24,
+        "content": "The code imports necessary libraries, defines variables for configuration and logging, creates an IO environment object, initializes an empty skill registry, and sets up constants for various skill categories. The code also defines a list of basic skills, movement skills, map skills, and trade skills.",
+        "type": "comment"
+    },
+    "310": {
+        "file_id": 24,
+        "content": "DENY_LIST_TERMS = ['shoot', 'follow', 'turn', 'move_forward', 'go_to_horse', 'navigate_path', 'select_weapon', 'select_sidearm', 'fight', 'mount_horse']\nALLOW_LIST_TERMS = []\ndef register_skill(name):\n    def decorator(skill):\n        SKILL_REGISTRY[name] = skill\n        skill_code = inspect.getsource(skill)\n        # Remove unnecessary annotation in skill library\n        if f\"@register_skill(\\\"{name}\\\")\\n\" in skill_code:\n            skill_code = skill_code.replace(f\"@register_skill(\\\"{name}\\\")\\n\", \"\")\n        SKILL_INDEX.append({SKILL_NAME_KEY:          name,\n                            SKILL_EMBEDDING_KEY:     None,\n                            SKILL_CODE_KEY:          skill_code})\n        return skill\n    return decorator\ndef post_skill_wait(wait_time: config.DEFAULT_POST_ACTION_WAIT_TIME):\n    \"\"\"Wait for skill to finish. Like if there is an animation\"\"\"\n    time.sleep(wait_time)\nclass SkillRegistry:\n    def __init__(\n        self,\n        local_path = '',\n        from_local = False,\n        store_path = '',",
+        "type": "code",
+        "location": "/cradle/gameio/skill_registry.py:35-67"
+    },
+    "311": {
+        "file_id": 24,
+        "content": "The code defines a skill registry for registering and waiting for skills to finish execution. It includes a `register_skill` decorator, which takes a name and wraps the skill function with additional functionality, including storing the skill's source code and removing unnecessary annotations. The `post_skill_wait` function waits for a specified amount of time after a skill is executed. The `SkillRegistry` class serves as a container for registered skills.",
+        "type": "comment"
+    },
+    "312": {
+        "file_id": 24,
+        "content": "        skill_scope = 'Full',\n        embedding_provider = None\n    ):\n        self.from_local = from_local\n        if skill_scope == 'Basic':\n            self.skill_library_filename = BASIC_SKILL_LIB_FILE\n        elif skill_scope == 'Full':\n            self.skill_library_filename = EXPL_SKILL_LIB_FILE\n        elif skill_scope == None:\n            self.from_local = False\n        self.skill_scope = skill_scope\n        self.local_path = local_path\n        self.store_path = store_path\n        self.embedding_provider = embedding_provider\n        self.basic_skills = copy.deepcopy(BASIC_SKILLS)\n        self.recent_skills = []\n        self.movement_skills = copy.deepcopy(MOVEMENT_SKILLS)\n        self.map_skills = copy.deepcopy(MAP_SKILLS)\n        self.trade_skills = copy.deepcopy(TRADE_SKILLS)\n        if self.from_local:\n            if not os.path.exists(os.path.join(self.local_path, self.skill_library_filename)):\n                logger.error(f\"{os.path.join(self.local_path, self.skill_library_filename)} does not exist.\")",
+        "type": "code",
+        "location": "/cradle/gameio/skill_registry.py:68-92"
+    },
+    "313": {
+        "file_id": 24,
+        "content": "This code initializes a SkillRegistry object with the specified skill scope (Basic, Full, or None), local and store paths, and embedding provider. It sets default filenames for Basic and Full scopes, handles None skill_scope by setting from_local to False, copies skill dictionaries for each category, and checks if the local skill library file exists if from_local is True.",
+        "type": "comment"
+    },
+    "314": {
+        "file_id": 24,
+        "content": "                self.filter_skill_library()\n                self.store_skills(os.path.join(self.local_path, self.skill_library_filename))\n            else:\n                self.load_skill_library(os.path.join(self.local_path, self.skill_library_filename))\n        else:\n            self.filter_skill_library()\n    def extract_function_info(self, input_string: str = \"open_map()\"):\n        pattern = re.compile(r'(\\w+)\\((.*?)\\)')\n        match = pattern.match(input_string)\n        if match:\n            function_name = match.group(1)\n            raw_arguments = match.group(2)\n            # To avoid simple errors based on faulty model output\n            if raw_arguments is not None and len(raw_arguments) > 0:\n                raw_arguments = raw_arguments.replace(\"=false\", \"=False\").replace(\"=true\", \"=True\")\n            try:\n                parsed_arguments = ast.parse(f\"fake_func({raw_arguments})\", mode='eval')\n            except SyntaxError:\n                raise ValueError(\"Invalid function call/arg format to parse.\")",
+        "type": "code",
+        "location": "/cradle/gameio/skill_registry.py:93-118"
+    },
+    "315": {
+        "file_id": 24,
+        "content": "This code filters the skill library and stores or loads it based on the condition, while also extracting function information from input strings using regular expressions and Python's ast module.",
+        "type": "comment"
+    },
+    "316": {
+        "file_id": 24,
+        "content": "            arguments = {}\n            for node in ast.walk(parsed_arguments):\n                if isinstance(node, ast.keyword):\n                    arguments[node.arg] = ast.literal_eval(node.value)\n            if len(raw_arguments) > 0 and len(arguments.keys()) == 0:\n                raise ValueError(\"Call arguments not properly parsed!\")\n            return function_name, arguments\n        else:\n            raise ValueError(\"Invalid function call format string.\")\n    def execute_skill(self, name: str = \"open_map\", params: Dict = None):\n        # @TODO return execution error info\n        if name in self.skill_registry:\n            skill = self.skill_registry[name]\n            skill(**params)\n        else:\n            raise ValueError(f\"Function '{name}' not found in the registry.\")\n    def execute_nop_skill(self):\n        time.sleep(2)\n    def convert_expression_to_skill(self, expression: str = \"open_map()\"):\n        skill_name, skill_params = self.extract_function_info(expression)\n        return skill_name, skill_params",
+        "type": "code",
+        "location": "/cradle/gameio/skill_registry.py:120-151"
+    },
+    "317": {
+        "file_id": 24,
+        "content": "The code includes functions for parsing function calls, executing skills, and converting expressions to skills. The \"execute_skill\" function takes a name and optional parameters to execute the corresponding skill in the registry. The \"execute_nop_skill\" pauses for 2 seconds. The \"convert_expression_to_skill\" extracts skill name and parameters from an expression string.",
+        "type": "comment"
+    },
+    "318": {
+        "file_id": 24,
+        "content": "    def get_from_skill_library(self, skill_name: str) -> Dict:\n        skill = self.skill_registry[skill_name]\n        docstring = inspect.getdoc(skill)\n        if docstring:\n            params = inspect.signature(skill).parameters\n            if len(params) > 0:\n                param_descriptions = {}\n                for param in params.values():\n                    name = param.name\n                    param_description = re.search(rf\"- {name}: (.+).\", docstring).group(1)\n                    param_descriptions[name] = param_description\n                return {\n                    \"function_expression\": f\"{skill.__name__}({', '.join(params.keys())})\",\n                    \"description\": docstring,\n                    \"parameters\": param_descriptions,\n                }\n            else:\n                return {\n                    \"function_expression\": f\"{skill.__name__}()\",\n                    \"description\": docstring,\n                    \"parameters\": {},\n                }\n        else:\n            return None",
+        "type": "code",
+        "location": "/cradle/gameio/skill_registry.py:154-180"
+    },
+    "319": {
+        "file_id": 24,
+        "content": "This function retrieves the documentation of a skill from the library and returns it in a structured format. It extracts the skill's name, description, and parameters if available.",
+        "type": "comment"
+    },
+    "320": {
+        "file_id": 24,
+        "content": "    def get_skill_library_in_code(self, skill: Any) -> Tuple[str, str]:\n        info = None\n        try:\n            skill_name, _ = self.extract_function_info(skill)\n        except:\n            skill_name = skill\n        skill_code = None\n        for item in self.skill_index:\n            if item[SKILL_NAME_KEY] == skill_name:\n                skill_code = item[SKILL_CODE_KEY]\n                if f\"@register_skill(\\\"{skill_name}\\\")\\n\" in skill_code:\n                    skill_code = skill_code.replace(f\"@register_skill(\\\"{skill_name}\\\")\\n\", \"\")\n                break\n        if skill_code is None:\n            info = f\"Skill '{skill_name}' not found in the registry.\"\n        return skill_code, info\n    def register_skill_from_code(self, skill_code: str, overwrite = False) -> Tuple[bool, str]:\n        \"\"\"Register the skill function from the code string.\n        Args:\n            skill_code: the code of skill.\n            overwrite: the flag indicates whether to overwrite the skill with the same name or not.\n        Returns:",
+        "type": "code",
+        "location": "/cradle/gameio/skill_registry.py:183-212"
+    },
+    "321": {
+        "file_id": 24,
+        "content": "This code defines two methods, `get_skill_library_in_code()` and `register_skill_from_code()`, for interacting with a skill registry. The `get_skill_library_in_code()` method retrieves the code of a skill given its name from the registry. It first tries to extract the function info and if it fails, uses the provided skill name directly. Then, it searches for the skill in the registry and returns its code and an information string if not found. The `register_skill_from_code()` method registers a skill from a given code string into the registry. It also takes an optional overwrite flag to determine whether to replace an existing skill with the same name.",
+        "type": "comment"
+    },
+    "322": {
+        "file_id": 24,
+        "content": "            bool: the true value means that there is no problem in the skill_code. The false value means that we may need to re-generate it.\n            str: the detailed information about the bool.\n        \"\"\"\n        def lower_func_name(skill_code):\n            skill_name = get_func_name(skill_code)\n            replaced_name = skill_name.lower()\n            # To make sure the skills in .py files will not be overwritten.\n            # The skills not in .py files can still be overwritten.\n            if replaced_name in SKILL_REGISTRY:\n                replaced_name = replaced_name+'_generated'\n            return skill_code.replace(skill_name, replaced_name)\n        def get_func_name(skill_code):\n            return skill_code.split('def ')[-1].split('(')[0]\n        def check_param_description(skill) -> bool:\n            docstring = inspect.getdoc(skill)\n            if docstring:\n                params = inspect.signature(skill).parameters\n                if len(params) > 0:\n                    for param in params.values():",
+        "type": "code",
+        "location": "/cradle/gameio/skill_registry.py:213-237"
+    },
+    "323": {
+        "file_id": 24,
+        "content": "The code provides three functions: `lower_func_name()` to lowercase the function name, `get_func_name()` to extract the function name from the skill code, and `check_param_description()` to check if a skill's docstring contains parameter descriptions. It ensures skills in .py files are not overwritten by appending '_generated' to their names.",
+        "type": "comment"
+    },
+    "324": {
+        "file_id": 24,
+        "content": "                        if not re.search(rf\"- {param.name}: (.+).\", docstring):\n                            return False\n                    return True\n                else:\n                    return True\n            else:\n                return True\n        def check_protection_conflict(skill):\n            for word in ALLOW_LIST_TERMS:\n                if word in skill:\n                    return True\n            for word in DENY_LIST_TERMS:\n                if word in skill:\n                    return False\n            return True\n        info = None\n        if skill_code.count('(') < 2:\n            info = \"Skill code contains no functionality.\"\n            logger.error(info)\n            return True, info\n        skill_code = lower_func_name(skill_code)\n        skill_name = get_func_name(skill_code)\n        # Always avoid adding skills that are ambiguous with existing pre-defined ones.\n        if check_protection_conflict(skill_name) == False:\n            info = f\"Skill '{skill_name}' conflicts with protected skills.\"",
+        "type": "code",
+        "location": "/cradle/gameio/skill_registry.py:238-270"
+    },
+    "325": {
+        "file_id": 24,
+        "content": "This code checks if a skill name conflicts with predefined protected terms, either allowing or denying their use. If the skill code lacks functionality or has an ambiguous name, it returns an error message and False.",
+        "type": "comment"
+    },
+    "326": {
+        "file_id": 24,
+        "content": "            for word in DENY_LIST_TERMS:\n                if word in skill_name:\n                    for protected_skill in BASIC_SKILLS:\n                        if word in protected_skill:\n                            self.recent_skills.append(protected_skill)\n            logger.write(info)\n            return True, info\n        if overwrite:\n            if skill_name in self.skill_registry:\n                self.delete_skill(skill_name)\n                logger.write(f\"Skill '{skill_name}' will be overwritten.\")\n        if skill_name in self.skill_registry:\n            info = f\"Skill '{skill_name}' already exists.\"\n            logger.write(info)\n            return True, info\n        try:\n            exec(skill_code)\n            skill = eval(skill_name)\n        except:\n            info = \"The skill code is invalid.\"\n            logger.error(info)\n            return False, info\n        if check_param_description(skill) == False:\n            info = \"The format of parameter description is wrong.\"\n            logger.error(info)",
+        "type": "code",
+        "location": "/cradle/gameio/skill_registry.py:271-299"
+    },
+    "327": {
+        "file_id": 24,
+        "content": "This code checks if the skill name is on a deny list and protects basic skills. If not, it deletes an existing skill, logs information, and attempts to evaluate the skill code. It handles invalid skill codes or incorrect parameter descriptions by logging errors.",
+        "type": "comment"
+    },
+    "328": {
+        "file_id": 24,
+        "content": "            return False, info\n        self.skill_registry[skill_name] = skill\n        self.skill_index.append({SKILL_NAME_KEY:     skill_name,\n                                SKILL_EMBEDDING_KEY: self.get_embedding(skill_name, inspect.getdoc(skill)),\n                                SKILL_CODE_KEY:      skill_code})\n        self.recent_skills.append(skill_name)\n        info = f\"Skill '{skill_name}' has been registered.\"\n        logger.write(info)\n        return True, info\n    def delete_skill(self, skill_name: str) -> None:\n        try:\n            skill_name, _ = self.extract_function_info(skill_name)\n        except:\n            skill_name = skill_name\n        if skill_name in self.skill_registry:\n            del self.skill_registry[skill_name]\n            position = next((i for i, skill in enumerate(self.skill_index) if skill[SKILL_NAME_KEY] == skill_name), None)\n            self.skill_index.pop(position)\n        if skill_name in self.recent_skills:\n            position = self.recent_skills.index(skill_name)",
+        "type": "code",
+        "location": "/cradle/gameio/skill_registry.py:300-325"
+    },
+    "329": {
+        "file_id": 24,
+        "content": "Function adds a skill to the registry and logs the action, while delete_skill function removes a skill from the registry and updates the index and recent skills list.",
+        "type": "comment"
+    },
+    "330": {
+        "file_id": 24,
+        "content": "            self.recent_skills.pop(position)\n    def retrieve_skills(self, query_task: str, skill_num: int, screen_type: str) -> List[str]:\n        skill_num = min(skill_num, len(self.skill_index))\n        target_skills = [skill for skill in self.recent_skills]\n        task_emb = np.array(self.embedding_provider.embed_query(query_task))\n        self.skill_index.sort(key = lambda x: -np.dot(x[SKILL_EMBEDDING_KEY],task_emb))\n        for skill in self.skill_index:\n            if len(target_skills)>=skill_num:\n                break\n            else:\n                if skill[SKILL_NAME_KEY] not in target_skills:\n                    target_skills.append(skill[SKILL_NAME_KEY])\n        self.recent_skills = []\n        # Add required skills based on screen type\n        if screen_type == constants.GENERAL_GAME_INTERFACE:\n            target_skills += [skill for skill in self.movement_skills]\n        elif screen_type == constants.TRADE_INTERFACE or screen_type == constants.SATCHEL_INTERFACE:\n            target_skills += [skill for skill in self.trade_skills]",
+        "type": "code",
+        "location": "/cradle/gameio/skill_registry.py:326-346"
+    },
+    "331": {
+        "file_id": 24,
+        "content": "This code retrieves skills based on a query task, skill number, and screen type. It sorts skills by their similarity to the query task, appends relevant ones to the target list, and adds additional skills for specific screens.",
+        "type": "comment"
+    },
+    "332": {
+        "file_id": 24,
+        "content": "        elif screen_type == constants.MAP_INTERFACE:\n            target_skills += [skill for skill in self.map_skills]\n        return target_skills\n    def register_available_skills(self, candidates:List[str]) -> None:\n        for skill_key in candidates:\n            if skill_key not in self.skill_registry:\n                logger.error(f\"Skill '{skill_key}' does not exist.\")\n        for skill_key in list(self.skill_registry.keys()):\n            if skill_key not in candidates:\n                del self.skill_registry[skill_key]\n        self.skill_index_t = []\n        for skill in self.skill_index:\n            if skill[SKILL_NAME_KEY] in candidates:\n                self.skill_index_t.append(skill)\n        self.skill_index = copy.deepcopy(self.skill_index_t)\n        del self.skill_index_t\n    def get_all_skills(self) -> List[str]:\n        return list(self.skill_registry.keys())\n    def get_embedding(self, skill_name, skill_doc):\n        return np.array(self.embedding_provider.embed_query('{}: {}'.format(skill_name, skill_doc)))",
+        "type": "code",
+        "location": "/cradle/gameio/skill_registry.py:347-374"
+    },
+    "333": {
+        "file_id": 24,
+        "content": "The code is a part of a skill registry class in the gameio module. It allows registering available skills, retrieves all registered skills, and gets embeddings for specific skills. In case of MAP_INTERFACE screen type, it adds skills from the map_skills list to target_skills. The register_available_skills function updates the skill registry based on provided candidates, removing any missing skills. get_all_skills returns a list of all registered skills, and get_embedding retrieves embeddings for a given skill name and document.",
+        "type": "comment"
+    },
+    "334": {
+        "file_id": 24,
+        "content": "    def convert_str_to_func(self, skill_name, skill_local):\n        exec(skill_local[skill_name][SKILL_CODE_KEY])\n        skill = eval(skill_name)\n        return skill\n    def store_skills(self, file_path = None) -> None:\n        if file_path == None:\n            file_path = os.path.join(self.store_path, self.skill_library_filename)\n        store_file = {}\n        for skill in self.skill_index:\n            store_file[skill[SKILL_NAME_KEY]] = {SKILL_CODE_KEY:skill[SKILL_CODE_KEY],\n                                                 SKILL_EMBEDDING_KEY:base64.b64encode(skill[SKILL_EMBEDDING_KEY].tobytes()).decode('utf-8'),\n                                                 SKILL_CODE_HASH_KEY:base64.b64encode(skill[SKILL_CODE_KEY].encode('utf-8')).decode('utf-8')}\n        save_json(file_path = file_path, json_dict = store_file, indent = 4)\n    def load_skill_library(self, file_name) -> None:\n        skill_local = load_json(file_name)\n        self.skill_index = []\n        self.skill_registry = {}\n        for skill_name in skill_local.keys():",
+        "type": "code",
+        "location": "/cradle/gameio/skill_registry.py:377-404"
+    },
+    "335": {
+        "file_id": 24,
+        "content": "The code defines functions for storing and loading skills in a skill library. It converts skill strings to functions, stores them in a dictionary with their code, embedding, and hash, and writes the data to a JSON file using base64 encoding. When loading, it reads the JSON file, decodes the base64 data, and populates the skill library accordingly.",
+        "type": "comment"
+    },
+    "336": {
+        "file_id": 24,
+        "content": "            if skill_name in SKILL_REGISTRY:\n                # the manually-designed skills follow the code in .py files\n                self.skill_registry[skill_name] = SKILL_REGISTRY[skill_name]\n                skill_code_base64 = base64.b64encode(skill_local[skill_name][SKILL_CODE_KEY].encode('utf-8')).decode('utf-8')\n                if skill_code_base64 == skill_local[skill_name][SKILL_CODE_HASH_KEY]: # the skill_code is not modified\n                    self.skill_index.append({SKILL_NAME_KEY:skill_name,\n                                             SKILL_EMBEDDING_KEY:np.frombuffer(base64.b64decode(skill_local[skill_name][SKILL_EMBEDDING_KEY]), dtype=np.float64),\n                                             SKILL_CODE_KEY:inspect.getsource(SKILL_REGISTRY[skill_name])})\n                else: # skill_code has been modified, we should recompute embeddings\n                    self.skill_index.append({SKILL_NAME_KEY:skill_name,\n                                             SKILL_EMBEDDING_KEY:self.get_embedding(skill_name, inspect.getdoc(SKILL_REGISTRY[skill_name])),",
+        "type": "code",
+        "location": "/cradle/gameio/skill_registry.py:406-420"
+    },
+    "337": {
+        "file_id": 24,
+        "content": "The code checks if the skill_name exists in SKILL_REGISTRY. If it does, the manually-designed skill is added to the skill registry and the skill code is encoded. If the encoded code matches the expected hash, the skill index is updated with the skill's name, encoding of the skill code, and the source code of the skill. If the encoded code doesn't match the expected hash, the skill index is updated by calling the get_embedding method to recompute the embeddings for the skill.",
+        "type": "comment"
+    },
+    "338": {
+        "file_id": 24,
+        "content": "                                             SKILL_CODE_KEY:inspect.getsource(SKILL_REGISTRY[skill_name])})\n            else:\n                # the skills got from gather_information follow the code in .json file\n                skill = self.convert_str_to_func(skill_name, skill_local)\n                self.skill_registry[skill_name] = skill\n                skill_code_base64 = base64.b64encode(skill_local[skill_name][SKILL_CODE_KEY].encode('utf-8')).decode('utf-8')\n                if skill_code_base64 == skill_local[skill_name][SKILL_CODE_HASH_KEY]: # the skill_code is not modified\n                    self.skill_index.append({SKILL_NAME_KEY:skill_name,\n                                             SKILL_EMBEDDING_KEY:np.frombuffer(base64.b64decode(skill_local[skill_name][SKILL_EMBEDDING_KEY]), dtype=np.float64),\n                                             SKILL_CODE_KEY:skill_local[skill_name][SKILL_CODE_KEY]})\n                else: # skill_code has been modified, we should recompute embedding\n                    self.skill_index.append({SKILL_NAME_KEY:skill_name,",
+        "type": "code",
+        "location": "/cradle/gameio/skill_registry.py:421-436"
+    },
+    "339": {
+        "file_id": 24,
+        "content": "This code handles skill registration and storage in a game. If the skill code is found within the function, it adds it to the skill registry. It then checks if the skill code is unmodified from the JSON file. If so, it appends the skill details (name, embedding, and code) to the skill index. If not, it recomputes the skill's embedding as the code has been modified.",
+        "type": "comment"
+    },
+    "340": {
+        "file_id": 24,
+        "content": "                                             SKILL_EMBEDDING_KEY:self.get_embedding(skill_name, inspect.getdoc(skill)),\n                                             SKILL_CODE_KEY:skill_local[skill_name][SKILL_CODE_KEY]})\n    def filter_skill_library(self) -> None:\n        if self.skill_scope == 'Basic':\n            self.skill_registry = {}\n            self.skill_index = []\n            for skill in SKILL_INDEX:\n                if skill[SKILL_NAME_KEY] in self.basic_skills:\n                    self.skill_registry[skill[SKILL_NAME_KEY]] = SKILL_REGISTRY[skill[SKILL_NAME_KEY]]\n                    self.skill_index.append(skill)\n        if self.skill_scope == 'Full':\n            self.skill_registry = copy.deepcopy(SKILL_REGISTRY)\n            self.skill_index = copy.deepcopy(SKILL_INDEX)\n        if self.skill_scope == None:\n            self.skill_registry = {}\n            self.skill_index = []\n            for skill in SKILL_INDEX:\n                if skill[SKILL_NAME_KEY] in self.necessary_skills:\n                    self.skill_registry[skill[SKILL_NAME_KEY]] = SKILL_REGISTRY[skill[SKILL_NAME_KEY]]",
+        "type": "code",
+        "location": "/cradle/gameio/skill_registry.py:437-460"
+    },
+    "341": {
+        "file_id": 24,
+        "content": "The code is filtering the skill library based on the 'skill_scope' provided. If 'Basic', it only includes necessary skills, if 'Full', it copies all existing skills, and if 'None', it initializes an empty registry and index. The SKILL_REGISTRY is used to store skills, while SKILL_INDEX provides a list of available skill names.",
+        "type": "comment"
+    },
+    "342": {
+        "file_id": 24,
+        "content": "                    self.skill_index.append(skill)\n        for skill in self.skill_index:\n            skill[SKILL_EMBEDDING_KEY] = self.get_embedding(skill[SKILL_NAME_KEY], inspect.getdoc(SKILL_REGISTRY[skill[SKILL_NAME_KEY]]))",
+        "type": "code",
+        "location": "/cradle/gameio/skill_registry.py:461-464"
+    },
+    "343": {
+        "file_id": 24,
+        "content": "This code is appending skills to a list and then iterates over the skills, setting the skill's embedding value using the get_embedding function and the skill's name and documentation.",
+        "type": "comment"
+    },
+    "344": {
+        "file_id": 25,
+        "content": "/cradle/gameio/video/VideoEasyOCRExtractor.py",
+        "type": "filepath"
+    },
+    "345": {
+        "file_id": 25,
+        "content": "This code imports libraries, defines a class for importing images and includes functions to extract or detect text from video frames using OpenCV. It creates an object, runs the detect_text function on two image files, logs results and average execution time.",
+        "type": "summary"
+    },
+    "346": {
+        "file_id": 25,
+        "content": "import os\nfrom typing import Any, List, Tuple\nimport time\nimport numpy as np\nimport cv2\nimport easyocr\nimport PIL\nfrom PIL import Image\n# Hack to avoid EasyOCR crash\nPIL.Image.ANTIALIAS = PIL.Image.LANCZOS\nfrom cradle.log import Logger\nfrom cradle.config import Config\nfrom cradle.provider.openai import decode_image\nfrom cradle.utils.file_utils import assemble_project_path\nlogger = Logger()\nconfig = Config()\nclass VideoEasyOCRExtractor():\n    def __init__(self):\n        self.crop_region = config.DEFAULT_OCR_CROP_REGION\n        self.reader = easyocr.Reader(['en'])\n    def to_images(self, data: Any) -> Any:\n        images = []\n        if isinstance(data, (str, Image.Image, np.ndarray, bytes)):\n            data = [data]\n        for image in data:\n            if isinstance(image, str): # path to cv2 image\n                if os.path.exists(assemble_project_path(image)):\n                    path = assemble_project_path(image)\n                    image = cv2.imread(path)\n                else: # base64 to cv2 image\n                    image_data = decode_image(image)",
+        "type": "code",
+        "location": "/cradle/gameio/video/VideoEasyOCRExtractor.py:1-44"
+    },
+    "347": {
+        "file_id": 25,
+        "content": "This code imports necessary libraries and defines a class VideoEasyOCRExtractor. The class initializes an EasyOCR reader with the English language and stores the default crop region configuration. The to_images method takes input data, checks its type, and converts it into images for OCR processing if needed. It supports different types of input including image paths, Image objects, numpy arrays, and base64 encoded strings.",
+        "type": "comment"
+    },
+    "348": {
+        "file_id": 25,
+        "content": "                    image = cv2.imdecode(np.frombuffer(image_data, np.uint8), cv2.IMREAD_COLOR)\n            elif isinstance(image, bytes):  # bytes to cv2 image\n                image = cv2.imdecode(np.frombuffer(image, np.uint8), cv2.IMREAD_COLOR)\n            elif isinstance(image, Image.Image):  # PIL to cv2 image\n                image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)\n            elif isinstance(image, np.ndarray):  # cv2 image\n                if len(image.shape) == 3 and image.shape[2] == 4:\n                    image = cv2.cvtColor(image, cv2.COLOR_BGRA2BGR)\n            # crop the image\n            if self.crop_region is not None:\n                x1, y1, x2, y2 = self.crop_region\n                image = image[y1:y2, x1:x2]\n            images.append(image)\n        return images\n    def extract_text(self, image: Any, return_full: int = 1) -> List[Any]:\n        images = self.to_images(image)\n        res = []\n        for image in images:\n            # if full, return the (bounding box, text, prob) tuple",
+        "type": "code",
+        "location": "/cradle/gameio/video/VideoEasyOCRExtractor.py:45-68"
+    },
+    "349": {
+        "file_id": 25,
+        "content": "This code segment is responsible for handling image inputs in various formats and converting them to OpenCV format, cropping if necessary, and appending to a list of images. The extracted text from these images will be processed subsequently.",
+        "type": "comment"
+    },
+    "350": {
+        "file_id": 25,
+        "content": "            # else, return text only\n            item = self.reader.readtext(image, detail=return_full)\n            res.append(item)\n        return res\n    def extract_text_from_video(self, video_path: str, return_full: int = 1) -> List[Any]:\n        cap = cv2.VideoCapture(video_path)\n        frames = []\n        while cap.isOpened():\n            ret, frame = cap.read()\n            if ret:\n                frames.append(frame)\n            else:\n                break\n            # Break the loop with 'q' key\n            if cv2.waitKey(1) & 0xFF == ord('q'):\n                break\n        cap.release()\n        cv2.destroyAllWindows()\n        res = self.extract_text(frames, return_full=return_full)\n        return res\n    def extract_text_from_frames(self, frames: List, return_full: int = 1) -> List[Any]:\n        res = self.extract_text(frames, return_full=return_full)\n        return res\n    def detect_text(self, image: Any) -> Tuple[List[Any], List[bool]]:\n        images = self.to_images(image)\n        bounding_boxes = []",
+        "type": "code",
+        "location": "/cradle/gameio/video/VideoEasyOCRExtractor.py:69-102"
+    },
+    "351": {
+        "file_id": 25,
+        "content": "The code defines three functions: `extract_text_from_video`, `extract_text_from_frames`, and `detect_text`. The first function reads text from a video file, the second extracts text from a list of frames, and the third detects text in an image. The extracted or detected text is returned as a list.",
+        "type": "comment"
+    },
+    "352": {
+        "file_id": 25,
+        "content": "        for image in images:\n            item = self.reader.detect(image)\n            item = item[0][0] # list of bounding boxes, (x, y, w, h)\n            bounding_boxes.append(item)\n        has_text_flag = [True if len(item) >0 else False for item in bounding_boxes ]\n        return bounding_boxes, has_text_flag\n    def detect_text_from_video(self, video_path: str) -> Tuple[List[Any], List[bool]]:\n        cap = cv2.VideoCapture(video_path)\n        frames = []\n        while cap.isOpened():\n            ret, frame = cap.read()\n            if ret:\n                frames.append(frame)\n            else:\n                break\n            # Break the loop with 'q' key\n            if cv2.waitKey(1) & 0xFF == ord('q'):\n                break\n        cap.release()\n        cv2.destroyAllWindows()\n        bounding_boxes, has_text_flag = self.detect_text(frames)\n        return bounding_boxes, has_text_flag\n    def detect_text_from_frames(self, frames: List) -> Tuple[List[Any], List[bool]]:\n        bounding_boxes, has_text_flag = self.detect_text(frames)",
+        "type": "code",
+        "location": "/cradle/gameio/video/VideoEasyOCRExtractor.py:103-136"
+    },
+    "353": {
+        "file_id": 25,
+        "content": "This code uses OpenCV and a detector to extract text from video frames. It reads the video, detects text within each frame using the provided detector, and returns bounding boxes for detected text and a flag for each frame indicating whether it contains any text.",
+        "type": "comment"
+    },
+    "354": {
+        "file_id": 25,
+        "content": "        return bounding_boxes, has_text_flag\nif __name__ == '__main__':\n    extractor = VideoEasyOCRExtractor()\n    times = []\n    for i in range(100):\n        start = time.time()\n        res = extractor.detect_text(['./res/test1.jpg', './res/test2.jpg'])\n        logger.write(res)\n        cost = time.time() - start\n        times.append(cost)\n        logger.write(cost)\n    logger.write(np.mean(times))",
+        "type": "code",
+        "location": "/cradle/gameio/video/VideoEasyOCRExtractor.py:137-153"
+    },
+    "355": {
+        "file_id": 25,
+        "content": "This code creates a VideoEasyOCRExtractor object, then runs the detect_text function 100 times on two image files, logging the results and execution time for each run. It finally logs the average execution time.",
+        "type": "comment"
+    },
+    "356": {
+        "file_id": 26,
+        "content": "/cradle/gameio/video/VideoFrameExtractor.py",
+        "type": "filepath"
+    },
+    "357": {
+        "file_id": 26,
+        "content": "The `JSONStructure` class manages data in an ordered dictionary and performs sorting/searching by timestamps. The `VideoFrameExtractor` initializes directories, handles frame caches, and runs the `VideoSubFinderWXW` executable on video files using specified CPU cores. The code defines CPU settings, execution command for frame extraction, and logs progress/exceptions with subprocess and os.listdir in a method called 'extract'.",
+        "type": "summary"
+    },
+    "358": {
+        "file_id": 26,
+        "content": "import multiprocessing\nimport os\nfrom typing import Dict, Any, List\nimport subprocess\nimport shutil\nfrom collections import OrderedDict\nimport numpy as np\nfrom cradle.log import Logger\nfrom cradle.config import Config\nlogger = Logger()\nconfig = Config()\nclass JSONStructure:\n    def __init__(self):\n        self.data_structure: Dict[int, Dict[str, list[Dict[str, any]]]] = {}\n        self.end_index: int = -1\n    def add_instance(self, time_stamp: str, instance: dict[str, any]) -> None:\n        # Check if the timestamp already exists across all indices\n        exists = False\n        for index_data in self.data_structure.values():\n            if time_stamp in index_data:\n                # Timestamp already exists, append the instance to the existing timestamp\n                index_data[time_stamp].append(instance)\n                exists = True\n                break\n        if not exists:\n            # Timestamp is new, create a new entry and increment the end_index\n            self.end_index += 1\n            self.data_structure.setdefault(self.end_index, {}).setdefault(time_stamp, []).append(instance)",
+        "type": "code",
+        "location": "/cradle/gameio/video/VideoFrameExtractor.py:1-36"
+    },
+    "359": {
+        "file_id": 26,
+        "content": "The code defines a class named `JSONStructure` which has an ordered dictionary `data_structure` to store data. The `add_instance` method adds new instances with their timestamp to the data structure. If the timestamp already exists, it appends the instance to the existing timestamp; otherwise, it creates a new entry with incremented end index and sets the timestamp with its corresponding instance.",
+        "type": "comment"
+    },
+    "360": {
+        "file_id": 26,
+        "content": "    def sort_index_by_timestamp(self) -> None:\n        extracted_data = [(key, value) for entry in self.data_structure.values() for key, value in entry.items()]\n        sorted_data = sorted(extracted_data, key=lambda x: x[0])\n        # Reconstructing the JSON structure with sorted data\n        self.data_structure = OrderedDict({index: {key: value} for index, (key, value) in enumerate(sorted_data)})\n    def search_type_across_all_indices(self, search_type: str) -> list[dict[str, any]]:\n        results = []\n        # Sort the keys in ascending order\n        for index, index_data in sorted(self.data_structure.items()):\n            for object_id, instances in index_data.items():\n                for instance in instances:\n                    for type, values in instance.items():\n                        if type == search_type and values != \"\" and values != []:\n                            results.append({\"index\": index, \"object_id\": object_id, \"values\":values})\n        return results\nclass VideoFrameExtractor():",
+        "type": "code",
+        "location": "/cradle/gameio/video/VideoFrameExtractor.py:38-60"
+    },
+    "361": {
+        "file_id": 26,
+        "content": "The code contains a method to sort extracted data based on timestamps and another method to search across all indices for a specific type. The first method sorts the extracted data using lambda functions, then reconstructs the JSON structure with sorted data. The second method searches through each index's instances and their values, appending results if a match is found for the given type and non-empty values.",
+        "type": "comment"
+    },
+    "362": {
+        "file_id": 26,
+        "content": "    def __init__(self) -> None:\n        self.path_vsf = config.VideoFrameExtractor_path\n        # Copy the placeholder file to the work_dir\n        run_placeholderfile_path = os.path.join(config.work_dir, 'test.srt')\n        if not os.path.exists(run_placeholderfile_path):\n            shutil.copy(config.VideoFrameExtractor_placeholderfile_path, run_placeholderfile_path)\n        self.vsf_subtitle = run_placeholderfile_path\n        self.frame_output_dir = os.path.join(config.work_dir, 'frame_output_dir')\n        self.extracted_frame_folder = os.path.join(self.frame_output_dir, \"RGBImages\")\n        os.makedirs(self.extracted_frame_folder, exist_ok=True)\n        # If self.path_vsf does not exist, throw a non-exist error\n        if not os.path.exists(self.path_vsf):\n            raise Exception(f\"VideoSubFinderWXW does not exist! Please install it according to the README.md.\")\n        # Create a folder to store the extracted frames\n        if not os.path.exists(self.frame_output_dir):\n            os.makedirs(self.frame_output_dir)",
+        "type": "code",
+        "location": "/cradle/gameio/video/VideoFrameExtractor.py:62-84"
+    },
+    "363": {
+        "file_id": 26,
+        "content": "Initializing the VideoFrameExtractor class by setting necessary paths and creating required directories. First, it copies a placeholder file to the work directory and sets the vsf_subtitle path. It then creates the extracted frame folder within the frame_output_dir. If the VideoSubFinderWXW file does not exist, it raises an exception.",
+        "type": "comment"
+    },
+    "364": {
+        "file_id": 26,
+        "content": "    def delete_frame_cache(self, frame_output_dir):\n        # Delete the cache of the extracted frames generated by the previous run\n        if len(os.listdir(frame_output_dir)) > 0:\n            for i in os.listdir(frame_output_dir):\n                path = os.path.join(frame_output_dir, i)\n                try:\n                    if os.path.isfile(path):\n                        os.remove(path)\n                    elif os.path.isdir(path):\n                        shutil.rmtree(path)\n                except PermissionError as e:\n                    logger.write(f\"Permission error: {e}\")\n                except Exception as e:\n                    logger.write(f\"An error occurred: {e}\")\n    def run_sub_finder(self, path_vsf, video_path, frame_output_dir, vsf_subtitle):\n        # path_vsf is the path of the VideoSubFinderWXW.exe\n        # vsf_subtitile is the path of the extracted sub titles (no usage), it should be ended with '.srt'\n        self.delete_frame_cache(frame_output_dir)\n        cpu_count = max(int(multiprocessing.cpu_count() * 2 / 3), 1)",
+        "type": "code",
+        "location": "/cradle/gameio/video/VideoFrameExtractor.py:87-113"
+    },
+    "365": {
+        "file_id": 26,
+        "content": "The code contains two functions: 'delete_frame_cache' and 'run_sub_finder'. The 'delete_frame_cache' function deletes the cache of extracted frames from a previous run if there are any files in the specified frame output directory. The 'run_sub_finder' function runs the VideoSubFinderWXW.exe executable at path_vsf on a video file at video_path, using a specified number of CPU cores (calculated as 2/3 of the available cores plus 1). No usage is made of the vsf_subtitle argument.",
+        "type": "comment"
+    },
+    "366": {
+        "file_id": 26,
+        "content": "        if cpu_count < 4:\n            cpu_count = max(multiprocessing.cpu_count() - 1, 1)\n        top_end = 0\n        bottom_end = 1\n        left_end = 0\n        right_end = 1\n        cmd = f\"{path_vsf} --use_cuda -c -r -i \\\"{video_path}\\\" -o \\\"{frame_output_dir}\\\" -ces \\\"{vsf_subtitle}\\\" \"\n        cmd += f\"-te {top_end} -be {bottom_end} -le {left_end} -re {right_end} -nthr {cpu_count} -nocrthr {cpu_count}\"\n        # Execute the command\n        try:\n            logger.write(f\"Extracting Informative Frames from {video_path} .....\")\n            startupinfo = None\n            if os.name == 'nt':\n                startupinfo = subprocess.STARTUPINFO()\n                startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW\n                startupinfo.wShowWindow = subprocess.SW_HIDE\n            proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, startupinfo=startupinfo)\n            try:\n                stdout, stderr = proc.communicate()\n            except KeyboardInterrupt:\n                logger.write(f\"Frame extraction stopped\")",
+        "type": "code",
+        "location": "/cradle/gameio/video/VideoFrameExtractor.py:114-140"
+    },
+    "367": {
+        "file_id": 26,
+        "content": "This code checks if the number of CPU cores is less than 4, and if so, sets it to at least 1. Then it sets default values for top-bottom-left-right end points in a video. It constructs a command with path to executable and arguments like video file path, frame output directory, start/end time, number of threads, etc. The code then tries to execute this command using subprocess.Popen and handles KeyboardInterrupt exceptions if any.",
+        "type": "comment"
+    },
+    "368": {
+        "file_id": 26,
+        "content": "            finally:\n                if proc.poll() is None:\n                    proc.terminate()\n            logger.write(f\"Frame Extraction Completed! Total Frames: {len(os.listdir(self.extracted_frame_folder))}\")\n        except Exception as e:\n            logger.write(f\"Frame Extraction Failed! {e}\")\n    def extract(self,video_path):\n        video_path = os.path.normpath(video_path)\n        self.run_sub_finder(self.path_vsf, video_path, self.frame_output_dir, self.vsf_subtitle)\n        # List all files in the directory, get full paths of jpeg files, and extract the first 11 characters of each filename as timestamp\n        extracted_frame_paths = [(os.path.join(self.extracted_frame_folder, file), file[:11]) for file in\n                                 os.listdir(self.extracted_frame_folder) if\n                                 file.endswith('.jpeg') or file.endswith('.jpg')]\n        return extracted_frame_paths",
+        "type": "code",
+        "location": "/cradle/gameio/video/VideoFrameExtractor.py:142-161"
+    },
+    "369": {
+        "file_id": 26,
+        "content": "The code snippet is a part of the VideoFrameExtractor class. It contains a method named 'extract' that accepts a video_path as input. The 'extract' method uses os.listdir to list all files in the directory, selects only .jpeg and .jpg files, and returns their full paths along with the first 11 characters of each filename as timestamp in a list format. In case of exceptions during frame extraction, it writes \"Frame Extraction Failed! {e}\" to the logger and if frame extraction is successful, it writes \"Frame Extraction Completed! Total Frames: {len(os.listdir(self.extracted_frame_folder))}\" to the logger.",
+        "type": "comment"
+    },
+    "370": {
+        "file_id": 27,
+        "content": "/cradle/gameio/video/VideoRecorder.py",
+        "type": "filepath"
+    },
+    "371": {
+        "file_id": 27,
+        "content": "This code introduces a `FrameBuffer` and `VideoRecorder` class for managing video frames in multi-threaded environments, utilizing OpenCV's VideoWriter, mss library, PyAutoGUI, OCR, spaCy's NLP, and handles duplicate frames, errors. It captures video frames, converts them to numpy arrays, applies OCR if needed, and initializes a VideoRecorder object for retrieving video and stopping screen capture.",
+        "type": "summary"
+    },
+    "372": {
+        "file_id": 27,
+        "content": "import threading\nimport os\nimport time\nfrom typing import Tuple\nimport spacy\nimport numpy as np\nimport cv2\nimport mss\nfrom cradle.log import Logger\nfrom cradle.config import Config\nfrom cradle.gameio.video.VideoEasyOCRExtractor import VideoEasyOCRExtractor\nconfig = Config()\nlogger = Logger()\nclass FrameBuffer():\n    def __init__(self):\n        self.queue = []\n        self.lock = threading.Lock()\n    def add_frame(self, frame_id, frame):\n        with self.lock:\n            self.queue.append((frame_id, frame))\n    def get_last_frame(self):\n        with self.lock:\n            if len(self.queue) == 0:\n                return None\n            else:\n                return self.queue[-1]\n    def get_frame_by_frame_id(self, frame_id):\n        with self.lock:\n            for frame in self.queue:\n                if frame[0] == frame_id:\n                    return frame\n        return None\n    def get_frames_to_latest(self, frame_id, before_frame_nums=5):\n        frames = []\n        with self.lock:\n            for frame in self.queue:",
+        "type": "code",
+        "location": "/cradle/gameio/video/VideoRecorder.py:1-51"
+    },
+    "373": {
+        "file_id": 27,
+        "content": "The code defines a `FrameBuffer` class that uses a threading lock to manage a queue of frames. It supports adding frames, retrieving the last frame, and searching for a specific frame by ID. The class also provides a method to retrieve a specified number of frames before a given frame ID. This class appears to be used for storing and managing video frames in a multi-threaded environment.",
+        "type": "comment"
+    },
+    "374": {
+        "file_id": 27,
+        "content": "                if frame[0] >= frame_id - before_frame_nums and frame[0] <= frame_id:\n                    frames.append(frame)\n        return frames\n    def clear(self):\n        with self.lock:\n            self.queue.clear()\n    def get_frames(self, start_frame_id, end_frame_id=None):\n        frames = []\n        with self.lock:\n            for frame in self.queue:\n                if frame[0] >= start_frame_id:\n                    if end_frame_id is not None and frame[0] > end_frame_id:\n                        break\n                    frames.append(frame)\n        return frames\nclass VideoRecorder():\n    def __init__(self, video_path: str, screen_region: Tuple[int, int, int, int] = config.game_region):\n        self.fps = config.video_fps\n        self.max_size = 10000\n        self.video_path = video_path\n        self.screen_region = screen_region\n        self.frame_size = (self.screen_region[2], self.screen_region[3])\n        self.current_frame_id = -1\n        self.current_frame = None\n        self.frame_buffer = FrameBuffer()",
+        "type": "code",
+        "location": "/cradle/gameio/video/VideoRecorder.py:52-86"
+    },
+    "375": {
+        "file_id": 27,
+        "content": "The code defines a class VideoRecorder that records video frames from a screen region. It uses a frame buffer and a lock for thread-safe queue operations. The VideoRecorder has methods to initialize the instance, clear the queue, and get frames between specific frame IDs. Frame ID refers to the order of frames in the recording sequence.",
+        "type": "comment"
+    },
+    "376": {
+        "file_id": 27,
+        "content": "        self.thread_flag = True\n        self.thread = threading.Thread(\n            target=self.capture_screen,\n            args=(self.frame_buffer, ),\n            name='Screen Capture'\n        )\n        self.thread.daemon = True\n        self.video_splits_dir = os.path.join(os.path.dirname(self.video_path), 'video_splits')\n        os.makedirs(self.video_splits_dir, exist_ok=True)\n        self.nlp = spacy.load(\"en_core_web_lg\")\n        self.video_ocr_extractor = VideoEasyOCRExtractor()\n        self.pre_text = None\n    def get_frames(self, start_frame_id, end_frame_id = None):\n        return self.frame_buffer.get_frames(start_frame_id, end_frame_id)\n    def get_frames_to_latest(self, frame_id, before_frame_nums = 5):\n        return self.frame_buffer.get_frames_to_latest(frame_id, before_frame_nums)\n    def get_video(self, start_frame_id, end_frame_id = None):\n        path = os.path.join(self.video_splits_dir, 'video_{:06d}.mp4'.format(start_frame_id))\n        writer = cv2.VideoWriter(path, cv2.VideoWriter_fourcc(*'mp4v'), self.fps, self.frame_size)",
+        "type": "code",
+        "location": "/cradle/gameio/video/VideoRecorder.py:87-114"
+    },
+    "377": {
+        "file_id": 27,
+        "content": "Thread creation: Initializing a background thread for screen capture.\nVideo splits directory setup: Creating the directory to store video file splits.\nNatural Language Processing (NLP) setup: Loading an English language model for text extraction.\nVideo OCR extractor setup: Instantiating a VideoOCRExtractor object.\nFrame operations: Methods to get frames and frames up to the latest.",
+        "type": "comment"
+    },
+    "378": {
+        "file_id": 27,
+        "content": "        frames = self.get_frames(start_frame_id, end_frame_id)\n        for frame in frames:\n            writer.write(frame[1])\n        writer.release()\n        return path\n    def clear_frame_buffer(self):\n        self.frame_buffer.clear()\n    def get_current_frame(self):\n        \"\"\"\n        Get the current frame\n        \"\"\"\n        return self.current_frame\n    def get_current_frame_id(self):\n        \"\"\"\n        Get the current frame id\n        \"\"\"\n        return self.current_frame_id\n    def capture_screen(self, frame_buffer: FrameBuffer):\n        logger.write('Screen capture started')\n        video_writer = cv2.VideoWriter(self.video_path,\n                                       cv2.VideoWriter_fourcc(*'mp4v'),\n                                       self.fps,\n                                       self.frame_size)\n        with mss.mss() as sct:\n            region = self.screen_region\n            region = {\n                \"left\": region[0],\n                \"top\": region[1],\n                \"width\": region[2],\n                \"height\": region[3],",
+        "type": "code",
+        "location": "/cradle/gameio/video/VideoRecorder.py:116-155"
+    },
+    "379": {
+        "file_id": 27,
+        "content": "The code defines a VideoRecorder class that captures the screen and saves it as a video file using OpenCV's VideoWriter. The class has methods for recording videos, clearing the frame buffer, getting the current frame, and getting the current frame ID. It uses the mss library to capture the screen region specified by the user.",
+        "type": "comment"
+    },
+    "380": {
+        "file_id": 27,
+        "content": "            }\n            while self.thread_flag:\n                try:\n                    frame = sct.grab(region)\n                    frame = np.array(frame) # Convert to numpy array\n                    # if config.ocr_enabled is true, start ocr and check whether the text is different from the previous one\n                    if config.ocr_enabled:\n                        cur_text = self.video_ocr_extractor.extract_text(frame, return_full=0)\n                        cur_text = cur_text[0]\n                        cur_text = \" \".join(cur_text)\n                        if self.pre_text is None:\n                            self.pre_text = cur_text\n                        else:\n                            emb1 = self.nlp(self.pre_text)\n                            emb2 = self.nlp(cur_text)\n                            score = emb1.similarity(emb2)\n                            if score < config.ocr_similarity_threshold:\n                                config.ocr_different_previous_text = True\n                            else:",
+        "type": "code",
+        "location": "/cradle/gameio/video/VideoRecorder.py:156-179"
+    },
+    "381": {
+        "file_id": 27,
+        "content": "This code is continuously grabbing frames from a video using PyAutoGUI's `sct.grab()` function, converting them to numpy arrays for further processing. If OCR (Optical Character Recognition) is enabled and the text in the frame is different from the previous one, it updates a flag indicating so. The code uses spaCy library's natural language processing capabilities to compare the text of the frames.",
+        "type": "comment"
+    },
+    "382": {
+        "file_id": 27,
+        "content": "                                config.ocr_different_previous_text = False\n                            self.pre_text = cur_text\n                    # if config.ocr_enabled is false, the ocr is not enabled, so the pre_text should be None\n                    if not config.ocr_enabled and self.pre_text is not None:\n                        self.pre_text = None\n                    frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)\n                    video_writer.write(frame)\n                    self.current_frame = frame\n                    for i in range(config.duplicate_frames):\n                        self.current_frame_id += 1\n                        frame_buffer.add_frame(self.current_frame_id, frame)\n                    time.sleep(config.duplicate_frames / config.video_fps - 0.05) # 0.05: time for taking a screenshots\n                    # Check the flag at regular intervals\n                    if not self.thread_flag:\n                        break\n                except KeyboardInterrupt:\n                    logger.write('Screen capture interrupted')",
+        "type": "code",
+        "location": "/cradle/gameio/video/VideoRecorder.py:180-201"
+    },
+    "383": {
+        "file_id": 27,
+        "content": "Code snippet handles video recording by implementing OCR, duplicate frames, and thread flag checking. It also includes error handling for KeyboardInterrupt.",
+        "type": "comment"
+    },
+    "384": {
+        "file_id": 27,
+        "content": "                    self.finish_capture()\n            video_writer.release()\n    def start_capture(self):\n        self.thread.start()\n    def finish_capture(self):\n        if not self.thread.is_alive():\n            logger.write('Screen capture thread is not executing')\n        else:\n            self.thread_flag = False  # Set the flag to False to signal the thread to stop\n            self.thread.join()  # Now we wait for the thread to finish\n            logger.write('Screen capture finished')\nif __name__ == '__main__':\n    capture_video = VideoRecorder('test.mp4')\n    capture_video.start_capture()\n    config.ocr_enabled = True\n    time.sleep(10)\n    capture_video.get_video(start_frame_id=0)\n    config.ocr_enabled = False\n    capture_video.finish_capture()",
+        "type": "code",
+        "location": "/cradle/gameio/video/VideoRecorder.py:202-230"
+    },
+    "385": {
+        "file_id": 27,
+        "content": "The code initializes a VideoRecorder object, starts the screen capture thread, waits for 10 seconds, retrieves the video with start_frame_id=0, and then stops the screen capture. The finish_capture() function checks if the thread is alive, sets the flag to False, joins the thread, and logs the finish message.",
+        "type": "comment"
+    },
+    "386": {
+        "file_id": 28,
+        "content": "/cradle/log/__init__.py",
+        "type": "filepath"
+    },
+    "387": {
+        "file_id": 28,
+        "content": "This code imports the Logger class from cradle.log.logger and adds it to the __all__ list, making it directly importable as part of the module.",
+        "type": "summary"
+    },
+    "388": {
+        "file_id": 28,
+        "content": "from cradle.log.logger import Logger\n__all__ = [\n    \"Logger\",\n]",
+        "type": "code",
+        "location": "/cradle/log/__init__.py:1-5"
+    },
+    "389": {
+        "file_id": 28,
+        "content": "This code imports the Logger class from cradle.log.logger and adds it to the __all__ list, making it directly importable as part of the module.",
+        "type": "comment"
+    },
+    "390": {
+        "file_id": 29,
+        "content": "/cradle/log/logger.py",
+        "type": "filepath"
+    },
+    "391": {
+        "file_id": 29,
+        "content": "This code creates a colorful logger, handles image processing in text and JSON, provides helper functions for error displaying, decoding, and file path normalization. It normalizes log lines, replaces candidate strings with Markdown formatted text for images, handles specific formats, excludes lines matching filter list, and finally joins processed lines into a single log string.",
+        "type": "summary"
+    },
+    "392": {
+        "file_id": 29,
+        "content": "import json\nimport logging\nimport os\nimport re\nimport sys\nimport ast\nfrom pathlib import PureWindowsPath\nfrom colorama import Fore, Back, Style, init as colours_on\nfrom cradle.utils import Singleton\nfrom cradle.config import Config\nfrom cradle.utils.encoding_utils import decode_base64\nfrom cradle.utils.string_utils import hash_text_sha256\nconfig = Config()\ncolours_on(autoreset=True)\nclass ColorFormatter(logging.Formatter):\n    # Change your colours here. Should use extra from log calls.\n    COLORS = {\n        \"WARNING\": Fore.YELLOW,\n        \"ERROR\": Fore.RED,\n        \"DEBUG\": Fore.GREEN,\n        \"INFO\": Fore.WHITE,\n        \"CRITICAL\": Fore.RED + Back.WHITE\n    }\n    def format(self, record):\n        color = self.COLORS.get(record.levelname, \"\")\n        if color:\n            record.name = color + record.name\n            record.msg = record.msg + Style.RESET_ALL\n        return logging.Formatter.format(self, record)\nclass Logger(metaclass=Singleton):\n    log_file = 'cradle.log'\n    DOWNSTREAM_MASK = \"\\n>> Downstream - A:\\n\"",
+        "type": "code",
+        "location": "/cradle/log/logger.py:1-44"
+    },
+    "393": {
+        "file_id": 29,
+        "content": "The code imports necessary libraries and defines a class called ColorFormatter, which inherits from logging.Formatter. This class assigns different colors to log levels for formatting purposes. The code also creates a metaclass named Logger as a Singleton, with its log file set to 'cradle.log'.",
+        "type": "comment"
+    },
+    "394": {
+        "file_id": 29,
+        "content": "    UPSTREAM_MASK = \"\\n>> Upstream - R:\\n\"\n    def __init__(self):\n        self.to_file = False\n        self._configure_root_logger()\n    def _configure_root_logger(self):\n        format = f'%(asctime)s - %(name)s - %(levelname)s - %(message)s'\n        formatter = logging.Formatter(format)\n        c_formatter = ColorFormatter(format)\n        stdout_handler = logging.StreamHandler(sys.stdout)\n        stdout_handler.setLevel(logging.INFO)\n        stdout_handler.setFormatter(c_formatter)\n        stderr_handler = logging.StreamHandler()\n        stderr_handler.setLevel(logging.ERROR)\n        stderr_handler.setFormatter(c_formatter)\n        file_handler = logging.FileHandler(filename=os.path.join(config.log_dir, self.log_file), mode='w', encoding='utf-8')\n        file_handler.setLevel(logging.DEBUG)\n        file_handler.setFormatter(formatter)\n        logging.basicConfig(level=logging.DEBUG, handlers=[stdout_handler, stderr_handler, file_handler])\n        self.logger = logging.getLogger(\"UAC Logger\")\n    def _log(",
+        "type": "code",
+        "location": "/cradle/log/logger.py:45-75"
+    },
+    "395": {
+        "file_id": 29,
+        "content": "This code initializes a logger with various handlers and formats, including a StreamHandler for stdout (INFO level), StreamHandler for stderr (ERROR level), and a FileHandler for a log file in debug mode. The logger is then obtained using logging.getLogger(\"UAC Logger\").",
+        "type": "comment"
+    },
+    "396": {
+        "file_id": 29,
+        "content": "            self,\n            title=\"\",\n            title_color=Fore.WHITE,\n            message=\"\",\n            level=logging.INFO\n        ):\n        if message:\n            if isinstance(message, list):\n                message = \" \".join(message)\n        self.logger.log(level, message, extra={\"title\": title, \"color\": title_color})\n    def critical(\n            self,\n            message,\n            title=\"\"\n        ):\n        self._log(title, Fore.RED + Back.WHITE, message, logging.ERROR)\n    def error(\n            self,\n            message,\n            title=\"\"\n        ):\n        self._log(title, Fore.RED, message, logging.ERROR)\n    def debug(\n            self,\n            message,\n            title=\"\",\n            title_color=Fore.GREEN,\n        ):\n        self._log(title, title_color, message, logging.DEBUG)\n    def write(\n            self,\n            message=\"\",\n            title=\"\",\n            title_color=Fore.WHITE,\n        ):\n        self._log(title, title_color, message, logging.INFO)\n    def warn(\n            self,",
+        "type": "code",
+        "location": "/cradle/log/logger.py:76-124"
+    },
+    "397": {
+        "file_id": 29,
+        "content": "This code defines a logger class with methods for logging different levels of messages. The `_log` method is used to log messages at specific levels, while the other methods (`critical`, `error`, `debug`, `write`) are used to simplify logging messages with optional titles and colors. The `write` method is used as a default logger when no specific level or message is provided.",
+        "type": "comment"
+    },
+    "398": {
+        "file_id": 29,
+        "content": "            message,\n            title=\"\",\n            title_color=Fore.YELLOW,\n        ):\n        self._log(title, title_color, message, logging.WARN)\n    def error_ex(self, exception: Exception):\n        traceback = exception.__traceback__\n        while traceback:\n            self.error(\"{}: {}\".format(traceback.tb_frame.f_code.co_filename, traceback.tb_lineno))\n            traceback = traceback.tb_next\n#\n# Functions below this line are just auxiliary to code to process a log file to facilitate debug. Code is very brittle.\n#\ndef _extract_text_between_tokens(text, start_token=\"(?<=;base64,)\", end_token=\"(?=\\\")\", escape = False):\n    # Escape the tokens if they contain special regex characters\n    if escape is True:\n        start_token = re.escape(start_token)\n        end_token = re.escape(end_token)\n    # Regex pattern to capture text between start_token and end_token\n    pattern = rf'{start_token}(.*?){end_token}'\n    # Extracting all occurrences\n    extracted_texts = re.findall(pattern, text)\n    return extracted_texts",
+        "type": "code",
+        "location": "/cradle/log/logger.py:125-156"
+    },
+    "399": {
+        "file_id": 29,
+        "content": "The code defines a class with methods for logging messages, errors, and error traces. The logger can accept message, title, and title color as parameters. An auxiliary function is provided to extract text between specific tokens from a given string.",
+        "type": "comment"
+    }
+}
