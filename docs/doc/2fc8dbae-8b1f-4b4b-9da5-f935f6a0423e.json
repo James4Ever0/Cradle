@@ -1,0 +1,10 @@
+{
+    "summary": "Base class for embedding model providers with abstract methods to embed queries, get embedding dimensions, and initialize provider via a JSON config.",
+    "details": [
+        {
+            "comment": "Base class for embedding model providers with abstract methods to embed queries, get embedding dimensions, and initialize provider via a JSON config.",
+            "location": "\"/media/root/Prima/works/github_code/Cradle/docs/src/cradle/provider/base_embedding.py\":0-22",
+            "content": "\"\"\"Base class for embedding model providers.\"\"\"\nimport abc\nfrom typing import (\n    List,\n)\nclass EmbeddingProvider(abc.ABC):\n    \"\"\"Interface for embedding models.\"\"\"\n    @abc.abstractmethod\n    def embed_query(self, text: str) -> List[float]:\n        \"\"\"Embed query text.\"\"\"\n    @abc.abstractmethod\n    def get_embedding_dim(self) -> int:\n        \"\"\"Get the embedding dimensions.\"\"\"\n        pass\n    @abc.abstractmethod\n    def init_provider(self, provider_cfg) -> None:\n        \"\"\"Initialize a provider via a json config.\"\"\"\n        pass"
+        }
+    ]
+}

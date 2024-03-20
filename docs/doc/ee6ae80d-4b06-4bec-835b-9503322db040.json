@@ -1,0 +1,15 @@
+{
+    "summary": "The code includes four skills: aiming, selecting weapons, shooting, and fighting, utilizing mouse and keyboard input.",
+    "details": [
+        {
+            "comment": "This code registers four skills: \"aim\", \"select_weapon\", \"select_sidearm\", and \"shoot\". The \"aim\" skill holds the right mouse button, while \"select_weapon\" and \"select_sidearm\" move the mouse to a specified location. Lastly, the \"shoot\" skill shoots at the given pixel location in view.",
+            "location": "\"/media/root/Prima/works/github_code/Cradle/docs/src/cradle/gameio/atomic_skills/combat.py\":0-43",
+            "content": "from cradle.config import Config\nfrom cradle.gameio import IOEnvironment\nfrom cradle.gameio.skill_registry import register_skill\nconfig = Config()\nio_env = IOEnvironment()\n@register_skill(\"aim\")\ndef aim():\n    \"\"\"\n    Aim the weapon in the game.\n    \"\"\"\n    io_env.mouse_hold_button(button=io_env.RIGHT_MOUSE_BUTTON)\n@register_skill(\"select_weapon\")\ndef select_weapon(x, y):\n    \"\"\"\n    Move the mouse to a specific location to select the weapon in the game.\n    Parameters:\n    - x: The normalized abscissa of the pixel.\n    - y: The normalized ordinate of the pixel.\n    \"\"\"\n    io_env.mouse_move_normalized(x, y)\n@register_skill(\"select_sidearm\")\ndef select_sidearm(x, y):\n    \"\"\"\n    Move the mouse to a specific location to select the sidearm in the game.\n    Parameters:\n    - x: The normalized abscissa of the pixel.\n    - y: The normalized ordinate of the pixel.\n    \"\"\"\n    select_weapon(x, y)\n@register_skill(\"shoot\")\ndef shoot(x, y):\n    \"\"\"\n    Shoot the weapon at a specific location in view.\n    Parameters:\n    - x: The normalized abscissa of the pixel."
+        },
+        {
+            "comment": "This code appears to contain a set of skills for a game, including aiming, shooting, selecting weapons, fighting, and viewing the weapon wheel. The \"mouse_move_normalized\" function moves the mouse cursor, while \"key_hold\" and \"key_press\" functions handle keyboard input. The \"fight\" skill seems to involve pressing 'f' repeatedly.",
+            "location": "\"/media/root/Prima/works/github_code/Cradle/docs/src/cradle/gameio/atomic_skills/combat.py\":44-72",
+            "content": "    - y: The normalized ordinate of the pixel.\n    \"\"\"\n    io_env.mouse_move_normalized(x=x, y=y, relative=True, from_center = True)\n    io_env.mouse_click_button(button=io_env.LEFT_MOUSE_BUTTON, clicks=2, duration=0.1)\n@register_skill(\"view_weapons\")\ndef view_weapons():\n    \"\"\"\n    View the weapon wheel.\n    \"\"\"\n    io_env.key_hold('tab')\n@register_skill(\"fight\")\ndef fight():\n    \"\"\"\n    Fight agains another person.\n    \"\"\"\n    io_env.key_press('f,f,f,f,f,f')\n__all__ = [\n    \"aim\",\n    \"shoot\",\n    \"select_weapon\",\n    \"select_sidearm\",\n    \"fight\",\n]"
+        }
+    ]
+}

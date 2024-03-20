@@ -1,0 +1,15 @@
+{
+    "summary": "This is a base class for LLM providers, with an abstract method assemble_prompt for combining parameters and creating completion from messages in text. Subclasses must implement the assemble_prompt method.",
+    "details": [
+        {
+            "comment": "Base class for LLM (Language Model) providers, defining abstract methods for creating completion from messages in text and initializing the provider via a JSON config.",
+            "location": "\"/media/root/Prima/works/github_code/Cradle/docs/src/cradle/provider/base_llm.py\":0-39",
+            "content": "\"\"\"Base class for LLM model providers.\"\"\"\nimport abc\nfrom typing import (\n    List,\n    Dict,\n    Tuple,\n    Optional,\n    Any\n)\nclass LLMProvider(abc.ABC):\n    \"\"\"Interface for LLM models.\"\"\"\n    @abc.abstractmethod\n    def create_completion(\n        self,\n        messages: List[Dict[str, str]],\n        model: str,\n        temperature: float,\n        stop_tokens: Optional[List[str]] = None,\n    ) -> Tuple[str, Dict[str, int]]:\n        \"\"\"Create a completion from messages in text (and potentially also encoded images).\"\"\"\n        pass\n    @abc.abstractmethod\n    async def create_completion_async(\n        self,\n        messages: List[Dict[str, str]],\n        model: str,\n        temperature: float,\n        stop_tokens: Optional[List[str]] = None,\n    ) -> Tuple[str, Dict[str, int]]:\n        \"\"\"Create a completion from messages in text (and potentially also encoded images).\"\"\"\n        pass\n    @abc.abstractmethod\n    def init_provider(self, provider_cfg) -> None:\n        \"\"\"Initialize a provider via a json config.\"\"\"\n        pass"
+        },
+        {
+            "comment": "The method assemble_prompt is an abstract method that combines parameters in the appropriate way for the provider to use. It takes a template string and params dictionary as input and returns a list of dictionaries as output. This is declared as abstract, meaning subclasses must implement it.",
+            "location": "\"/media/root/Prima/works/github_code/Cradle/docs/src/cradle/provider/base_llm.py\":41-44",
+            "content": "    @abc.abstractmethod\n    def assemble_prompt(self, template_str: str = None, params: Dict[str, Any] = None) -> List[Dict[str, Any]]:\n        \"\"\"Combine parametes in the appropriate way for the provider to use.\"\"\"\n        pass"
+        }
+    ]
+}

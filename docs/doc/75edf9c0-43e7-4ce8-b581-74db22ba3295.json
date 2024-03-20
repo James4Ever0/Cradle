@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports various memory classes from cradle's memory module and adds them to the __all__ list, indicating they are publicly exposed. This allows users to import these specific memory classes when using the cradle package.",
+    "details": [
+        {
+            "comment": "This code imports various memory classes from cradle's memory module and adds them to the __all__ list, indicating they are publicly exposed. This allows users to import these specific memory classes when using the cradle package.",
+            "location": "\"/media/root/Prima/works/github_code/Cradle/docs/src/cradle/memory/__init__.py\":0-10",
+            "content": "from cradle.memory.base import BaseMemory\nfrom cradle.memory.vector_store import VectorStore\nfrom cradle.memory.basic_vector_memory import BasicVectorMemory\nfrom cradle.memory.local_memory import LocalMemory\n__all__ = [\n    \"VectorStore\",\n    \"BaseMemory\",\n    \"BasicVectorMemory\",\n    \"LocalMemory\"\n]"
+        }
+    ]
+}

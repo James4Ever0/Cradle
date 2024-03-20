@@ -1,0 +1,10 @@
+{
+    "summary": "This code defines a base class, BasePlanner, for planners with abstract methods for gathering information, decision making, and success detection. It imports necessary modules and classes for configuration and logging.",
+    "details": [
+        {
+            "comment": "This code defines a base class, BasePlanner, for planners with abstract methods for gathering information, decision making, and success detection. It imports necessary modules and classes for configuration and logging.",
+            "location": "\"/media/root/Prima/works/github_code/Cradle/docs/src/cradle/planner/base.py\":0-54",
+            "content": "import abc\nfrom typing import (\n    Any,\n    Dict,\n    List,\n    Literal,\n    Optional,\n    Sequence,\n    Set,\n    Tuple,\n    Union,\n)\nimport json\nfrom cradle.config import Config\nfrom cradle.log import Logger\nconfig = Config()\nlogger = Logger()\nclass BasePlanner():\n    def __init__(self,\n                 ):\n        pass\n    @abc.abstractmethod\n    def gather_information(self, *args, **kwargs) -> Dict[str, Any]:\n        \"\"\"\n        gather information for the task\n        :param args:\n        :param kwargs:\n        :return:\n        \"\"\"\n        pass\n    @abc.abstractmethod\n    def decision_making(self, *args, **kwargs) -> Dict[str, Any]:\n        \"\"\"\n        generate the next skill\n        :param args:\n        :param kwargs:\n        :return:\n        \"\"\"\n        pass\n    @abc.abstractmethod\n    def success_detection(self, *args, **kwargs) -> Dict[str, Any]:\n        \"\"\"\n        detect whether the task is success\n        :param args:\n        :param kwargs:\n        :return:\n        \"\"\"\n        pass"
+        }
+    ]
+}

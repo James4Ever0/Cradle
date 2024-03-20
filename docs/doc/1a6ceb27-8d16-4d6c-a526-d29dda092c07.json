@@ -1,0 +1,15 @@
+{
+    "summary": "This code is an abstract base class for memory operations with methods such as get_recent_history, add_summarization, and load/save functions. It's designed to be inherited by more specific implementations of the memory functionality.",
+    "details": [
+        {
+            "comment": "The code is a base class for memory implementations that require adding data, similarity searching using query data and number of results, and adding recent history. It imports necessary types and modules, uses ABC to define abstract methods, and includes a Config object for configuration settings.",
+            "location": "\"/media/root/Prima/works/github_code/Cradle/docs/src/cradle/memory/base.py\":0-58",
+            "content": "import abc\nfrom typing import (\n    Any,\n    Iterable,\n    List,\n    Dict,\n    Union,\n    Tuple,\n    Optional,\n)\nfrom cradle.config.config import Config\nImage = Any\nconfig = Config()\nclass BaseMemory:\n    \"\"\"Base class for all memories.\"\"\"\n    @abc.abstractmethod\n    def add(\n        self,\n        **kwargs,\n    ) -> None:\n        \"\"\"Add data to memory.\n        Args:\n            **kwargs: Other keyword arguments that subclasses might use.\n        \"\"\"\n        pass\n    @abc.abstractmethod\n    def similarity_search(\n        self,\n        data: Union[str, Image],\n        top_k: int,\n        **kwargs: Any,\n    ) -> List[Union[str, Image]]:\n        \"\"\"Retrieve the keys from the store.\n        Args:\n            data: the query data.\n            top_k: the number of results to return.\n            **kwargs: Other keyword arguments that subclasses might use.\n        Returns:\n            the corresponding values from the memory.\n        \"\"\"\n        pass\n    @abc.abstractmethod\n    def add_recent_history(\n        self,\n        key: str,\n        info: Any,"
+        },
+        {
+            "comment": "This code defines an abstract base class for memory operations, including get_recent_history, add_summarization, get_summarization, load, and save methods. The class is designed to be inherited by more specific implementations of the memory functionality.",
+            "location": "\"/media/root/Prima/works/github_code/Cradle/docs/src/cradle/memory/base.py\":59-89",
+            "content": "    ) -> None:\n        pass\n    @abc.abstractmethod\n    def get_recent_history(\n        self,\n        key: str,\n        k: int = 1,\n    ) -> List[Any]:\n        pass\n    @abc.abstractmethod\n    def add_summarization(self, hidden_state: str) -> None:\n        pass\n    @abc.abstractmethod\n    def get_summarization(self) -> str:\n        pass\n    @abc.abstractmethod\n    def load(self) -> None:\n        \"\"\"Load the memory from persistence.\"\"\"\n    @abc.abstractmethod\n    def save(self) -> None:\n        \"\"\"Save the memory to persistence.\"\"\""
+        }
+    ]
+}

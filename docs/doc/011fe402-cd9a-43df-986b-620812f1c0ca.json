@@ -1,0 +1,10 @@
+{
+    "summary": "This code is a requirements list for a Python project. It includes libraries and packages such as backoff, openai, python-dotenv, numpy, tiktoken, colorama, pydirectinput, pyautogui, ahk, opencv-python, opencv-contrib-python, pillow, Multi-Template-Matching, imageio[ffmpeg], mss, aiohttp, easyocr, spacy, chardet. These are necessary for the project's functionality.",
+    "details": [
+        {
+            "comment": "This code is a requirements list for a Python project. It includes libraries and packages such as backoff, openai, python-dotenv, numpy, tiktoken, colorama, pydirectinput, pyautogui, ahk, opencv-python, opencv-contrib-python, pillow, Multi-Template-Matching, imageio[ffmpeg], mss, aiohttp, easyocr, spacy, chardet. These are necessary for the project's functionality.",
+            "location": "\"/media/root/Prima/works/github_code/Cradle/docs/src/requirements.txt\":0-19",
+            "content": "backoff==2.2.1\nopenai==1.2.3\npython-dotenv==1.0.0\nnumpy==1.24.3\ntiktoken==0.5.1\ncolorama\npydirectinput==1.0.4\npyautogui==0.9.54\nahk==1.3.0\nahk[binary]\nopencv-python==4.8.1.78\nopencv-contrib-python==4.8.1.78\npillow==10.2.0\nMulti-Template-Matching==1.6.6\nimageio[ffmpeg]\nmss==9.0.1\naiohttp\neasyocr==1.7.1\nspacy==3.7.2\nchardet==5.2.0"
+        }
+    ]
+}

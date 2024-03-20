@@ -1,0 +1,15 @@
+{
+    "summary": "The code defines a function that checks planner parameters and verifies file paths for template items in the `templates` directory. If any key is missing or file does not exist, an error message is raised with relevant information.",
+    "details": [
+        {
+            "comment": "This code defines a function `check_planner_params` that takes a planner dictionary as input and checks if certain keys are present in the dictionary. If any key is missing, it raises an assertion error with an appropriate message. The keys being checked are \"prompt_paths\" and \"__check_list__\". It also verifies if the files specified in the \"input_example\" dictionary exist within the project path using the `exists_in_project_path` function from the `file_utils` module.",
+            "location": "\"/media/root/Prima/works/github_code/Cradle/docs/src/cradle/utils/check.py\":0-31",
+            "content": "from typing import Dict\nfrom cradle.config import Config\nfrom cradle.log import Logger\nfrom cradle.utils.file_utils import assemble_project_path, exists_in_project_path\nconfig = Config()\nlogger = Logger()\ndef check_planner_params(planner: Dict = None):\n    flag = True\n    try:\n        # check keys\n        assert \"prompt_paths\" in planner, f\"prompt_paths is not in planner\"\n        assert \"__check_list__\" in planner, f\"__check_list__ is not in planner\"\n        prompt_paths = planner[\"prompt_paths\"]\n        assert \"inputs\" in prompt_paths, f\"input_example is not in prompt_paths\"\n        assert \"templates\" in prompt_paths, f\"templates is not in prompt_paths\"\n        input_example = prompt_paths[\"inputs\"]\n        templates = prompt_paths[\"templates\"]\n        \"\"\"check modules\"\"\"\n        check_list = planner[\"__check_list__\"]\n        for check_item in check_list:\n            assert (check_item in input_example and\n                    exists_in_project_path(input_example[check_item])), \\\n                f\"{check_item} is not in input_example or {assemble_project_path(input_example[check_item])} does not exist\""
+        },
+        {
+            "comment": "The code checks if the specified `check_item` exists in `templates` and is a valid file path. If not, it throws an error with relevant information to the logger.",
+            "location": "\"/media/root/Prima/works/github_code/Cradle/docs/src/cradle/utils/check.py\":32-40",
+            "content": "            assert (check_item in templates and\n                    exists_in_project_path(templates[check_item])), \\\n                f\"{check_item} is not in template or {assemble_project_path(templates[check_item])} does not exist\"\n    except Exception as e:\n        logger.error(f\"Error in check_prompt_paths: {e}\")\n        flag = False\n    return flag"
+        }
+    ]
+}

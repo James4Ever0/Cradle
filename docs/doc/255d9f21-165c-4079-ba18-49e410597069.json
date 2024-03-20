@@ -1,0 +1,10 @@
+{
+    "summary": "This code defines functions for handling file paths within a project. `assemble_project_path` converts relative paths to absolute within the project root, `gen_relative_project_path` ensures path is within project root and generates relative path, `exists_in_project_path` checks if a path exists within the project, `get_project_root` finds the project's root directory, and `read_resource_file` reads contents of a resource file in the expected project structure.",
+    "details": [
+        {
+            "comment": "This code defines functions for handling file paths within a project. `assemble_project_path` converts relative paths to absolute within the project root, `gen_relative_project_path` ensures path is within project root and generates relative path, `exists_in_project_path` checks if a path exists within the project, `get_project_root` finds the project's root directory, and `read_resource_file` reads contents of a resource file in the expected project structure.",
+            "location": "\"/media/root/Prima/works/github_code/Cradle/docs/src/cradle/utils/file_utils.py\":0-36",
+            "content": "import os\ndef assemble_project_path(path):\n    \"\"\"Assemble a path relative to the project root directory\"\"\"\n    if not os.path.isabs(path):\n        path = os.path.join(get_project_root(), path)\n    return path\ndef gen_relative_project_path(path):\n    root = get_project_root()\n    if root not in path:\n        raise ValueError('Path to convert should be within the project root.')\n    path = path.replace(root, '.').replace('.\\\\', '')\n    return path\ndef exists_in_project_path(path):\n    return os.path.exists(assemble_project_path(path))\ndef get_project_root():\n    path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))\n    path = os.path.dirname(path) # get to parent, outside of project code path\"\n    return path\ndef read_resource_file(path):\n    assert \"./res/\" in path, 'Path should include ./res/'\n    with open(assemble_project_path(path), \"r\", encoding=\"utf-8\") as fd:\n        return fd.read()"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports the hashlib module and defines a function that takes a string as input, encodes it using utf-8, calculates its SHA256 hash, and returns the resulting hexadecimal digest.",
+    "details": [
+        {
+            "comment": "This code imports the hashlib module and defines a function that takes a string as input, encodes it using utf-8, calculates its SHA256 hash, and returns the resulting hexadecimal digest.",
+            "location": "\"/media/root/Prima/works/github_code/Cradle/docs/src/cradle/utils/string_utils.py\":0-4",
+            "content": "import hashlib\ndef hash_text_sha256(text: str) -> str:\n    hash_object = hashlib.sha256(text.encode())\n    return hash_object.hexdigest()"
+        }
+    ]
+}

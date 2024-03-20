@@ -1,0 +1,10 @@
+{
+    "summary": "These functions encode and decode base64 data, respectively. If payload is None, it raises ValueError.",
+    "details": [
+        {
+            "comment": "These functions encode and decode base64 data, respectively. If payload is None, it raises ValueError.",
+            "location": "\"/media/root/Prima/works/github_code/Cradle/docs/src/cradle/utils/encoding_utils.py\":0-16",
+            "content": "import base64\ndef encode_base64(payload):\n    if payload is None:\n        raise ValueError(\"Payload cannot be None.\")\n    return base64.b64encode(payload).decode('utf-8')\ndef decode_base64(payload):\n    if payload is None:\n        raise ValueError(\"Payload cannot be None.\")\n    return base64.b64decode(payload)"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "summary": "Imports the BasePlanner class from the base module.",
+    "details": [
+        {
+            "comment": "Imports the BasePlanner class from the base module.",
+            "location": "\"/media/root/Prima/works/github_code/Cradle/docs/src/cradle/planner/__init__.py\":0-0",
+            "content": "from .base import BasePlanner"
+        }
+    ]
+}

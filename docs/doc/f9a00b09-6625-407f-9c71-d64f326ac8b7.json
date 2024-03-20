@@ -1,0 +1,10 @@
+{
+    "summary": "Importing IOEnvironment and GameManager classes from respective modules, defining __all__ to include IOEnvironment and GameManager.",
+    "details": [
+        {
+            "comment": "Importing IOEnvironment and GameManager classes from respective modules, defining __all__ to include IOEnvironment and GameManager.",
+            "location": "\"/media/root/Prima/works/github_code/Cradle/docs/src/cradle/gameio/__init__.py\":0-6",
+            "content": "from cradle.gameio.io_env import IOEnvironment\nfrom cradle.gameio.game_manager import GameManager\n__all__ = [\n    \"IOEnvironment\",\n    \"GameManager\",\n]"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "summary": "This code defines the configuration for a machine learning model with specified parameters such as batch size, model name, backbone architecture, position embedding type, temperature values, intermediate layers to return, and various other features like transformer activation, noise scales, label ratios, etc. These settings are used to train or evaluate the model in a downstream task.",
+    "details": [
+        {
+            "comment": "This code defines the configuration for a machine learning model with specified parameters such as batch size, model name, backbone architecture, position embedding type, temperature values, intermediate layers to return, and various other features like transformer activation, noise scales, label ratios, etc. These settings are used to train or evaluate the model in a downstream task.",
+            "location": "\"/media/root/Prima/works/github_code/Cradle/docs/src/cache/GroundingDINO_SwinB_cfg.py\":0-42",
+            "content": "batch_size = 1\nmodelname = \"groundingdino\"\nbackbone = \"swin_B_384_22k\"\nposition_embedding = \"sine\"\npe_temperatureH = 20\npe_temperatureW = 20\nreturn_interm_indices = [1, 2, 3]\nbackbone_freeze_keywords = None\nenc_layers = 6\ndec_layers = 6\npre_norm = False\ndim_feedforward = 2048\nhidden_dim = 256\ndropout = 0.0\nnheads = 8\nnum_queries = 900\nquery_dim = 4\nnum_patterns = 0\nnum_feature_levels = 4\nenc_n_points = 4\ndec_n_points = 4\ntwo_stage_type = \"standard\"\ntwo_stage_bbox_embed_share = False\ntwo_stage_class_embed_share = False\ntransformer_activation = \"relu\"\ndec_pred_bbox_embed_share = True\ndn_box_noise_scale = 1.0\ndn_label_noise_ratio = 0.5\ndn_label_coef = 1.0\ndn_bbox_coef = 1.0\nembed_init_tgt = True\ndn_labelbook_size = 2000\nmax_text_len = 256\ntext_encoder_type = \"bert-base-uncased\"\nuse_text_enhancer = True\nuse_fusion_layer = True\nuse_checkpoint = True\nuse_transformer_ckpt = True\nuse_text_cross_attention = True\ntext_dropout = 0.0\nfusion_dropout = 0.0\nfusion_droppath = 0.1\nsub_sentence_present = True"
+        }
+    ]
+}

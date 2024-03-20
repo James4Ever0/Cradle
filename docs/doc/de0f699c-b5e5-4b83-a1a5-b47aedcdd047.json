@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports the Agent class from the 'agent' module and adds it to the __all__ list, making it importable when using 'from cradle.agent import *'.",
+    "details": [
+        {
+            "comment": "This code imports the Agent class from the 'agent' module and adds it to the __all__ list, making it importable when using 'from cradle.agent import *'.",
+            "location": "\"/media/root/Prima/works/github_code/Cradle/docs/src/cradle/agent/__init__.py\":0-4",
+            "content": "from cradle.agent.agent import Agent\n__all__ = [\n    \"Agent\",\n]"
+        }
+    ]
+}

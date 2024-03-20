@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports and exposes two classes, AbstractSingleton and Singleton, from the cradle.utils.singleton module as part of the __init__.py file in the Cradle/cradle/utils directory.",
+    "details": [
+        {
+            "comment": "This code imports and exposes two classes, AbstractSingleton and Singleton, from the cradle.utils.singleton module as part of the __init__.py file in the Cradle/cradle/utils directory.",
+            "location": "\"/media/root/Prima/works/github_code/Cradle/docs/src/cradle/utils/__init__.py\":0-5",
+            "content": "from cradle.utils.singleton import AbstractSingleton, Singleton\n__all__ = [\n    \"AbstractSingleton\",\n    \"Singleton\",\n]"
+        }
+    ]
+}

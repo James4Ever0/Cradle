@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports the Config class from cradle.config.config and assigns it to the variable \"Config\". It then creates an empty list __all__ which will contain all publicly exported identifiers. The only identifier in this case is \"Config\", so it gets added to __all__.",
+    "details": [
+        {
+            "comment": "This code imports the Config class from cradle.config.config and assigns it to the variable \"Config\". It then creates an empty list __all__ which will contain all publicly exported identifiers. The only identifier in this case is \"Config\", so it gets added to __all__.",
+            "location": "\"/media/root/Prima/works/github_code/Cradle/docs/src/cradle/config/__init__.py\":0-4",
+            "content": "from cradle.config.config import Config\n__all__ = [\n    \"Config\",\n]"
+        }
+    ]
+}

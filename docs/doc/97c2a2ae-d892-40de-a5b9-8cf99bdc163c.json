@@ -1,0 +1,10 @@
+{
+    "summary": "This code defines a Singleton metaclass, ensuring only one instance of a class is created. It utilizes the ABCMeta and type classes, creates an instances dictionary for storage, and includes a call method to manage instantiation and return the singleton instance. The AbstractSingleton class serves as a base class for creating single-instance subclasses.",
+    "details": [
+        {
+            "comment": "This code defines a Singleton metaclass, ensuring only one instance of a class is created. It utilizes the ABCMeta and type classes, creates an instances dictionary for storage, and includes a call method to manage instantiation and return the singleton instance. The AbstractSingleton class serves as a base class for creating single-instance subclasses.",
+            "location": "\"/media/root/Prima/works/github_code/Cradle/docs/src/cradle/utils/singleton.py\":0-23",
+            "content": "\"\"\"A singleton metaclass for ensuring only one instance of a class.\"\"\"\nimport abc\nclass Singleton(abc.ABCMeta, type):\n    \"\"\"\n    Singleton metaclass for ensuring only one instance of a class.\n    \"\"\"\n    _instances = {}\n    def __call__(cls, *args, **kwargs):\n        \"\"\"Call method for the singleton metaclass.\"\"\"\n        if cls not in cls._instances:\n            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)\n        return cls._instances[cls]\nclass AbstractSingleton(abc.ABC, metaclass=Singleton):\n    \"\"\"\n    Abstract singleton class for ensuring only one instance of a class.\n    \"\"\"\n    pass"
+        }
+    ]
+}

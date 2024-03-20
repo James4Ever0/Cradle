@@ -1,0 +1,10 @@
+{
+    "summary": "This configuration file defines Azure-based OpenAI model settings. It includes variables for API key, base URL, supported models, and default embedding/completion models. The is_azure flag confirms the Azure context, while api_version specifies the required version.",
+    "details": [
+        {
+            "comment": "This configuration file defines Azure-based OpenAI model settings. It includes variables for API key, base URL, supported models, and default embedding/completion models. The is_azure flag confirms the Azure context, while api_version specifies the required version.",
+            "location": "\"/media/root/Prima/works/github_code/Cradle/docs/src/conf/azure_vis_config.json\":0-11",
+            "content": "{\n\t\"key_var\" : \"AZ_VIS_OPENAI_KEY\",\n\t\"base_var\": \"AZ_VIS_BASE_URL\",\n\t\"models\": {\n\t\t\"gpt-4v\": \"gpt-4v\",\n\t\t\"text-embedding-ada-002\": \"text-embedding-ada-002\"\n\t},\n\t\"emb_model\": \"text-embedding-ada-002\",\n\t\"comp_model\": \"gpt-4v\",\n\t\"is_azure\": true,\n\t\"api_version\": \"2024-02-15-preview\"\n}"
+        }
+    ]
+}

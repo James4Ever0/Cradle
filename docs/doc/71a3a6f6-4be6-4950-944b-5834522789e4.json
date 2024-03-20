@@ -1,0 +1,15 @@
+{
+    "summary": "This code includes field names, tags, and constants for an application handling data from various sources, focusing on skill-related keys, LLM message types, and prompts.",
+    "details": [
+        {
+            "comment": "This code defines various field names for expected information, tags used in prompt templates, and minimap information. It seems to be part of a larger program that handles data from different sources.",
+            "location": "\"/media/root/Prima/works/github_code/Cradle/docs/src/cradle/constants.py\":0-30",
+            "content": "# Gather information expected fields\nACTION_GUIDANCE = 'action_guidance'\nITEM_STATUS = 'item_status'\nTASK_GUIDANCE = 'task_guidance'\nDIALOGUE = 'dialogue'\nGATHER_TEXT_REASONING = 'reasoning'\nIMAGE_DESCRIPTION = 'description'\nTARGET_OBJECT_NAME = 'target_object_name'\nGATHER_INFO_REASONING = 'reasoning_of_object'\nSCREEN_CLASSIFICATION = 'screen_classification'\nGENERAL_GAME_INTERFACE = 'general game interface without any menu'\nTRADE_INTERFACE = 'trade'\nMAP_INTERFACE = 'map'\nPAUSE_INTERFACE = 'pause'\nSATCHEL_INTERFACE = 'satchel'\nRADIAL_INTERFACE = 'radial menu'\nLAST_TASK_GUIDANCE = 'last_task_guidance'\nLAST_TASK_HORIZON = 'task_horizon'\nTASK_DESCRIPTION = 'task_description'\n# Tags used in prompt templates\nIMAGES_INPUT_TAG_NAME = 'image_introduction'\nIMAGE_INTRO_TAG_NAME = 'introduction'\nIMAGE_PATH_TAG_NAME = 'path'\nIMAGE_RESOLUTION_TAG_NAME = 'resolution'\nIMAGE_ASSISTANT_TAG_NAME = 'assistant'\nIMAGES_INPUT_TAG = f'<${IMAGES_INPUT_TAG_NAME}$>'\n# Minimap information\nMINIMAP_INFORMATION = 'minimap_information'\nRED_POINTS = 'red points'"
+        },
+        {
+            "comment": "Constants defined for the application, including skill-related keys, LLM message types, and prompts for None output.",
+            "location": "\"/media/root/Prima/works/github_code/Cradle/docs/src/cradle/constants.py\":31-49",
+            "content": "YELLOW_POINTS = 'yellow points'\nYELLOW_REGION = 'yellow region'\nGD_PROMPT = 'red points . yellow points . yellow region .'\n# Skill-related keys\nDISTANCE_TYPE = 'distance'\n# Local memory\nAUGMENTED_IMAGES_MEM_BUCKET = 'augmented_image'\nIMAGES_MEM_BUCKET = 'image'\nNO_IMAGE = '[None]'\n# LLM message type constants\nMESSAGE_CONSTRUCTION_MODE_TRIPART = 'tripartite'\nMESSAGE_CONSTRUCTION_MODE_PARAGRAPH = 'paragraph'\n# Prompts when output is None\nNONE_TASK_OUTPUT = \"null\"\nNONE_TARGET_OBJECT_OUTPUT = \"null\""
+        }
+    ]
+}

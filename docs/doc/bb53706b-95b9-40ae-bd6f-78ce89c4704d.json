@@ -1,0 +1,15 @@
+{
+    "summary": "This code defines an abstract base class `VectorStore` for a vector store interface, with methods for adding embeddings, deleting entries, and performing similarity search. An ABC method is also provided for saving a FAISS index and key mapping to disk.",
+    "details": [
+        {
+            "comment": "This code defines an abstract base class `VectorStore` for a vector store interface, with three methods: `add_embeddings`, `delete`, and `similarity_search`. The `add_embeddings` method allows adding embeddings to the vector store along with their metadata. The `delete` method deletes entries from the vector store based on specified keys. Lastly, the `similarity_search` method performs similarity search operations on the vector store.",
+            "location": "\"/media/root/Prima/works/github_code/Cradle/docs/src/cradle/memory/vector_store.py\":0-44",
+            "content": "import abc\nfrom typing import (\n    Any,\n    Iterable,\n    List,\n    Dict,\n    Union,\n    Tuple,\n    Optional,\n)\nclass VectorStore(abc.ABC):\n    \"\"\"Interface for vector store.\"\"\"\n    @abc.abstractmethod\n    def add_embeddings(\n        self,\n        keys: List[str],\n        embeddings: Iterable[List[float]],\n        **kwargs: Any,\n    ) -> None:\n        \"\"\"Add embeddings to the vectorstore.\n        Args:\n            keys: list of metadatas associated with the embedding.\n            embeddings: Iterable of embeddings to add to the vectorstore.\n            kwargs: vectorstore specific parameters\n        \"\"\"\n    @abc.abstractmethod\n    def delete(self, keys: List[str] = None, **kwargs: Any) -> bool:\n        \"\"\"Delete by keys.\n        Args:\n            keys: List of keys to delete.\n            **kwargs: Other keyword arguments that subclasses might use.\n        Returns:\n            bool: True if deletion is successful,\n            False otherwise, None if not implemented.\n        \"\"\"\n    @abc.abstractmethod\n    def similarity_search("
+        },
+        {
+            "comment": "This code defines an abstract base class (ABC) method for saving a FAISS index and the associated key mapping to disk, with parameters self, embedding (a list of floats), top_k (an integer), and any additional keyword arguments. The return type is a list of tuples representing keys and their similarity scores.",
+            "location": "\"/media/root/Prima/works/github_code/Cradle/docs/src/cradle/memory/vector_store.py\":45-54",
+            "content": "        self,\n        embedding: List[float],\n        top_k: int,\n        **kwargs: Any,\n    ) -> List[Tuple[str, float]]:\n        \"\"\"Return keys most similar to query.\"\"\"\n    @abc.abstractmethod\n    def save(self, name: str) -> None:\n        \"\"\"Save FAISS index and index_to_key to disk.\"\"\""
+        }
+    ]
+}

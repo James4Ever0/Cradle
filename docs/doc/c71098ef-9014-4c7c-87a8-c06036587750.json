@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports the Logger class from cradle.log.logger and adds it to the __all__ list, making it directly importable as part of the module.",
+    "details": [
+        {
+            "comment": "This code imports the Logger class from cradle.log.logger and adds it to the __all__ list, making it directly importable as part of the module.",
+            "location": "\"/media/root/Prima/works/github_code/Cradle/docs/src/cradle/log/__init__.py\":0-4",
+            "content": "from cradle.log.logger import Logger\n__all__ = [\n    \"Logger\",\n]"
+        }
+    ]
+}

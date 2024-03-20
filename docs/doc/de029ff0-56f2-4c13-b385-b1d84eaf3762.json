@@ -1,0 +1,10 @@
+{
+    "summary": "The provided JSON file contains configuration settings for OpenAI API. Key variables include the OpenAI API key, embedding model (text-embedding-ada-002), completion model (gpt-4-vision-preview), and a flag indicating if Azure is being used.",
+    "details": [
+        {
+            "comment": "The provided JSON file contains configuration settings for OpenAI API. Key variables include the OpenAI API key, embedding model (text-embedding-ada-002), completion model (gpt-4-vision-preview), and a flag indicating if Azure is being used.",
+            "location": "\"/media/root/Prima/works/github_code/Cradle/docs/src/conf/openai_config.json\":0-5",
+            "content": "{\n\t\"key_var\" : \"OA_OPENAI_KEY\",\n\t\"emb_model\": \"text-embedding-ada-002\",\n\t\"comp_model\": \"gpt-4-vision-preview\",\n\t\"is_azure\": false\n}"
+        }
+    ]
+}

@@ -1,0 +1,15 @@
+{
+    "summary": "The code provides skills for selling products in a game, including \"sell_product\", \"sell_single_product_all_quantity\" and \"sell_one_product\". It also contains functions for switching between product types using keys 'e' and 'q', simulating key presses with the 'io_env.key_press' function.",
+    "details": [
+        {
+            "comment": "The code defines three skills for selling products in a game. The \"sell_product\" skill opens the trade bar for selling products, \"sell_single_product_all_quantity\" sells one unit of the current product by holding the \"f\" key, and \"sell_one_product\" sells one unit of the current product by pressing \"enter\". Each skill can be executed with different durations depending on user input.",
+            "location": "\"/media/root/Prima/works/github_code/Cradle/docs/src/cradle/gameio/atomic_skills/sell.py\":0-33",
+            "content": "from cradle.gameio import IOEnvironment\nfrom cradle.gameio.skill_registry import register_skill\nio_env = IOEnvironment()\n@register_skill(\"sell_product\")\ndef sell_product(duration=1):\n    \"\"\"\n    Opens the trade bar for selling products.\n    Note: it must run the shopkeeper_interaction function before running this function\n    Parameters:\n     - duration: The duration for which the \"r\" key is held down (default is 1 second).\n    \"\"\"\n    io_env.key_hold('r', duration)\n@register_skill(\"sell_single_product_all_quantity\")\ndef sell_single_product_all_quantity(duration=1.0):\n    \"\"\"\n    Presses and holds the \"f\" key to sell the quantity of one unit of the current product.\n    Note: The product quantity must be greater than one.\n    Parameters:\n     - duration: The duration for which the \"f\" key is held down in seconds (default is 1.0 second).\n    \"\"\"\n    io_env.key_hold('f', duration)\n@register_skill(\"sell_one_product\")\ndef sell_one_product():\n    \"\"\"\n    Presses \"enter\" to sell one unit of the current product.\n    \"\"\""
+        },
+        {
+            "comment": "This code contains three functions: \"switch_to_next_product_type\", \"switch_to_previous_product_type\". It presses \"e\" and \"q\" respectively to switch between product types. The 'io_env.key_press' function simulates key presses.",
+            "location": "\"/media/root/Prima/works/github_code/Cradle/docs/src/cradle/gameio/atomic_skills/sell.py\":34-54",
+            "content": "    io_env.key_press('enter')\n@register_skill(\"switch_to_next_product_type\")\ndef switch_to_next_product_type():\n    \"\"\"\n    Presses \"e\" to switch to the next product type.\n    \"\"\"\n    io_env.key_press('e')\n@register_skill(\"switch_to_previous_product_type\")\ndef switch_to_previous_product_type():\n    \"\"\"\n    Presses \"q\" to switch to the previous product type.\n    \"\"\"\n    io_env.key_press('q')\n__all__ = [\n]"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "summary": "This code imports necessary classes and sets up a list of providers for LLMs (Language Models) and embeddings. These providers are used in the \"Cradle\" framework, which likely involves natural language processing tasks.",
+    "details": [
+        {
+            "comment": "This code imports necessary classes and sets up a list of providers for LLMs (Language Models) and embeddings. These providers are used in the \"Cradle\" framework, which likely involves natural language processing tasks.",
+            "location": "\"/media/root/Prima/works/github_code/Cradle/docs/src/cradle/provider/__init__.py\":0-10",
+            "content": "from cradle.provider.base_embedding import EmbeddingProvider\nfrom cradle.provider.base_llm import LLMProvider\nfrom cradle.provider.openai import OpenAIProvider\nfrom cradle.provider.gd_provider import GdProvider\n__all__ = [\n    \"LLMProvider\",\n    \"EmbeddingProvider\",\n    \"OpenAIProvider\",\n    \"GdProvider\"\n]"
+        }
+    ]
+}
